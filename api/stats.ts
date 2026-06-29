@@ -1,5 +1,5 @@
 // GET /api/stats — public, anonymised aggregate usage statistics.
-import { getNum, scard, ALPHABET, K, storeEnabled } from './_lib';
+import { getNum, scard, ALPHABET, K, storeEnabled } from './_lib.js';
 
 type Res = {
   status: (code: number) => Res;

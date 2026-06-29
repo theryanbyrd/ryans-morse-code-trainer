@@ -1,6 +1,6 @@
 // POST /api/track — ingest a single anonymous, consent-gated learning event.
 // Only aggregate counters are stored; no per-user data is retained.
-import { incr, sadd, readJson, ALPHABET, K, storeEnabled } from './_lib';
+import { incr, sadd, readJson, ALPHABET, K, storeEnabled } from './_lib.js';
 
 type Req = { method?: string; body?: unknown };
 type Res = {

@@ -1,7 +1,7 @@
 // GET /api/data-dump — public anonymised data export.
 //   /api/data-dump            → JSON
 //   /api/data-dump?format=csv → CSV (per-letter table)
-import { getNum, ALPHABET, K, storeEnabled } from './_lib';
+import { getNum, ALPHABET, K, storeEnabled } from './_lib.js';
 
 type Req = { query?: Record<string, string | string[]> };
 type Res = {
