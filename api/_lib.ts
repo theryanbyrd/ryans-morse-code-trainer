@@ -1,3 +1,4 @@
+/// <reference types="node" />
 // Shared server helpers. Files prefixed with "_" are not turned into routes by
 // Vercel, so this is just a module the handlers import.
 //
