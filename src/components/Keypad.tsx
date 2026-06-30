@@ -1,14 +1,14 @@
 import { DotIcon, DashIcon } from './Icons';
 
-export type KeyAction = 'dot' | 'dash' | 'commit' | 'delete';
+export type KeyAction = 'dot' | 'dash' | 'delete';
 
-// Scanning order for one-switch mode.
-export const SCAN_ORDER: KeyAction[] = ['dot', 'dash', 'commit', 'delete'];
+// Scanning order for one-switch mode. There's no "enter" — answers are judged
+// automatically once the pattern is the right length.
+export const SCAN_ORDER: KeyAction[] = ['dot', 'dash', 'delete'];
 
 const LABELS: Record<KeyAction, string> = {
   dot: 'Dot',
   dash: 'Dash',
-  commit: 'Enter',
   delete: 'Delete',
 };
 
@@ -43,12 +43,11 @@ export function Keypad({
       </div>
       <div className="key-row secondary">
         {tile('delete', <span className="key-text">⌫ Delete</span>)}
-        {tile('commit', <span className="key-text">↵ Enter</span>)}
       </div>
       {!oneSwitch && (
         <p className="key-hint">
-          Keyboard: <b>J</b> or <b>.</b> = dot · <b>K</b> or <b>-</b> = dash · <b>Space</b> = enter ·{' '}
-          <b>⌫</b> = delete
+          Keyboard: <b>J</b> or <b>.</b> = dot · <b>K</b> or <b>-</b> = dash · <b>⌫</b> = delete.
+          Answers check themselves once the code is complete.
         </p>
       )}
     </div>

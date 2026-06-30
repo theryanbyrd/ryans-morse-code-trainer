@@ -9,6 +9,7 @@ import {
   playDot,
   playPattern,
   playWrong,
+  speak,
   speakLetterHint,
 } from '../lib/audio';
 import { LetterCard } from './LetterCard';
@@ -18,8 +19,8 @@ import { Keypad, SCAN_ORDER } from './Keypad';
 import type { KeyAction } from './Keypad';
 import { Completion } from './Completion';
 
-const ADVANCE_DELAY = 700;
-const WRONG_DELAY = 650;
+const ADVANCE_DELAY = 850;
+const WRONG_DELAY = 700;
 const INPUT_LOCK_MS = 350; // brief debounce after a new letter loads
 
 export function Game({ onOpenStats }: { onOpenStats: () => void }) {
@@ -56,56 +57,70 @@ export function Game({ onOpenStats }: { onOpenStats: () => void }) {
 
   const advance = useCallback((fromProgress: typeof progress, avoid: string | null) => {
     const next = pickNext(fromProgress, avoid);
+    inputRef.current = '';
     setInput('');
     setFeedback('idle');
     setCurrent(next);
   }, []);
 
-  const doCommit = useCallback(() => {
-    const cur = currentRef.current;
-    const seq = inputRef.current;
-    if (!cur || seq === '' || feedbackRef.current !== 'idle') return;
+  // Auto-evaluate: as soon as the entered pattern reaches the target's length,
+  // we judge it — no separate "enter" step, just like the original.
+  const evaluate = useCallback(
+    (seq: string) => {
+      const cur = currentRef.current;
+      if (!cur) return;
+      const correct = seq === MORSE[cur.letter];
+      setFeedback(correct ? 'correct' : 'wrong');
 
-    const correct = seq === MORSE[cur.letter];
-    setFeedback(correct ? 'correct' : 'wrong');
-    if (settingsRef.current.sound) (correct ? playCorrect : playWrong)();
+      if (correct) {
+        if (settingsRef.current.speechHints) speak('Correct!');
+        else if (settingsRef.current.sound) playCorrect();
+      } else if (settingsRef.current.sound) {
+        playWrong();
+      }
 
-    const nextProgress = recordAnswer(cur.letter, correct);
+      const nextProgress = recordAnswer(cur.letter, correct);
 
-    if (correct) {
-      window.setTimeout(() => advance(nextProgress, cur.letter), ADVANCE_DELAY);
-    } else {
-      // Stay on the same letter; replay the hint and let them retry.
-      window.setTimeout(() => {
-        setInput('');
-        setFeedback('idle');
-        if (settingsRef.current.speechHints) speakLetterHint(cur.letter);
-      }, WRONG_DELAY);
-    }
-  }, [advance, recordAnswer]);
+      if (correct) {
+        window.setTimeout(() => advance(nextProgress, cur.letter), ADVANCE_DELAY);
+      } else {
+        // Stay on the same letter; clear, replay the hint, and let them retry.
+        window.setTimeout(() => {
+          inputRef.current = '';
+          setInput('');
+          setFeedback('idle');
+          if (settingsRef.current.speechHints) speakLetterHint(cur.letter);
+        }, WRONG_DELAY);
+      }
+    },
+    [advance, recordAnswer],
+  );
 
   const handleAction = useCallback(
     (a: KeyAction) => {
       if (Date.now() < lockUntil.current) return;
       if (feedbackRef.current !== 'idle') return;
-      switch (a) {
-        case 'dot':
-          setInput((i) => i + '.');
-          if (settingsRef.current.sound) playDot();
-          break;
-        case 'dash':
-          setInput((i) => i + '-');
-          if (settingsRef.current.sound) playDash();
-          break;
-        case 'delete':
-          setInput((i) => i.slice(0, -1));
-          break;
-        case 'commit':
-          doCommit();
-          break;
+      const cur = currentRef.current;
+      if (!cur) return;
+
+      if (a === 'delete') {
+        const next = inputRef.current.slice(0, -1);
+        inputRef.current = next;
+        setInput(next);
+        return;
+      }
+
+      if (a === 'dot' || a === 'dash') {
+        const sym = a === 'dot' ? '.' : '-';
+        const next = inputRef.current + sym;
+        inputRef.current = next;
+        setInput(next);
+        if (settingsRef.current.sound) (a === 'dot' ? playDot : playDash)();
+        // Reached the target length → judge it immediately.
+        if (next.length >= MORSE[cur.letter].length) evaluate(next);
       }
     },
-    [doCommit],
+    [evaluate],
   );
   const handleActionRef = useRef(handleAction);
   handleActionRef.current = handleAction;
@@ -144,10 +159,7 @@ export function Game({ onOpenStats }: { onOpenStats: () => void }) {
       const k = e.key.toLowerCase();
       if (k === 'j' || e.key === '.') handleActionRef.current('dot');
       else if (k === 'k' || e.key === '-') handleActionRef.current('dash');
-      else if (e.key === ' ') {
-        e.preventDefault();
-        handleActionRef.current('commit');
-      } else if (e.key === 'Backspace' || e.key === 'Delete' || k === 'i') {
+      else if (e.key === 'Backspace' || e.key === 'Delete' || k === 'i') {
         e.preventDefault();
         handleActionRef.current('delete');
       }
