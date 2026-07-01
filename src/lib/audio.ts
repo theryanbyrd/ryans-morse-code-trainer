@@ -1,14 +1,16 @@
 // Audio, using the original Morse Learn mp3 assets under /assets/sounds.
-// Dot/dash beeps, spoken correct/wrong feedback, and the "sounds-alike" mnemonic
-// clips all come from the original recordings. A tiny bit of SpeechSynthesis is
-// kept only for the completion message, which has no recorded asset.
+//
+// iOS Safari only lets audio start from a user gesture, and cloned <audio>
+// elements are NOT unlocked by that gesture. So we keep ONE reusable element
+// per sound, "prime" the core ones during the first tap (play → pause), and
+// replay by rewinding the same element. A little SpeechSynthesis is kept only
+// for the completion message, which has no recorded asset.
 
 const BASE = '/assets/sounds';
 
-// One cached <audio> per URL; we clone it per play so sounds can overlap.
 const cache = new Map<string, HTMLAudioElement>();
 
-function base(url: string): HTMLAudioElement {
+function el(url: string): HTMLAudioElement {
   let a = cache.get(url);
   if (!a) {
     a = new Audio(url);
@@ -20,9 +22,13 @@ function base(url: string): HTMLAudioElement {
 
 function play(url: string, volume = 1): HTMLAudioElement | null {
   try {
-    const a = base(url).cloneNode(true) as HTMLAudioElement;
+    const a = el(url);
     a.volume = volume;
-    a.currentTime = 0;
+    try {
+      a.currentTime = 0;
+    } catch {
+      /* not yet seekable — fine */
+    }
     void a.play().catch(() => {});
     return a;
   } catch {
@@ -39,9 +45,32 @@ const url = {
   soundalike: (l: string) => `${BASE}/soundalikes-mw/${l.toLowerCase()}.mp3`,
 };
 
-/** Warm up the common clips on the first user gesture so playback is snappy. */
+const CORE = [url.dot, url.dash, url.correct, url.wrong];
+
+let unlocked = false;
+
+/** Prime the core clips inside the first user gesture so iOS will play them. */
 export function unlockAudio(): void {
-  [url.dot, url.dash, url.correct, url.wrong].forEach((u) => base(u).load());
+  if (unlocked) return;
+  unlocked = true;
+  for (const u of CORE) {
+    const a = el(u);
+    a.muted = true;
+    a
+      .play()
+      .then(() => {
+        a.pause();
+        try {
+          a.currentTime = 0;
+        } catch {
+          /* ignore */
+        }
+        a.muted = false;
+      })
+      .catch(() => {
+        a.muted = false;
+      });
+  }
 }
 
 export function playDot(): void {

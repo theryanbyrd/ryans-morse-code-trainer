@@ -17,7 +17,14 @@
 
 * { box-sizing: border-box; }
 
-html, body, #root { height: 100%; margin: 0; }
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  /* iOS: fill the visual viewport reliably */
+  min-height: -webkit-fill-available;
+}
+
+html { -webkit-text-size-adjust: 100%; }
 
 body {
   font-family: var(--font);
@@ -25,15 +32,37 @@ body {
   color: #fff;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
+  /* Kill iOS tap flash, long-press callouts, and accidental text selection
+     during rapid tapping. Inputs re-enable selection below. */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
 }
 
-button { font-family: inherit; cursor: pointer; }
+button {
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+img { -webkit-user-drag: none; user-select: none; }
+
+input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px; }
 
 .app {
-  min-height: 100%;
   display: flex;
   flex-direction: column;
   background: var(--red);
+  /* Fallback → iOS fill-available → modern dynamic viewport height */
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  min-height: 100dvh;
+  /* Respect the notch / home indicator on the sides */
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 /* ---------- Top chrome ---------- */
@@ -42,6 +71,7 @@ button { font-family: inherit; cursor: pointer; }
   justify-content: space-between;
   align-items: center;
   padding: 14px 16px;
+  padding-top: calc(14px + env(safe-area-inset-top));
   gap: 12px;
 }
 .chrome-left { display: flex; align-items: center; gap: 10px; }
@@ -90,11 +120,17 @@ button { font-family: inherit; cursor: pointer; }
 .stage {
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
   padding: 8px 16px 28px;
+  padding-bottom: calc(28px + env(safe-area-inset-bottom));
   position: relative;
+  /* On short screens, let the play area scroll rather than clip. */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
+/* Center the single child vertically, but keep the top reachable on overflow. */
+.stage > * { margin-top: auto; margin-bottom: auto; }
 
 /* ---------- Start screen ---------- */
 .start-screen {
@@ -327,13 +363,15 @@ button { font-family: inherit; cursor: pointer; }
 .modal-backdrop {
   position: fixed; inset: 0; background: rgba(0,0,0,0.45);
   display: flex; align-items: center; justify-content: center;
-  padding: 20px; z-index: 50; animation: fade 0.15s ease;
+  padding: calc(20px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom));
+  z-index: 50; animation: fade 0.15s ease;
 }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 .modal {
   background: #fff; color: var(--ink);
   border-radius: 22px; width: 100%; max-width: 440px;
-  max-height: 88vh; overflow-y: auto;
+  max-height: 88dvh; overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 22px; box-shadow: var(--shadow);
 }
 .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
@@ -413,7 +451,7 @@ button { font-family: inherit; cursor: pointer; }
 .code-box {
   width: 100%; min-height: 110px; border-radius: 12px;
   border: 1px solid #ddd; padding: 12px; font-family: ui-monospace, monospace;
-  font-size: 13px; resize: vertical; color: var(--ink); margin-top: 6px;
+  font-size: 16px; resize: vertical; color: var(--ink); margin-top: 6px;
 }
 .note { background: #fff7e6; border-radius: 10px; padding: 10px 12px; font-size: 14px; }
 .error-text { color: var(--red-deep); font-weight: 600; }
@@ -431,4 +469,34 @@ button { font-family: inherit; cursor: pointer; }
 @media (max-width: 380px) {
   .key-glyph { width: 38px; height: 38px; }
   .mnemonic-art { width: 96px; height: 96px; }
+  .mnemonic-img { width: 104px; height: 104px; }
+}
+
+/* Compact vertical layout so the whole game fits on short iPhones
+   (SE ~667px, and any device with the URL bar showing) without scrolling.
+   The big letter circle and keyboard hint are dropped — the highlighted word
+   brick already shows the current letter, and touch users tap the buttons. */
+@media (max-height: 760px) {
+  .game { gap: 8px; }
+  .conveyor { height: 34px; }
+  .letter-card { padding: 14px 18px 16px; gap: 8px; border-radius: 22px; }
+  .word-bricks { gap: 6px; margin-bottom: 0; }
+  .brick { width: 38px; height: 44px; font-size: 22px; }
+  .letter-circle { display: none; }
+  .mnemonic-img { width: 96px; height: 96px; }
+  .live-decode { min-height: 46px; padding: 8px 16px; }
+  .key-row.main .key { height: 72px; }
+  .key-row.secondary .key { height: 44px; }
+  .key-glyph { width: 40px; height: 40px; }
+  .play-pattern { padding: 6px 16px; }
+  .key-hint { display: none; }
+  .alphabet-bar { padding: 2px 16px 6px; }
+}
+
+@media (max-height: 640px) {
+  .conveyor { display: none; }
+  .letter-card { padding: 12px 16px 14px; gap: 6px; }
+  .brick { width: 34px; height: 40px; font-size: 20px; }
+  .mnemonic-img { width: 80px; height: 80px; }
+  .key-row.main .key { height: 64px; }
 }
