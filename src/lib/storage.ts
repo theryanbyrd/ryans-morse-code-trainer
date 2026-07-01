@@ -13,6 +13,9 @@ export type Settings = {
   oneSwitch: boolean;
   trackingConsent: boolean;
   scanIntervalMs: number; // one-switch dwell time
+  // Receive mode: character speed (WPM) and Farnsworth (extra-spaced) timing.
+  wpm: number;
+  farnsworth: boolean;
 };
 
 export type LetterStat = {
@@ -34,6 +37,20 @@ export type Progress = {
   playMs: number;
 };
 
+// Receive (listening) mode keeps its own per-letter mastery, independent of Send.
+export type ReceiveLetterStat = {
+  attempts: number;
+  correct: number;
+  wrong: number;
+  score: number;
+};
+
+export type ReceiveProgress = {
+  letters: Record<string, ReceiveLetterStat>;
+  totalAnswered: number;
+  playMs: number;
+};
+
 export const START_LETTERS = 3;
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -44,6 +61,8 @@ export const DEFAULT_SETTINGS: Settings = {
   oneSwitch: false,
   trackingConsent: false,
   scanIntervalMs: 1200,
+  wpm: 12,
+  farnsworth: true,
 };
 
 export function freshProgress(): Progress {
@@ -54,6 +73,14 @@ export function freshProgress(): Progress {
   return { letters, lettersInPlay: START_LETTERS, consecutiveCorrect: 0, totalAnswered: 0, playMs: 0 };
 }
 
+export function freshReceiveProgress(): ReceiveProgress {
+  const letters: Record<string, ReceiveLetterStat> = {};
+  for (const l of TEACHING_ORDER) {
+    letters[l] = { attempts: 0, correct: 0, wrong: 0, score: 0 };
+  }
+  return { letters, totalAnswered: 0, playMs: 0 };
+}
+
 export function load(): SaveState {
   try {
     const raw = localStorage.getItem(KEY);
@@ -62,18 +89,30 @@ export function load(): SaveState {
       return {
         settings: { ...DEFAULT_SETTINGS, ...(parsed.settings ?? {}) },
         progress: hydrateProgress(parsed.progress),
+        receive: hydrateReceive(parsed.receive),
       };
     }
   } catch {
     /* ignore corrupt storage */
   }
-  return { settings: { ...DEFAULT_SETTINGS }, progress: freshProgress() };
+  return { settings: { ...DEFAULT_SETTINGS }, progress: freshProgress(), receive: freshReceiveProgress() };
 }
 
 export type SaveState = {
   settings: Settings;
   progress: Progress;
+  receive: ReceiveProgress;
 };
+
+function hydrateReceive(r?: Partial<ReceiveProgress>): ReceiveProgress {
+  const base = freshReceiveProgress();
+  if (!r) return base;
+  return {
+    letters: { ...base.letters, ...(r.letters ?? {}) },
+    totalAnswered: r.totalAnswered ?? 0,
+    playMs: r.playMs ?? 0,
+  };
+}
 
 function hydrateProgress(p?: Partial<Progress>): Progress {
   const base = freshProgress();

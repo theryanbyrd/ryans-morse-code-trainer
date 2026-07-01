@@ -4,6 +4,8 @@ import { newestLetter } from './lib/session';
 import { StartScreen } from './components/StartScreen';
 import { Onboarding } from './components/Onboarding';
 import { Game } from './components/Game';
+import { ModeSelect } from './components/ModeSelect';
+import { ReceiveGame } from './components/ReceiveGame';
 import { AlphabetBar } from './components/AlphabetBar';
 import { SettingsModal } from './components/SettingsModal';
 import { StatsScreen } from './components/StatsScreen';
@@ -15,7 +17,8 @@ import { GearIcon, HelpIcon } from './components/Icons';
 type Overlay = 'none' | 'settings' | 'stats' | 'about' | 'getcode' | 'loadcode' | 'board';
 
 export default function App() {
-  const { started, onboarded, settings, progress, progressVersion, start, finishOnboarding } = useApp();
+  const { started, onboarded, mode, settings, progress, progressVersion, start, finishOnboarding, setMode } =
+    useApp();
   const [overlay, setOverlay] = useState<Overlay>('none');
 
   // #about route opens the About screen, per the original.
@@ -38,7 +41,8 @@ export default function App() {
     setOverlay('about');
   };
 
-  const inGame = started && onboarded;
+  const inSend = started && onboarded && mode === 'send';
+  const inReceive = started && onboarded && mode === 'receive';
 
   return (
     <div className="app">
@@ -47,7 +51,12 @@ export default function App() {
           <button className="icon-btn chrome-btn" onClick={() => setOverlay('settings')} aria-label="Settings">
             <GearIcon />
           </button>
-          {settings.morseBoard && inGame && (
+          {mode && (
+            <button className="board-btn" onClick={() => setMode(null)} aria-label="Switch mode">
+              ⇄ {mode === 'send' ? 'Send' : 'Receive'}
+            </button>
+          )}
+          {settings.morseBoard && inSend && (
             <button className="board-btn" onClick={() => setOverlay('board')}>
               Morse board
             </button>
@@ -58,13 +67,17 @@ export default function App() {
         </button>
       </div>
 
-      {inGame && <AlphabetBar progress={progress} current={newestLetter(progress)} />}
+      {inSend && <AlphabetBar progress={progress} current={newestLetter(progress)} />}
 
       <main className="stage">
         {!started ? (
           <StartScreen onStart={start} />
         ) : !onboarded ? (
           <Onboarding onDone={finishOnboarding} />
+        ) : !mode ? (
+          <ModeSelect />
+        ) : inReceive ? (
+          <ReceiveGame />
         ) : (
           <Game key={progressVersion} onOpenStats={() => setOverlay('stats')} />
         )}

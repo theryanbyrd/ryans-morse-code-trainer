@@ -275,7 +275,15 @@ analytics remains separate and consent-gated.
 - **M3 — Accounts:** auth + cloud storage, first-sign-in merge, cross-device sync.
 - **M4 — History:** Stats/History screen across modes; export/delete.
 
-## 12. Open decisions (need your call)
+## 12. Decisions (locked 2026-07-01)
+1. **Auth:** Supabase (auth + Postgres).
+2. **Accounts:** optional, guest-first.
+3. **First receive input:** multiple-choice first.
+4. **Letter pool:** gate Receive on Send-learned letters.
+5. **Default speed:** 12 WPM char / Beginner Farnsworth (default; adjustable).
+6. **Build order:** M1 (Receive letters, guest-only, no backend) first; accounts in M3.
+
+### Original open questions (for reference)
 1. **Auth provider:** Supabase (auth+DB in one, recommended) vs Clerk (+separate DB)
    vs custom magic-link/JWT on our `/api` + Vercel Postgres.
 2. **Accounts required or optional?** Recommended: optional, guest-first with

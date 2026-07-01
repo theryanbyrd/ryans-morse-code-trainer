@@ -2,7 +2,14 @@ import { useApp } from '../state/AppContext';
 import type { Settings } from '../lib/storage';
 import { CloseIcon } from './Icons';
 
-type ToggleKey = 'sound' | 'speechHints' | 'visualHints' | 'morseBoard' | 'oneSwitch' | 'trackingConsent';
+type ToggleKey =
+  | 'sound'
+  | 'speechHints'
+  | 'visualHints'
+  | 'morseBoard'
+  | 'oneSwitch'
+  | 'farnsworth'
+  | 'trackingConsent';
 
 const TOGGLES: { key: ToggleKey; label: string; help: string }[] = [
   { key: 'sound', label: 'Sound', help: 'Dot/dash tones and correct/wrong cues' },
@@ -10,6 +17,7 @@ const TOGGLES: { key: ToggleKey; label: string; help: string }[] = [
   { key: 'visualHints', label: 'Visual Hints', help: 'Show the mnemonic picture for each letter' },
   { key: 'morseBoard', label: 'Morse Board', help: 'Show the A–Z reference board button' },
   { key: 'oneSwitch', label: 'One-Switch Mode', help: 'Operate everything from a single switch' },
+  { key: 'farnsworth', label: 'Beginner spacing', help: 'Extra space between letters when receiving' },
   { key: 'trackingConsent', label: 'Tracking Consent', help: 'Share anonymous learning analytics' },
 ];
 
@@ -68,6 +76,21 @@ export function SettingsModal({
               />
             </label>
           )}
+
+          <label className="toggle-row slider-row">
+            <span className="toggle-text">
+              <span className="toggle-label">Receive speed</span>
+              <span className="toggle-help">{settings.wpm} WPM (how fast the code plays)</span>
+            </span>
+            <input
+              type="range"
+              min={5}
+              max={25}
+              step={1}
+              value={settings.wpm}
+              onChange={(e) => setSetting('wpm', Number(e.target.value))}
+            />
+          </label>
         </div>
 
         <div className="action-grid">
