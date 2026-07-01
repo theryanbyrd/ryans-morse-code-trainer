@@ -1,5 +1,4 @@
 import { MORSE } from '../data/morse';
-import { MNEMONICS } from '../data/mnemonics';
 import { Pattern } from './Pattern';
 import type { Settings } from '../lib/storage';
 
@@ -20,7 +19,6 @@ export function WordCard({
   feedback: 'idle' | 'correct' | 'wrong';
 }) {
   const letter = word[index];
-  const mnemonic = MNEMONICS[letter];
 
   return (
     <div className={`letter-card ${feedback}`}>
@@ -37,10 +35,13 @@ export function WordCard({
 
       <div className="letter-circle">{letter.toUpperCase()}</div>
 
-      {hint && settings.visualHints && mnemonic && (
+      {hint && settings.visualHints && (
         <div className="mnemonic">
-          <div className="mnemonic-art">{mnemonic.icon}</div>
-          <div className="mnemonic-word">{mnemonic.word}</div>
+          <img
+            className="mnemonic-img"
+            src={`/assets/images/final/${letter.toUpperCase()}.png`}
+            alt=""
+          />
         </div>
       )}
 

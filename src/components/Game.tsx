@@ -3,13 +3,12 @@ import { MORSE } from '../data/morse';
 import { useApp } from '../state/AppContext';
 import { hintActive, isCourseComplete, pickWord } from '../lib/session';
 import {
+  playCorrect,
   playDash,
   playDot,
+  playLetterHint,
   playPattern,
-  playTick,
   playWrong,
-  speak,
-  speakLetterHint,
 } from '../lib/audio';
 import { WordCard } from './WordCard';
 import { LiveDecode } from './LiveDecode';
@@ -57,12 +56,12 @@ export function Game({ onOpenStats }: { onOpenStats: () => void }) {
     return () => clearInterval(t);
   }, [addPlayTime]);
 
-  // On each new letter: brief input lock, and speak the hint if it's active.
+  // On each new letter: brief input lock, and play the hint if it's active.
   useEffect(() => {
     lockUntil.current = Date.now() + INPUT_LOCK_MS;
     const l = wordRef.current[indexRef.current];
     if (l && settingsRef.current.speechHints && hintActive(progressRef.current, l)) {
-      speakLetterHint(l);
+      playLetterHint(l);
     }
   }, [word, index]);
 
@@ -95,10 +94,8 @@ export function Game({ onOpenStats }: { onOpenStats: () => void }) {
       setFeedback(correct ? 'correct' : 'wrong');
 
       if (correct) {
-        // Say "Correct!" after every correct letter (fall back to a tone when
-        // speech is off).
-        if (settingsRef.current.speechHints) speak('Correct!');
-        else if (settingsRef.current.sound) playTick();
+        // The original's recorded "correct" clip, after every correct letter.
+        if (settingsRef.current.sound) playCorrect();
       } else if (settingsRef.current.sound) {
         playWrong();
       }
@@ -114,7 +111,7 @@ export function Game({ onOpenStats }: { onOpenStats: () => void }) {
           inputRef.current = '';
           setInput('');
           setFeedback('idle');
-          if (settingsRef.current.speechHints) speakLetterHint(l);
+          if (settingsRef.current.speechHints) playLetterHint(l);
         }, WRONG_DELAY);
       }
     },

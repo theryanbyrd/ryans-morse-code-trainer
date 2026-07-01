@@ -1,108 +1,108 @@
-// Audio: Morse dot/dash tones, correct/wrong cues, and spoken hints.
-// Built on the Web Audio API + SpeechSynthesis — no audio files needed.
+// Audio, using the original Morse Learn mp3 assets under /assets/sounds.
+// Dot/dash beeps, spoken correct/wrong feedback, and the "sounds-alike" mnemonic
+// clips all come from the original recordings. A tiny bit of SpeechSynthesis is
+// kept only for the completion message, which has no recorded asset.
 
-import { MNEMONICS } from '../data/mnemonics';
+const BASE = '/assets/sounds';
 
-let ctx: AudioContext | null = null;
+// One cached <audio> per URL; we clone it per play so sounds can overlap.
+const cache = new Map<string, HTMLAudioElement>();
 
-function audioCtx(): AudioContext | null {
-  if (typeof window === 'undefined') return null;
-  if (!ctx) {
-    const Ctor =
-      window.AudioContext ||
-      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    if (!Ctor) return null;
-    ctx = new Ctor();
+function base(url: string): HTMLAudioElement {
+  let a = cache.get(url);
+  if (!a) {
+    a = new Audio(url);
+    a.preload = 'auto';
+    cache.set(url, a);
   }
-  if (ctx.state === 'suspended') void ctx.resume();
-  return ctx;
+  return a;
 }
 
-/** Call once on first user gesture so audio is allowed to play. */
+function play(url: string, volume = 1): HTMLAudioElement | null {
+  try {
+    const a = base(url).cloneNode(true) as HTMLAudioElement;
+    a.volume = volume;
+    a.currentTime = 0;
+    void a.play().catch(() => {});
+    return a;
+  } catch {
+    return null;
+  }
+}
+
+const url = {
+  dot: `${BASE}/dot.mp3`,
+  dash: `${BASE}/dash.mp3`,
+  correct: `${BASE}/correct.mp3`,
+  wrong: `${BASE}/wrong.mp3`,
+  letter: (l: string) => `${BASE}/${l.toLowerCase()}.mp3`,
+  soundalike: (l: string) => `${BASE}/soundalikes-mw/${l.toLowerCase()}.mp3`,
+};
+
+/** Warm up the common clips on the first user gesture so playback is snappy. */
 export function unlockAudio(): void {
-  audioCtx();
+  [url.dot, url.dash, url.correct, url.wrong].forEach((u) => base(u).load());
 }
-
-function tone(freq: number, durationMs: number, when = 0, type: OscillatorType = 'sine', gain = 0.18) {
-  const ac = audioCtx();
-  if (!ac) return;
-  const t0 = ac.currentTime + when;
-  const osc = ac.createOscillator();
-  const g = ac.createGain();
-  osc.type = type;
-  osc.frequency.value = freq;
-  // Soft attack/release to avoid clicks.
-  g.gain.setValueAtTime(0, t0);
-  g.gain.linearRampToValueAtTime(gain, t0 + 0.008);
-  g.gain.setValueAtTime(gain, t0 + durationMs / 1000 - 0.02);
-  g.gain.linearRampToValueAtTime(0, t0 + durationMs / 1000);
-  osc.connect(g).connect(ac.destination);
-  osc.start(t0);
-  osc.stop(t0 + durationMs / 1000 + 0.02);
-}
-
-const DOT_MS = 90;
-const DASH_MS = 240;
-const FREQ = 620;
 
 export function playDot(): void {
-  tone(FREQ, DOT_MS);
+  play(url.dot);
 }
 
 export function playDash(): void {
-  tone(FREQ, DASH_MS);
-}
-
-/** Play a full dot/dash pattern (e.g. for a hint), with correct spacing. */
-export function playPattern(pattern: string): void {
-  let when = 0;
-  for (const ch of pattern) {
-    const dur = ch === '-' ? DASH_MS : DOT_MS;
-    tone(FREQ, dur, when);
-    when += dur / 1000 + DOT_MS / 1000; // inter-element gap
-  }
+  play(url.dash);
 }
 
 export function playCorrect(): void {
-  tone(660, 110, 0);
-  tone(880, 160, 0.1);
-}
-
-/** A light blip for each correct letter within a word. */
-export function playTick(): void {
-  tone(780, 70, 0, 'sine', 0.14);
+  play(url.correct);
 }
 
 export function playWrong(): void {
-  tone(220, 200, 0, 'square', 0.12);
-  tone(160, 240, 0.06, 'square', 0.12);
+  play(url.wrong);
 }
 
-// ----- Speech ----------------------------------------------------------------
-
-let voicesReady = false;
-function ensureVoices() {
-  if (voicesReady || typeof speechSynthesis === 'undefined') return;
-  speechSynthesis.getVoices();
-  voicesReady = true;
+/** Play a full dot/dash pattern (for the "Hear the code" button). */
+export function playPattern(pattern: string): void {
+  let when = 0;
+  for (const ch of pattern) {
+    const isDash = ch === '-';
+    window.setTimeout(() => play(isDash ? url.dash : url.dot), when);
+    when += (isDash ? 620 : 230) + 90;
+  }
 }
+
+// ----- Spoken hints (the recorded "sounds-alike" mnemonics) -------------------
+
+let hintAudio: HTMLAudioElement | null = null;
 
 export function cancelSpeech(): void {
+  if (hintAudio) {
+    try {
+      hintAudio.pause();
+    } catch {
+      /* ignore */
+    }
+    hintAudio = null;
+  }
   if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel();
 }
 
+/** Play the recorded "sounds-alike" mnemonic clip for a letter. */
+export function playLetterHint(letter: string): void {
+  cancelSpeech();
+  hintAudio = play(url.soundalike(letter));
+}
+
+/** Spoken letter name (e.g. "S"). */
+export function playLetterName(letter: string): void {
+  play(url.letter(letter));
+}
+
+// ----- SpeechSynthesis fallback (completion message only) --------------------
+
 export function speak(text: string, rate = 1): void {
   if (typeof speechSynthesis === 'undefined') return;
-  ensureVoices();
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   u.rate = rate;
-  u.pitch = 1;
   speechSynthesis.speak(u);
-}
-
-/** Spoken hint for a letter: the letter name plus its picture word. */
-export function speakLetterHint(letter: string): void {
-  const word = MNEMONICS[letter]?.word ?? '';
-  speak(`${letter.toUpperCase()}. ${word}`);
 }

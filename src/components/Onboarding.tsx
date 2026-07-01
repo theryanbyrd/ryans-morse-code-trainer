@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { DotIcon, DashIcon } from './Icons';
-import { MNEMONICS } from '../data/mnemonics';
 import { Pattern } from './Pattern';
 
 const SLIDES = [
@@ -19,7 +18,7 @@ const SLIDES = [
     body: 'A is an archer — the dot is the nock, the dash is the long arrow. Picture it and the code sticks.',
     art: (
       <div className="ob-letter">
-        <div className="ob-mnemonic">{MNEMONICS.a.icon}</div>
+        <img className="ob-mnemonic-img" src="/assets/images/final/A.png" alt="" />
         <Pattern pattern=".-" size={20} />
       </div>
     ),
