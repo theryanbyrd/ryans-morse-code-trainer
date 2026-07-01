@@ -1,4 +1,5 @@
 import { ALPHABET } from '../data/morse';
+import { LEARNED_THRESHOLD } from '../lib/session';
 import type { Progress } from '../lib/storage';
 
 // Persistent A–Z strip; learned letters are highlighted.
@@ -6,7 +7,7 @@ export function AlphabetBar({ progress, current }: { progress: Progress; current
   return (
     <div className="alphabet-bar" role="img" aria-label="Alphabet progress">
       {ALPHABET.map((l) => {
-        const learned = progress.letters[l]?.learned;
+        const learned = (progress.letters[l]?.score ?? 0) >= LEARNED_THRESHOLD;
         const isCurrent = l === current;
         return (
           <span

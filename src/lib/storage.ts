@@ -19,21 +19,22 @@ export type LetterStat = {
   attempts: number;
   correct: number;
   wrong: number;
-  streak: number;
-  learned: boolean;
+  // Cumulative mastery score (+1 correct, -1 wrong) — drives "learned" status.
+  score: number;
+  // The mnemonic hint follows the LAST outcome: hidden after a correct answer,
+  // shown again after a wrong one (and shown the very first time).
+  hideHint: boolean;
 };
 
 export type Progress = {
   letters: Record<string, LetterStat>;
-  introduced: number; // how many letters from TEACHING_ORDER have been introduced
+  lettersInPlay: number; // how many letters from TEACHING_ORDER are currently in play
+  consecutiveCorrect: number; // consecutive clean words (drives new-letter introduction)
   totalAnswered: number;
   playMs: number;
 };
 
-export type SaveState = {
-  settings: Settings;
-  progress: Progress;
-};
+export const START_LETTERS = 3;
 
 export const DEFAULT_SETTINGS: Settings = {
   sound: true,
@@ -48,9 +49,9 @@ export const DEFAULT_SETTINGS: Settings = {
 export function freshProgress(): Progress {
   const letters: Record<string, LetterStat> = {};
   for (const l of TEACHING_ORDER) {
-    letters[l] = { attempts: 0, correct: 0, wrong: 0, streak: 0, learned: false };
+    letters[l] = { attempts: 0, correct: 0, wrong: 0, score: 0, hideHint: false };
   }
-  return { letters, introduced: 1, totalAnswered: 0, playMs: 0 };
+  return { letters, lettersInPlay: START_LETTERS, consecutiveCorrect: 0, totalAnswered: 0, playMs: 0 };
 }
 
 export function load(): SaveState {
@@ -69,12 +70,18 @@ export function load(): SaveState {
   return { settings: { ...DEFAULT_SETTINGS }, progress: freshProgress() };
 }
 
+export type SaveState = {
+  settings: Settings;
+  progress: Progress;
+};
+
 function hydrateProgress(p?: Partial<Progress>): Progress {
   const base = freshProgress();
   if (!p) return base;
   return {
     letters: { ...base.letters, ...(p.letters ?? {}) },
-    introduced: p.introduced ?? base.introduced,
+    lettersInPlay: Math.max(START_LETTERS, p.lettersInPlay ?? base.lettersInPlay),
+    consecutiveCorrect: p.consecutiveCorrect ?? 0,
     totalAnswered: p.totalAnswered ?? 0,
     playMs: p.playMs ?? 0,
   };

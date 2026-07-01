@@ -1,92 +1,105 @@
-// Pure helpers driving the learning loop: which letter to show next, and how an
-// answer updates progress. Letters are introduced in TEACHING_ORDER, become
-// "learned" after LEARNED_THRESHOLD correct answers, and previously-learned
-// letters are mixed back in for spaced review.
+// Word-based learning loop, mirroring the original Morse Learn pacing.
+//
+// - Letters are introduced a few at a time (starting with e, t, a). A new letter
+//   is added only after a run of clean words (CONSECUTIVE_CORRECT).
+// - We show real words spelled only from the letters currently "in play",
+//   prioritising the newest letter so it gets drilled.
+// - Each letter carries a score (+1 correct, -1 wrong). The mnemonic hint shows
+//   only while the score is below HINT_THRESHOLD, so getting a letter right
+//   hides its hint next time, and getting it wrong brings the hint back.
 
-import { TEACHING_ORDER } from '../data/morse';
+import { TEACHING_ORDER, MORSE } from '../data/morse';
+import { WORDS } from '../data/words';
 import type { Progress } from './storage';
 
-// A letter is marked learned after one correct answer; previously-learned
-// letters are then mixed back in for spaced review (see pickNext).
-export const LEARNED_THRESHOLD = 1;
-const REVIEW_EVERY = 4; // every 4th question reviews an already-learned letter
+export const LEARNED_THRESHOLD = 2; // score at which a letter counts as "learned"
+export const CONSECUTIVE_CORRECT = 3; // clean words needed to introduce a new letter
+export const SCORE_MAX = LEARNED_THRESHOLD + 2;
 
-export function introducedLetters(p: Progress): string[] {
-  return TEACHING_ORDER.slice(0, p.introduced);
+function score(p: Progress, letter: string): number {
+  return p.letters[letter]?.score ?? 0;
+}
+
+export function lettersInPlayList(p: Progress): string[] {
+  return TEACHING_ORDER.slice(0, p.lettersInPlay);
 }
 
 export function learnedLetters(p: Progress): string[] {
-  return TEACHING_ORDER.filter((l) => p.letters[l]?.learned);
+  return TEACHING_ORDER.filter((l) => score(p, l) >= LEARNED_THRESHOLD);
 }
 
 export function learnedCount(p: Progress): number {
   return learnedLetters(p).length;
 }
 
+/** The most recently introduced letter — the one we're actively teaching. */
+export function newestLetter(p: Progress): string {
+  return TEACHING_ORDER[Math.min(p.lettersInPlay, TEACHING_ORDER.length) - 1];
+}
+
 export function isCourseComplete(p: Progress): boolean {
-  return TEACHING_ORDER.every((l) => p.letters[l]?.learned);
+  return p.lettersInPlay >= TEACHING_ORDER.length && TEACHING_ORDER.every((l) => score(p, l) >= LEARNED_THRESHOLD);
 }
-
-/** The active letter the learner is currently working to master, or null. */
-export function activeLetter(p: Progress): string | null {
-  return introducedLetters(p).find((l) => !p.letters[l].learned) ?? null;
-}
-
-export type Pick = { letter: string; isReview: boolean };
 
 /**
- * Decide which letter to present next. Returns null only when the whole course
- * is complete. `avoid` is the previously shown letter (we try not to repeat).
+ * Should the mnemonic hint be shown for this letter right now? It follows the
+ * last outcome: shown until first correct, hidden after a correct answer, and
+ * shown again the moment you get it wrong.
  */
-export function pickNext(p: Progress, avoid: string | null): Pick | null {
-  if (isCourseComplete(p)) return null;
-
-  const active = activeLetter(p);
-  const learned = learnedLetters(p);
-
-  const wantReview =
-    learned.length > 0 && p.totalAnswered > 0 && p.totalAnswered % REVIEW_EVERY === REVIEW_EVERY - 1;
-
-  if (wantReview) {
-    const pool = learned.filter((l) => l !== avoid);
-    const choice = (pool.length ? pool : learned)[
-      Math.floor(Math.random() * (pool.length ? pool.length : learned.length))
-    ];
-    return { letter: choice, isReview: true };
-  }
-
-  if (active) return { letter: active, isReview: false };
-
-  // Everything introduced so far is learned — the reducer will introduce the
-  // next letter; report it here so the UI can show it immediately.
-  if (p.introduced < TEACHING_ORDER.length) {
-    return { letter: TEACHING_ORDER[p.introduced], isReview: false };
-  }
-  return null;
+export function hintActive(p: Progress, letter: string): boolean {
+  return !(p.letters[letter]?.hideHint ?? false);
 }
 
-/** Apply an answer to progress, returning a new Progress object. */
-export function applyAnswer(p: Progress, letter: string, correct: boolean): Progress {
+/** Choose the next practice word: only in-play letters, favouring the newest. */
+export function pickWord(p: Progress, avoid: string | null): string {
+  const inPlay = new Set(lettersInPlayList(p));
+  const newest = newestLetter(p);
+
+  const candidates = WORDS.filter((w) => [...w].every((c) => inPlay.has(c)));
+  if (candidates.length === 0) return newest; // extreme fallback
+
+  // Prefer words that drill the newest letter (unless it's already learned).
+  const drillNewest = score(p, newest) < LEARNED_THRESHOLD;
+  const pools = [
+    drillNewest ? candidates.filter((w) => w !== avoid && w.includes(newest)) : [],
+    candidates.filter((w) => w !== avoid),
+    candidates,
+  ];
+  const pool = pools.find((arr) => arr.length > 0) as string[];
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n));
+
+/** Apply a single letter answer: update its score and per-letter stats. */
+export function applyLetterAnswer(p: Progress, letter: string, correct: boolean): Progress {
   const letters = { ...p.letters };
-  const prev = letters[letter] ?? { attempts: 0, correct: 0, wrong: 0, streak: 0, learned: false };
-  const justLearned = !prev.learned && correct && prev.correct + 1 >= LEARNED_THRESHOLD;
+  const prev = letters[letter] ?? { attempts: 0, correct: 0, wrong: 0, score: 0, hideHint: false };
   letters[letter] = {
     attempts: prev.attempts + 1,
     correct: prev.correct + (correct ? 1 : 0),
     wrong: prev.wrong + (correct ? 0 : 1),
-    streak: correct ? prev.streak + 1 : 0,
-    learned: prev.learned || justLearned,
+    score: clamp(prev.score + (correct ? 1 : -1), 0, SCORE_MAX),
+    hideHint: correct, // hide after a correct answer, show again after a wrong one
   };
+  return { ...p, letters, totalAnswered: p.totalAnswered + 1 };
+}
 
-  let introduced = p.introduced;
-  // If the active letter was just learned and more remain, introduce the next.
-  const nextActive = introducedLetters({ ...p, letters }).find((l) => !letters[l].learned);
-  if (!nextActive && introduced < TEACHING_ORDER.length) introduced += 1;
+/**
+ * Apply end-of-word bookkeeping: track the streak of clean words and, once it
+ * reaches CONSECUTIVE_CORRECT, introduce the next letter.
+ */
+export function applyWordEnd(p: Progress, clean: boolean): Progress {
+  let consecutiveCorrect = clean ? p.consecutiveCorrect + 1 : 0;
+  let lettersInPlay = p.lettersInPlay;
+  if (consecutiveCorrect >= CONSECUTIVE_CORRECT && lettersInPlay < TEACHING_ORDER.length) {
+    lettersInPlay += 1;
+    consecutiveCorrect = 0;
+  }
+  return { ...p, consecutiveCorrect, lettersInPlay };
+}
 
-  return {
-    letters,
-    introduced,
-    totalAnswered: p.totalAnswered + 1,
-    playMs: p.playMs,
-  };
+/** Convenience: the target Morse pattern for a letter. */
+export function patternFor(letter: string): string {
+  return MORSE[letter] ?? '';
 }

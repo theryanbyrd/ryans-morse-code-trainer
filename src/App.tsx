@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useApp } from './state/AppContext';
-import { activeLetter } from './lib/session';
+import { newestLetter } from './lib/session';
 import { StartScreen } from './components/StartScreen';
 import { Onboarding } from './components/Onboarding';
 import { Game } from './components/Game';
@@ -58,7 +58,7 @@ export default function App() {
         </button>
       </div>
 
-      {inGame && <AlphabetBar progress={progress} current={activeLetter(progress)} />}
+      {inGame && <AlphabetBar progress={progress} current={newestLetter(progress)} />}
 
       <main className="stage">
         {!started ? (

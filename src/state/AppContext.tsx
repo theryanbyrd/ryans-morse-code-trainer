@@ -8,7 +8,12 @@ import {
   save,
 } from '../lib/storage';
 import type { Progress, Settings } from '../lib/storage';
-import { applyAnswer, isCourseComplete, LEARNED_THRESHOLD } from '../lib/session';
+import {
+  applyLetterAnswer,
+  applyWordEnd,
+  isCourseComplete,
+  LEARNED_THRESHOLD,
+} from '../lib/session';
 import { track } from '../lib/analytics';
 
 const ONBOARDED_KEY = 'rmct.onboarded';
@@ -23,7 +28,13 @@ type Ctx = {
   setSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
   start: () => void;
   finishOnboarding: () => void;
-  recordAnswer: (letter: string, correct: boolean) => Progress;
+  /**
+   * Record a single letter answer. `wordEnd` marks the last letter of a word
+   * (only reached on a correct answer); `wordClean` says the whole word was
+   * answered without a mistake, which drives new-letter introduction.
+   * Returns the updated progress so the caller can pick the next word.
+   */
+  answerLetter: (letter: string, correct: boolean, wordEnd: boolean, wordClean: boolean) => Progress;
   addPlayTime: (ms: number) => void;
   resetProgress: () => void;
   loadFromCode: (code: string) => boolean;
@@ -62,15 +73,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setOnboarded(true);
   }, []);
 
-  const recordAnswer = useCallback<Ctx['recordAnswer']>((letter, correct) => {
+  const answerLetter = useCallback<Ctx['answerLetter']>((letter, correct, wordEnd, wordClean) => {
     const before = progressRef.current;
-    const wasLearned = before.letters[letter]?.learned;
-    const next = applyAnswer(before, letter, correct);
+    const wasLearned = (before.letters[letter]?.score ?? 0) >= LEARNED_THRESHOLD;
+    let next = applyLetterAnswer(before, letter, correct);
+    if (correct && wordEnd) next = applyWordEnd(next, wordClean);
     setProgress(next);
 
     const consent = settingsRef.current.trackingConsent;
     track({ type: 'answer', letter, correct }, consent);
-    if (!wasLearned && next.letters[letter]?.learned) {
+    const nowLearned = (next.letters[letter]?.score ?? 0) >= LEARNED_THRESHOLD;
+    if (!wasLearned && nowLearned) {
       track({ type: 'letter_learned', letter }, consent);
     }
     if (!isCourseComplete(before) && isCourseComplete(next)) {
@@ -106,12 +119,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setSetting,
       start,
       finishOnboarding,
-      recordAnswer,
+      answerLetter,
       addPlayTime,
       resetProgress,
       loadFromCode,
     }),
-    [settings, progress, started, onboarded, progressVersion, setSetting, start, finishOnboarding, recordAnswer, addPlayTime, resetProgress, loadFromCode],
+    [settings, progress, started, onboarded, progressVersion, setSetting, start, finishOnboarding, answerLetter, addPlayTime, resetProgress, loadFromCode],
   );
 
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>;

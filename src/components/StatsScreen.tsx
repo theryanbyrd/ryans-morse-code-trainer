@@ -1,6 +1,6 @@
 import { TEACHING_ORDER, MORSE } from '../data/morse';
 import { useApp } from '../state/AppContext';
-import { learnedCount } from '../lib/session';
+import { learnedCount, LEARNED_THRESHOLD } from '../lib/session';
 import { Pattern } from './Pattern';
 import { CloseIcon } from './Icons';
 
@@ -39,8 +39,9 @@ export function StatsScreen({ onClose }: { onClose: () => void }) {
               {TEACHING_ORDER.map((l) => {
                 const s = progress.letters[l];
                 const acc = s.attempts ? Math.round((s.correct / s.attempts) * 100) : 0;
+                const isLearned = s.score >= LEARNED_THRESHOLD;
                 return (
-                  <div key={l} className={`pl-row${s.learned ? ' learned' : ''}`}>
+                  <div key={l} className={`pl-row${isLearned ? ' learned' : ''}`}>
                     <span className="pl-letter">{l.toUpperCase()}</span>
                     <Pattern pattern={MORSE[l]} size={10} className="pl-pattern" />
                     <div className="pl-bar">
@@ -49,7 +50,7 @@ export function StatsScreen({ onClose }: { onClose: () => void }) {
                     <span className="pl-meta">
                       {s.attempts ? `${s.correct}/${s.attempts}` : '—'}
                     </span>
-                    {s.learned && <span className="pl-check">✓</span>}
+                    {isLearned && <span className="pl-check">✓</span>}
                   </div>
                 );
               })}

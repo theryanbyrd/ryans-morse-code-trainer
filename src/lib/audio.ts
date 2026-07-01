@@ -68,6 +68,11 @@ export function playCorrect(): void {
   tone(880, 160, 0.1);
 }
 
+/** A light blip for each correct letter within a word. */
+export function playTick(): void {
+  tone(780, 70, 0, 'sine', 0.14);
+}
+
 export function playWrong(): void {
   tone(220, 200, 0, 'square', 0.12);
   tone(160, 240, 0.06, 'square', 0.12);
