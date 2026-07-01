@@ -9,6 +9,14 @@ trainer by **Tania Finlayson**, **Use All Five**, and the **Google Creative Lab*
 - "Sounds-alike" audio (`sounds/soundalikes-mw/`) created by voice artist
   **Matthew Wade**. A second voice set is in `sounds/soundalikes-ww/`.
 
+## Local modifications
+
+- `sounds/soundalikes-mw/o.mp3` was replaced with our own clip saying
+  **"Oh my gosh"** (macOS `say`, Daniel voice) instead of the original
+  "Oh my god", to keep the mnemonic family-friendly. The original clip remains
+  in git history and in the unused `sounds/soundalikes-mw/o 2.mp3` /
+  `sounds/soundalikes-ww/o.mp3` variants.
+
 ## Contents
 
 - `images/final/A.png … Z.png` — the original per-letter mnemonic illustrations.
