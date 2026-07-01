@@ -3,7 +3,6 @@ import { MORSE } from '../data/morse';
 import { useApp } from '../state/AppContext';
 import { hintActive, isCourseComplete, pickWord } from '../lib/session';
 import {
-  playCorrect,
   playDash,
   playDot,
   playPattern,
@@ -19,7 +18,7 @@ import type { KeyAction } from './Keypad';
 import { Completion } from './Completion';
 
 const WORD_DELAY = 850; // pause after finishing a word
-const LETTER_DELAY = 260; // pause between letters within a word
+const LETTER_DELAY = 480; // pause between letters (lets "Correct!" be heard)
 const WRONG_DELAY = 700;
 const INPUT_LOCK_MS = 320; // brief debounce after a new letter/word loads
 
@@ -96,11 +95,10 @@ export function Game({ onOpenStats }: { onOpenStats: () => void }) {
       setFeedback(correct ? 'correct' : 'wrong');
 
       if (correct) {
-        if (settingsRef.current.sound) {
-          if (wordEnd && !settingsRef.current.speechHints) playCorrect();
-          else if (!wordEnd) playTick();
-        }
-        if (wordEnd && settingsRef.current.speechHints) speak('Correct!');
+        // Say "Correct!" after every correct letter (fall back to a tone when
+        // speech is off).
+        if (settingsRef.current.speechHints) speak('Correct!');
+        else if (settingsRef.current.sound) playTick();
       } else if (settingsRef.current.sound) {
         playWrong();
       }
