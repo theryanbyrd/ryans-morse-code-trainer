@@ -17,6 +17,8 @@ import {
 } from '../lib/session';
 import { applyReceiveAnswer } from '../lib/receive';
 import { track } from '../lib/analytics';
+import { useAuth } from './AuthContext';
+import { loadRemote, mergeSaveState, saveRemote } from '../lib/cloud';
 
 const ONBOARDED_KEY = 'rmct.onboarded';
 const MODE_KEY = 'rmct.mode';
@@ -73,6 +75,42 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     save({ settings, progress, receive });
   }, [settings, progress, receive]);
+
+  // ----- Cloud sync (only active when Supabase is configured + signed in) -----
+  const { user } = useAuth();
+  const syncReadyForUser = useRef<string | null>(null);
+  const pendingUser = useRef<string | null>(null);
+
+  useEffect(() => {
+    const uid = user?.id ?? null;
+    if (!uid) {
+      syncReadyForUser.current = null;
+      pendingUser.current = null;
+      return;
+    }
+    if (syncReadyForUser.current === uid || pendingUser.current === uid) return;
+    pendingUser.current = uid;
+    void (async () => {
+      const local = { settings: settingsRef.current, progress: progressRef.current, receive: receiveRef.current };
+      const remote = await loadRemote(uid);
+      const merged = remote ? mergeSaveState(local, remote) : local;
+      setSettings(merged.settings);
+      setProgress(merged.progress);
+      setReceive(merged.receive);
+      setProgressVersion((v) => v + 1);
+      await saveRemote(uid, merged);
+      syncReadyForUser.current = uid;
+      pendingUser.current = null;
+    })();
+  }, [user]);
+
+  // Debounced upload whenever state changes after the initial merge.
+  useEffect(() => {
+    const uid = user?.id;
+    if (!uid || syncReadyForUser.current !== uid) return;
+    const t = setTimeout(() => void saveRemote(uid, { settings, progress, receive }), 800);
+    return () => clearTimeout(t);
+  }, [settings, progress, receive, user]);
 
   const setSetting = useCallback<Ctx['setSetting']>((key, value) => {
     setSettings((s) => ({ ...s, [key]: value }));

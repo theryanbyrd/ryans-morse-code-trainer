@@ -9,6 +9,7 @@ type ToggleKey =
   | 'morseBoard'
   | 'oneSwitch'
   | 'farnsworth'
+  | 'visual'
   | 'trackingConsent';
 
 const TOGGLES: { key: ToggleKey; label: string; help: string }[] = [
@@ -18,6 +19,7 @@ const TOGGLES: { key: ToggleKey; label: string; help: string }[] = [
   { key: 'morseBoard', label: 'Morse Board', help: 'Show the A–Z reference board button' },
   { key: 'oneSwitch', label: 'One-Switch Mode', help: 'Operate everything from a single switch' },
   { key: 'farnsworth', label: 'Beginner spacing', help: 'Extra space between letters when receiving' },
+  { key: 'visual', label: 'Flash & vibrate', help: 'Blink and buzz in time with the code (Receive)' },
   { key: 'trackingConsent', label: 'Tracking Consent', help: 'Share anonymous learning analytics' },
 ];
 

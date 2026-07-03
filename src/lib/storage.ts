@@ -16,6 +16,8 @@ export type Settings = {
   // Receive mode: character speed (WPM) and Farnsworth (extra-spaced) timing.
   wpm: number;
   farnsworth: boolean;
+  // Receive: mirror the audio with an on-screen flash + device vibration.
+  visual: boolean;
 };
 
 export type LetterStat = {
@@ -63,6 +65,7 @@ export const DEFAULT_SETTINGS: Settings = {
   scanIntervalMs: 1200,
   wpm: 12,
   farnsworth: true,
+  visual: false,
 };
 
 export function freshProgress(): Progress {

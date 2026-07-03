@@ -32,6 +32,8 @@ export type PlayOptions = {
   farnsworth: boolean; // stretch inter-char / word gaps for beginners
   freq?: number; // sidetone frequency
   volume?: number;
+  onFlash?: (on: boolean) => void; // drive an on-screen lamp in sync
+  haptic?: boolean; // vibrate the device in time with the tones
 };
 
 export type Playback = { stop: () => void; durationMs: number };
@@ -54,7 +56,17 @@ export function playMorse(text: string, opts: PlayOptions): Playback {
   if (!ac) return { stop: () => {}, durationMs: 0 };
 
   const oscillators: OscillatorNode[] = [];
-  let t = ac.currentTime + 0.06;
+  const timers: number[] = [];
+  const vibe: number[] = []; // [on, off, on, off, …] for navigator.vibrate
+  const start = ac.currentTime + 0.06;
+  let t = start;
+
+  const scheduleFlash = (onSec: number, durSec: number) => {
+    if (!opts.onFlash) return;
+    const onMs = (onSec - start) * 1000;
+    timers.push(window.setTimeout(() => opts.onFlash?.(true), Math.max(0, onMs)));
+    timers.push(window.setTimeout(() => opts.onFlash?.(false), Math.max(0, onMs + durSec * 1000)));
+  };
 
   const beep = (durationSec: number) => {
     const osc = ac.createOscillator();
@@ -70,25 +82,43 @@ export function playMorse(text: string, opts: PlayOptions): Playback {
     osc.start(t);
     osc.stop(t + durationSec + 0.01);
     oscillators.push(osc);
+    scheduleFlash(t, durationSec);
   };
 
   const chars = text.toLowerCase().split('');
   chars.forEach((ch, ci) => {
     if (ch === ' ') {
       t += 7 * gapUnit;
+      if (vibe.length) vibe.push(Math.round(7 * gapUnit * 1000));
       return;
     }
     const pattern = MORSE[ch];
     if (!pattern) return;
     for (let i = 0; i < pattern.length; i++) {
-      beep(pattern[i] === '-' ? 3 * unit : unit);
-      t += pattern[i] === '-' ? 3 * unit : unit;
-      if (i < pattern.length - 1) t += unit; // intra-character gap
+      const dur = pattern[i] === '-' ? 3 * unit : unit;
+      beep(dur);
+      vibe.push(Math.round(dur * 1000));
+      t += dur;
+      if (i < pattern.length - 1) {
+        t += unit; // intra-character gap
+        vibe.push(Math.round(unit * 1000));
+      }
     }
-    if (ci < chars.length - 1) t += 3 * gapUnit; // inter-character gap
+    if (ci < chars.length - 1) {
+      t += 3 * gapUnit; // inter-character gap
+      vibe.push(Math.round(3 * gapUnit * 1000));
+    }
   });
 
-  const durationMs = Math.max(0, (t - ac.currentTime) * 1000);
+  if (opts.haptic && typeof navigator !== 'undefined' && navigator.vibrate) {
+    try {
+      navigator.vibrate(vibe);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  const durationMs = Math.max(0, (t - start) * 1000);
   return {
     stop: () => {
       for (const o of oscillators) {
@@ -96,6 +126,15 @@ export function playMorse(text: string, opts: PlayOptions): Playback {
           o.stop();
         } catch {
           /* already stopped */
+        }
+      }
+      for (const id of timers) clearTimeout(id);
+      opts.onFlash?.(false);
+      if (opts.haptic && typeof navigator !== 'undefined' && navigator.vibrate) {
+        try {
+          navigator.vibrate(0);
+        } catch {
+          /* ignore */
         }
       }
     },

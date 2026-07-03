@@ -12,6 +12,7 @@ import { StatsScreen } from './components/StatsScreen';
 import { AboutScreen } from './components/AboutScreen';
 import { GetCodeModal, LoadCodeModal } from './components/CodeModals';
 import { MorseBoard } from './components/MorseBoard';
+import { AccountButton } from './components/Account';
 import { GearIcon, HelpIcon } from './components/Icons';
 
 type Overlay = 'none' | 'settings' | 'stats' | 'about' | 'getcode' | 'loadcode' | 'board';
@@ -62,9 +63,12 @@ export default function App() {
             </button>
           )}
         </div>
-        <button className="icon-btn chrome-btn" onClick={openAbout} aria-label="About">
-          <HelpIcon />
-        </button>
+        <div className="chrome-right">
+          <AccountButton />
+          <button className="icon-btn chrome-btn" onClick={openAbout} aria-label="About">
+            <HelpIcon />
+          </button>
+        </div>
       </div>
 
       {inSend && <AlphabetBar progress={progress} current={newestLetter(progress)} />}

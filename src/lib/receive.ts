@@ -3,10 +3,12 @@
 // options (favouring confusable letters so the practice is meaningful).
 
 import { MORSE, TEACHING_ORDER } from '../data/morse';
+import { WORDS } from '../data/words';
 import { LEARNED_THRESHOLD } from './session';
 import type { Progress, ReceiveProgress } from './storage';
 
 export const RECEIVE_MASTERED = 3; // receive-score at which a letter is "mastered to hear"
+export const PROMOTE_TO_RECALL = 2; // at/above this, drop the multiple-choice narrowing (recall)
 export const RECEIVE_SCORE_MAX = RECEIVE_MASTERED + 2;
 export const MIN_LETTERS_TO_RECEIVE = 3;
 const MAX_CHOICES = 4;
@@ -90,6 +92,26 @@ export function makeChoices(correct: string, pool: string[]): string[] {
 /** Number of choice tiles for a given pool size. */
 export function choiceCount(pool: string[]): number {
   return Math.min(MAX_CHOICES, Math.max(2, pool.length));
+}
+
+/** Has this letter graduated from recognition (narrowed choices) to recall? */
+export function isRecall(r: ReceiveProgress, letter: string): boolean {
+  return rScore(r, letter) >= PROMOTE_TO_RECALL;
+}
+
+/** Recall options: ALL the learner's known letters, shuffled (no narrowing). */
+export function recallOptions(correct: string, pool: string[]): string[] {
+  return shuffle(pool.includes(correct) ? pool : [correct, ...pool]);
+}
+
+/** Pick a word for the receive word-phase: only in-pool letters, length >= 2. */
+export function pickReceiveWord(pool: string[], avoid: string | null): string | null {
+  const set = new Set(pool);
+  const candidates = WORDS.filter((w) => w.length >= 2 && [...w].every((c) => set.has(c)));
+  if (candidates.length === 0) return null;
+  const notAvoid = candidates.filter((w) => w !== avoid);
+  const list = notAvoid.length ? notAvoid : candidates;
+  return list[Math.floor(Math.random() * list.length)];
 }
 
 const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n));

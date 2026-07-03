@@ -26,3 +26,7 @@ dist-ssr
 # local reference art + python venv
 .reference
 .vercel
+
+# local env
+.env.local
+.env

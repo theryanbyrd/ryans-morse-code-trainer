@@ -98,6 +98,13 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
   font-size: 14px;
 }
 .board-btn:hover { background: rgba(255, 255, 255, 0.28); }
+.chrome-right { display: flex; align-items: center; gap: 10px; }
+.account-chip {
+  background: rgba(255, 255, 255, 0.16); color: #fff; border: none;
+  border-radius: 999px; padding: 9px 16px; font-weight: 600; font-size: 14px;
+}
+.account-chip:hover { background: rgba(255, 255, 255, 0.28); }
+.icon-btn.avatar { font-weight: 800; font-size: 16px; background: rgba(255, 255, 255, 0.3); }
 
 /* ---------- Alphabet progress bar ---------- */
 .alphabet-bar {
@@ -409,12 +416,37 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 .choice.correct { background: var(--green); color: #fff; box-shadow: 0 6px 0 var(--green-dark); }
 .choice.wrong { background: #fde7e5; color: var(--red-deep); box-shadow: 0 6px 0 #e6b3ad; }
 .choice.dim { opacity: 0.5; }
-.receive-controls { display: flex; gap: 10px; }
+.receive-controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
 .rc-btn {
   background: rgba(255,255,255,0.18); color: #fff; border: none;
   border-radius: 999px; padding: 10px 20px; font-weight: 600; font-size: 15px;
 }
 .rc-btn:hover { background: rgba(255,255,255,0.3); }
+.rc-btn.scanning { outline: 4px solid #ffe14d; outline-offset: 2px; }
+
+/* Recall grid: all known letters, smaller tiles */
+.choices.recall { grid-template-columns: repeat(auto-fit, minmax(58px, 1fr)); gap: 8px; }
+.choices.recall .choice { padding: 14px 0; font-size: 24px; }
+.choice.scanning { outline: 5px solid #ffe14d; outline-offset: 2px; }
+
+/* Visual flash: the Listen card lights up on each dit/dah */
+.listen-btn.lamp-on { background: #ffe14d; box-shadow: 0 0 0 6px rgba(255,225,77,0.5), var(--shadow); }
+
+/* Word phase */
+.phase-tag {
+  align-self: center; background: var(--blue-deep); color: #fff;
+  font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 999px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.brick.missed { background: #fde7e5; color: var(--red-deep); }
+.word-input-row { display: flex; gap: 10px; width: 100%; }
+.word-input {
+  flex: 1; border: none; border-radius: 14px; padding: 14px 16px;
+  font-size: 20px; font-weight: 700; color: var(--ink);
+  background: var(--card); text-align: center; letter-spacing: 2px;
+}
+.word-input:focus { outline: 3px solid #fff; }
+.word-input-row .btn { border-radius: 14px; padding: 0 20px; }
 
 @media (max-height: 760px) {
   .receive { gap: 12px; }
@@ -505,6 +537,14 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 .pl-fill { height: 100%; background: var(--green); border-radius: 999px; transition: width 0.3s; }
 .pl-meta { font-size: 13px; color: var(--ink-soft); min-width: 36px; text-align: right; }
 .pl-check { color: var(--green-dark); font-weight: 800; }
+.sync-line { font-size: 13px; color: var(--ink-soft); margin: -4px 0 12px; }
+.per-letter-head { display: flex; align-items: center; gap: 10px; padding: 0 10px 4px; }
+.per-letter-head .pl-letter { width: 18px; }
+.plh-pattern { width: 40px; }
+.plh-label { flex: 1; text-align: center; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--ink-soft); }
+.pl-bar.recv { }
+.pl-fill.r { background: var(--blue-deep); }
+.pl-marks { font-size: 13px; min-width: 34px; text-align: right; }
 
 /* About */
 .modal.about p { color: var(--ink); }

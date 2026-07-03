@@ -269,11 +269,18 @@ analytics remains separate and consent-gated.
   game code identical for both.
 
 ## 11. Phased rollout
-- **M1 — Receive letters (guest only):** mode-select, Web-Audio player, letter phase
-  multiple-choice, WPM/Farnsworth, reveal/replay. Ships value with zero backend.
-- **M2 — Recall + words:** free-recall promotion, word phase, visual/haptic fallback.
-- **M3 — Accounts:** auth + cloud storage, first-sign-in merge, cross-device sync.
-- **M4 — History:** Stats/History screen across modes; export/delete.
+- **M1 — Receive letters (guest only): ✅ shipped.** mode-select, Web-Audio player,
+  letter phase multiple-choice, WPM/Farnsworth, reveal/replay.
+- **M2 — Recall + words: ✅ shipped.** recall promotion (all-known-letters grid at
+  receive-score ≥ 2), word phase (type the word; positive-only scoring so a wrong
+  word doesn't demote you), visual flash + haptic (`navigator.vibrate`), one-switch
+  scanning of choices.
+- **M3 — Accounts: ✅ shipped (env-gated, dormant until configured).** Supabase
+  email magic-link + Google, single JSONB `user_state` row w/ RLS, first-sign-in
+  merge (higher score per letter), debounced cloud sync. Setup: `docs/supabase-setup.md`.
+- **M4 — History: ✅ shipped.** Stats screen now spans Send + Receive (per-letter
+  send/receive accuracy bars, both totals, combined time, sync line when signed in).
+  Export/delete + activity heatmap remain future work (heatmap needs event timestamps).
 
 ## 12. Decisions (locked 2026-07-01)
 1. **Auth:** Supabase (auth + Postgres).
