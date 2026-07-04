@@ -515,6 +515,7 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 .btn.danger:hover { background: #fbd6d3; }
 .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
 .action-grid.two { grid-template-columns: 1fr 1fr; }
+.action-grid.one { grid-template-columns: 1fr; }
 
 /* Stats */
 .empty-state { text-align: center; padding: 28px 10px; color: var(--ink-soft); }

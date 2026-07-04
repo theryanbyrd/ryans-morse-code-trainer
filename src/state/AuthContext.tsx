@@ -6,6 +6,7 @@ import { supabase, supabaseEnabled } from '../lib/supabase';
 type AuthCtx = {
   enabled: boolean;
   ready: boolean;
+  googleEnabled: boolean;
   user: User | null;
   signInWithEmail: (email: string) => Promise<{ ok: boolean; error?: string }>;
   signInWithGoogle: () => Promise<{ ok: boolean; error?: string }>;
@@ -17,6 +18,7 @@ const Ctx = createContext<AuthCtx | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(!supabaseEnabled);
+  const [googleEnabled, setGoogleEnabled] = useState(false);
 
   useEffect(() => {
     if (!supabase) return;
@@ -27,6 +29,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
+    // Only surface the Google button if the provider is actually enabled.
+    const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+    const key = (import.meta.env.VITE_SUPABASE_ANON_KEY ||
+      import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY) as string | undefined;
+    if (url && key) {
+      fetch(`${url}/auth/v1/settings`, { headers: { apikey: key } })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d) => setGoogleEnabled(Boolean(d?.external?.google)))
+        .catch(() => {});
+    }
     return () => sub.subscription.unsubscribe();
   }, []);
 
@@ -34,6 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       enabled: supabaseEnabled,
       ready,
+      googleEnabled,
       user,
       async signInWithEmail(email) {
         if (!supabase) return { ok: false, error: 'Sign-in is not configured.' };
@@ -55,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await supabase?.auth.signOut();
       },
     }),
-    [ready, user],
+    [ready, googleEnabled, user],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

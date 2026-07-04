@@ -3,7 +3,7 @@ import { useAuth } from '../state/AuthContext';
 import { CloseIcon } from './Icons';
 
 export function AccountButton() {
-  const { enabled, user, signInWithEmail, signInWithGoogle, signOut } = useAuth();
+  const { enabled, googleEnabled, user, signInWithEmail, signInWithGoogle, signOut } = useAuth();
   const [open, setOpen] = useState(false);
 
   // Dormant until Supabase is configured — keeps the guest UI unchanged.
@@ -24,6 +24,7 @@ export function AccountButton() {
         <AccountModal
           onClose={() => setOpen(false)}
           user={user}
+          googleEnabled={googleEnabled}
           signInWithEmail={signInWithEmail}
           signInWithGoogle={signInWithGoogle}
           signOut={signOut}
@@ -36,12 +37,13 @@ export function AccountButton() {
 type Props = {
   onClose: () => void;
   user: ReturnType<typeof useAuth>['user'];
+  googleEnabled: boolean;
   signInWithEmail: ReturnType<typeof useAuth>['signInWithEmail'];
   signInWithGoogle: ReturnType<typeof useAuth>['signInWithGoogle'];
   signOut: ReturnType<typeof useAuth>['signOut'];
 };
 
-function AccountModal({ onClose, user, signInWithEmail, signInWithGoogle, signOut }: Props) {
+function AccountModal({ onClose, user, googleEnabled, signInWithEmail, signInWithGoogle, signOut }: Props) {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [error, setError] = useState('');
@@ -97,11 +99,13 @@ function AccountModal({ onClose, user, signInWithEmail, signInWithGoogle, signOu
                   autoComplete="email"
                 />
                 {status === 'error' && <p className="error-text">{error}</p>}
-                <div className="action-grid two">
+                <div className={`action-grid ${googleEnabled ? 'two' : 'one'}`}>
                   <button className="btn primary" onClick={sendLink} disabled={status === 'sending' || !email.trim()}>
                     {status === 'sending' ? 'Sending…' : 'Email me a link'}
                   </button>
-                  <button className="btn" onClick={() => void signInWithGoogle()}>Continue with Google</button>
+                  {googleEnabled && (
+                    <button className="btn" onClick={() => void signInWithGoogle()}>Continue with Google</button>
+                  )}
                 </div>
               </>
             )}
