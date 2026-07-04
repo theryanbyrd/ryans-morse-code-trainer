@@ -21,13 +21,18 @@ To turn on sign-in and cloud sync, do this once:
   - Add the same URL (and `http://localhost:5173` for dev) to **Redirect URLs**.
 
 ## 4. Add the keys
-Dashboard → **Project Settings → API**. Copy the **Project URL** and the
-**anon public** key.
+Dashboard → **Project Settings → API Keys**. Copy the **Project URL** and the
+**Publishable key** (`sb_publishable_…`).
+
+> ⚠️ Use the **Publishable** key (the new name for the anon key) — it's
+> browser-safe. **Never** use the **Secret** key (`sb_secret_…` / service_role):
+> it bypasses Row-Level Security, and Vite bakes `VITE_*` vars into the public
+> JS bundle. The app hard-refuses a secret key and logs an error if you try.
 
 Local dev — create `.env.local` (see [`.env.example`](../.env.example)):
 ```
 VITE_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
-VITE_SUPABASE_ANON_KEY=YOUR-ANON-KEY
+VITE_SUPABASE_ANON_KEY=sb_publishable_xxxxxxxx
 ```
 
 Vercel — Project → **Settings → Environment Variables**, add the same two keys
