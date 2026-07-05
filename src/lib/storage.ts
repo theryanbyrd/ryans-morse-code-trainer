@@ -51,6 +51,14 @@ export type ReceiveProgress = {
   letters: Record<string, ReceiveLetterStat>;
   totalAnswered: number;
   playMs: number;
+  // Gamification
+  xp: number;
+  streak: number;
+  bestStreak: number;
+  wordsCompleted: number;
+  sentencesCompleted: number;
+  topWpm: number; // fastest speed the learner has practised at
+  badges: string[]; // earned badge ids
 };
 
 export const START_LETTERS = 3;
@@ -81,7 +89,18 @@ export function freshReceiveProgress(): ReceiveProgress {
   for (const l of TEACHING_ORDER) {
     letters[l] = { attempts: 0, correct: 0, wrong: 0, score: 0 };
   }
-  return { letters, totalAnswered: 0, playMs: 0 };
+  return {
+    letters,
+    totalAnswered: 0,
+    playMs: 0,
+    xp: 0,
+    streak: 0,
+    bestStreak: 0,
+    wordsCompleted: 0,
+    sentencesCompleted: 0,
+    topWpm: 0,
+    badges: [],
+  };
 }
 
 export function load(): SaveState {
@@ -114,6 +133,13 @@ function hydrateReceive(r?: Partial<ReceiveProgress>): ReceiveProgress {
     letters: { ...base.letters, ...(r.letters ?? {}) },
     totalAnswered: r.totalAnswered ?? 0,
     playMs: r.playMs ?? 0,
+    xp: r.xp ?? 0,
+    streak: r.streak ?? 0,
+    bestStreak: r.bestStreak ?? 0,
+    wordsCompleted: r.wordsCompleted ?? 0,
+    sentencesCompleted: r.sentencesCompleted ?? 0,
+    topWpm: r.topWpm ?? 0,
+    badges: r.badges ?? [],
   };
 }
 

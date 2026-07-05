@@ -68,6 +68,13 @@ function mergeReceive(a: ReceiveProgress, b: ReceiveProgress): ReceiveProgress {
     letters,
     totalAnswered: Math.max(a.totalAnswered, b.totalAnswered),
     playMs: Math.max(a.playMs, b.playMs),
+    xp: Math.max(a.xp, b.xp),
+    streak: Math.max(a.streak, b.streak),
+    bestStreak: Math.max(a.bestStreak, b.bestStreak),
+    wordsCompleted: Math.max(a.wordsCompleted, b.wordsCompleted),
+    sentencesCompleted: Math.max(a.sentencesCompleted, b.sentencesCompleted),
+    topWpm: Math.max(a.topWpm, b.topWpm),
+    badges: [...new Set([...(a.badges ?? []), ...(b.badges ?? [])])],
   };
 }
 

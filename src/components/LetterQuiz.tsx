@@ -1,46 +1,43 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useApp } from '../state/AppContext';
 import { playCorrect, playWrong } from '../lib/audio';
-import { playMorse } from '../lib/morsePlayer';
-import type { Playback } from '../lib/morsePlayer';
+import { useMorsePlayer } from '../hooks/useMorsePlayer';
 import {
-  isReceiveComplete,
   isRecall,
   knownLetters,
   makeChoices,
-  pickReceiveLetter,
   pickReceiveWord,
   recallOptions,
 } from '../lib/receive';
-import { ReceiveComplete } from './ReceiveComplete';
-import { WordReceive } from './WordReceive';
 
-const CORRECT_DELAY = 750;
-const WRONG_DELAY = 1600;
+const CORRECT_DELAY = 620;
+const WRONG_DELAY = 1500;
 const FIRST_PLAY_DELAY = 350;
 const SLOW_WPM = 7;
 
-export function ReceiveGame() {
-  const { progress, receive, settings, answerReceive, addReceivePlayTime, setMode } = useApp();
+// Decode a word one letter at a time: hear A, pick A; hear T, pick T; … to
+// spell the word — the receive mirror of the Send word trainer.
+export function LetterQuiz() {
+  const { progress, receive, settings, answerReceive, addReceivePlayTime } = useApp();
+  const { play, lampOn } = useMorsePlayer();
 
   const pool = knownLetters(progress);
-
   const optionsFor = useCallback(
     (letter: string, r = receive) => (isRecall(r, letter) ? recallOptions(letter, pool) : makeChoices(letter, pool)),
     [pool, receive],
   );
 
-  const [target, setTarget] = useState<string | null>(() => pickReceiveLetter(receive, pool, null));
-  const [choices, setChoices] = useState<string[]>(() => (target ? optionsFor(target) : []));
+  const [word, setWord] = useState<string>(() => pickReceiveWord(pool, null) ?? pool[0] ?? 'e');
+  const [index, setIndex] = useState(0);
+  const [choices, setChoices] = useState<string[]>(() => optionsFor(word[0]));
   const [feedback, setFeedback] = useState<'idle' | 'correct' | 'wrong'>('idle');
   const [picked, setPicked] = useState<string | null>(null);
-  const [lampOn, setLampOn] = useState(false);
   const [scanIndex, setScanIndex] = useState<number | null>(null);
 
-  const settingsRef = useRef(settings);
-  settingsRef.current = settings;
-  const targetRef = useRef(target);
-  targetRef.current = target;
+  const wordRef = useRef(word);
+  wordRef.current = word;
+  const indexRef = useRef(index);
+  indexRef.current = index;
   const feedbackRef = useRef(feedback);
   feedbackRef.current = feedback;
   const receiveRef = useRef(receive);
@@ -51,64 +48,74 @@ export function ReceiveGame() {
   choicesRef.current = choices;
   const scanIndexRef = useRef(scanIndex);
   scanIndexRef.current = scanIndex;
-  const playback = useRef<Playback | null>(null);
+  const settingsRef = useRef(settings);
+  settingsRef.current = settings;
 
-  const play = useCallback((letter: string, wpm?: number) => {
-    playback.current?.stop();
-    playback.current = playMorse(letter, {
-      wpm: wpm ?? settingsRef.current.wpm,
-      farnsworth: settingsRef.current.farnsworth,
-      onFlash: settingsRef.current.visual ? setLampOn : undefined,
-      haptic: settingsRef.current.visual,
-    });
-  }, []);
+  const letter = word[index];
 
   useEffect(() => {
     const t = setInterval(() => addReceivePlayTime(1000), 1000);
     return () => clearInterval(t);
   }, [addReceivePlayTime]);
 
+  // Play the current letter each time it changes.
+  // Play the current letter whenever the POSITION changes — keyed on word+index,
+  // not the letter value, so a repeated consecutive letter (e.g. the E's in
+  // "tee", or landing back on the same letter after a wrong→right) still plays.
   useEffect(() => {
-    if (!target) return;
-    const t = setTimeout(() => play(target), FIRST_PLAY_DELAY);
+    const l = word[index];
+    if (!l) return;
+    const t = setTimeout(() => play(l), FIRST_PLAY_DELAY);
     return () => clearTimeout(t);
-  }, [target, play]);
+  }, [word, index, play]);
 
-  const nextItem = useCallback(() => {
-    const nextTarget = pickReceiveLetter(receiveRef.current, poolRef.current, targetRef.current);
+  const advance = useCallback(() => {
+    const w = wordRef.current;
+    const i = indexRef.current;
     setPicked(null);
     setFeedback('idle');
     setScanIndex(null);
-    setTarget(nextTarget);
-    setChoices(nextTarget ? optionsFor(nextTarget, receiveRef.current) : []);
+    if (i + 1 >= w.length) {
+      // Word fully spelled — on to the next word (mastery is tracked per letter).
+      const next = pickReceiveWord(poolRef.current, w) ?? poolRef.current[0] ?? 'e';
+      setWord(next);
+      setIndex(0);
+      setChoices(optionsFor(next[0], receiveRef.current));
+    } else {
+      setIndex(i + 1);
+      setChoices(optionsFor(w[i + 1], receiveRef.current));
+    }
   }, [optionsFor]);
 
   const choose = useCallback(
-    (letter: string) => {
+    (pick: string) => {
       if (feedbackRef.current !== 'idle') return;
-      const t = targetRef.current;
+      const t = wordRef.current[indexRef.current];
       if (!t) return;
-      const correct = letter === t;
-      setPicked(letter);
+      const correct = pick === t;
+      setPicked(pick);
       setFeedback(correct ? 'correct' : 'wrong');
       if (settingsRef.current.sound) (correct ? playCorrect : playWrong)();
       answerReceive(t, correct);
       if (correct) {
-        window.setTimeout(nextItem, CORRECT_DELAY);
+        window.setTimeout(advance, CORRECT_DELAY);
       } else {
+        // Reveal + replay slower, then retry the SAME letter (so the word gets spelled).
         window.setTimeout(() => play(t, SLOW_WPM), 300);
-        window.setTimeout(nextItem, WRONG_DELAY);
+        window.setTimeout(() => {
+          setPicked(null);
+          setFeedback('idle');
+        }, WRONG_DELAY);
       }
     },
-    [answerReceive, nextItem, play],
+    [answerReceive, advance, play],
   );
   const chooseRef = useRef(choose);
   chooseRef.current = choose;
 
-  // One-switch scanning over the choice tiles + a final "replay" option.
-  const optionCount = choices.length + 1; // last index = replay
+  // One-switch scanning over the tiles + a final replay option.
   useEffect(() => {
-    if (!settings.oneSwitch || !target) {
+    if (!settings.oneSwitch || !letter) {
       setScanIndex(null);
       return;
     }
@@ -118,17 +125,16 @@ export function ReceiveGame() {
       setScanIndex((i) => ((i ?? -1) + 1) % (choicesRef.current.length + 1));
     }, settings.scanIntervalMs);
     return () => clearInterval(id);
-  }, [settings.oneSwitch, settings.scanIntervalMs, target, choices.length]);
+  }, [settings.oneSwitch, settings.scanIntervalMs, letter, choices.length]);
 
   const selectScanned = useCallback(() => {
     const i = scanIndexRef.current;
     if (i === null) return;
     const cs = choicesRef.current;
     if (i < cs.length) chooseRef.current(cs[i]);
-    else if (targetRef.current) play(targetRef.current);
+    else play(wordRef.current[indexRef.current]);
   }, [play]);
 
-  // Keyboard: one-switch → space/enter selects; otherwise a letter key picks it.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (settingsRef.current.oneSwitch) {
@@ -145,24 +151,27 @@ export function ReceiveGame() {
     return () => window.removeEventListener('keydown', onKey);
   }, [selectScanned]);
 
-  useEffect(() => () => playback.current?.stop(), []);
-
-  // Once every known letter is mastered by ear, move on to the word phase
-  // (which falls back to a completion screen if no words are possible yet).
-  if (isReceiveComplete(receive, pool)) {
-    if (pickReceiveWord(pool, null)) return <WordReceive />;
-    return <ReceiveComplete pool={pool} onSwitch={() => setMode(null)} />;
-  }
-  if (!target) return null;
-
-  const recall = isRecall(receive, target);
+  if (!letter) return null;
+  const recall = isRecall(receive, letter);
+  const optionCount = choices.length + 1;
 
   return (
     <div className="receive">
+      <div className="word-bricks">
+        {word.split('').map((ch, i) => {
+          const state = i < index ? 'done' : i === index ? 'current' : 'upcoming';
+          return (
+            <span key={i} className={`brick ${state}`}>
+              {i < index ? ch.toUpperCase() : ''}
+            </span>
+          );
+        })}
+      </div>
+
       <button
         className={`listen-btn${lampOn ? ' lamp-on' : ''}`}
-        onClick={() => play(target)}
-        aria-label="Play the code again"
+        onClick={() => play(letter)}
+        aria-label="Play the letter again"
       >
         <span className="listen-icon" aria-hidden="true">🔊</span>
         <span>Listen</span>
@@ -176,7 +185,7 @@ export function ReceiveGame() {
         {choices.map((l, i) => {
           let cls = 'choice';
           if (feedback !== 'idle') {
-            if (l === target) cls += ' correct';
+            if (l === letter) cls += ' correct';
             else if (l === picked) cls += ' wrong';
             else cls += ' dim';
           }
@@ -190,13 +199,10 @@ export function ReceiveGame() {
       </div>
 
       <div className="receive-controls">
-        <button
-          className={`rc-btn${scanIndex === optionCount - 1 ? ' scanning' : ''}`}
-          onClick={() => play(target)}
-        >
+        <button className={`rc-btn${scanIndex === optionCount - 1 ? ' scanning' : ''}`} onClick={() => play(letter)}>
           ↻ Replay
         </button>
-        <button className="rc-btn" onClick={() => play(target, SLOW_WPM)}>🐢 Slower</button>
+        <button className="rc-btn" onClick={() => play(letter, SLOW_WPM)}>🐢 Slower</button>
       </div>
 
       {settings.oneSwitch && (

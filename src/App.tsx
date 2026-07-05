@@ -5,7 +5,7 @@ import { StartScreen } from './components/StartScreen';
 import { Onboarding } from './components/Onboarding';
 import { Game } from './components/Game';
 import { ModeSelect } from './components/ModeSelect';
-import { ReceiveGame } from './components/ReceiveGame';
+import { Receive } from './components/Receive';
 import { AlphabetBar } from './components/AlphabetBar';
 import { SettingsModal } from './components/SettingsModal';
 import { StatsScreen } from './components/StatsScreen';
@@ -81,7 +81,7 @@ export default function App() {
         ) : !mode ? (
           <ModeSelect />
         ) : inReceive ? (
-          <ReceiveGame />
+          <Receive />
         ) : (
           <Game key={progressVersion} onOpenStats={() => setOverlay('stats')} />
         )}

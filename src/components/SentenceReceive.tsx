@@ -2,25 +2,27 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useApp } from '../state/AppContext';
 import { playCorrect, playWrong } from '../lib/audio';
 import { useMorsePlayer } from '../hooks/useMorsePlayer';
-import { knownLetters, pickReceiveWord } from '../lib/receive';
+import { knownLetters, pickSentence } from '../lib/receive';
 
-const CORRECT_DELAY = 900;
-const FIRST_PLAY_DELAY = 400;
+const CORRECT_DELAY = 1100;
+const FIRST_PLAY_DELAY = 450;
 const SLOW_WPM = 7;
 
-export function WordReceive() {
-  const { progress, settings, answerReceive, completeReceiveWord, addReceivePlayTime } = useApp();
+const norm = (s: string) => s.trim().toLowerCase().replace(/\s+/g, ' ');
+
+export function SentenceReceive() {
+  const { progress, settings, answerReceive, completeReceiveSentence, addReceivePlayTime } = useApp();
   const { play, lampOn } = useMorsePlayer();
   const pool = knownLetters(progress);
 
-  const [word, setWord] = useState<string>(() => pickReceiveWord(pool, null) ?? '');
+  const [sentence, setSentence] = useState<string>(() => pickSentence(pool, null) ?? '');
   const [input, setInput] = useState('');
   const [checked, setChecked] = useState(false);
 
   const settingsRef = useRef(settings);
   settingsRef.current = settings;
-  const wordRef = useRef(word);
-  wordRef.current = word;
+  const sentenceRef = useRef(sentence);
+  sentenceRef.current = sentence;
   const scoredRef = useRef(false);
   const inputEl = useRef<HTMLInputElement>(null);
 
@@ -30,72 +32,73 @@ export function WordReceive() {
   }, [addReceivePlayTime]);
 
   useEffect(() => {
-    if (!word) return;
-    const t = setTimeout(() => play(word), FIRST_PLAY_DELAY);
+    if (!sentence) return;
+    const t = setTimeout(() => play(sentence), FIRST_PLAY_DELAY);
     return () => clearTimeout(t);
-  }, [word, play]);
+  }, [sentence, play]);
 
-  const nextWord = useCallback(() => {
+  const nextSentence = useCallback(() => {
     scoredRef.current = false;
     setInput('');
     setChecked(false);
-    setWord((prev) => pickReceiveWord(pool, prev) ?? prev);
+    setSentence((prev) => pickSentence(pool, prev) ?? prev);
     inputEl.current?.focus();
   }, [pool]);
 
   const check = useCallback(() => {
-    const w = wordRef.current;
-    const guess = input.trim().toLowerCase();
-    if (!w || !guess) return;
+    const s = sentenceRef.current;
+    const guess = norm(input);
+    if (!s || !guess) return;
     setChecked(true);
-    const allRight = guess === w;
+    const allRight = guess === s;
 
-    // Reinforce correct letters once per word (positive-only).
     if (!scoredRef.current) {
       scoredRef.current = true;
-      for (let i = 0; i < w.length; i++) if (guess[i] === w[i]) answerReceive(w[i], true);
+      for (let i = 0; i < s.length; i++) if (s[i] !== ' ' && guess[i] === s[i]) answerReceive(s[i], true);
     }
 
     if (allRight) {
       if (settingsRef.current.sound) playCorrect();
-      completeReceiveWord();
-      window.setTimeout(nextWord, CORRECT_DELAY);
+      completeReceiveSentence();
+      window.setTimeout(nextSentence, CORRECT_DELAY);
     } else if (settingsRef.current.sound) {
       playWrong();
-      window.setTimeout(() => play(w, SLOW_WPM), 300);
+      window.setTimeout(() => play(s, SLOW_WPM), 300);
     }
-  }, [input, answerReceive, completeReceiveWord, nextWord, play]);
+  }, [input, answerReceive, completeReceiveSentence, nextSentence, play]);
 
   const reveal = useCallback(() => {
     scoredRef.current = true;
-    setInput(wordRef.current);
+    setInput(sentenceRef.current);
     setChecked(true);
   }, []);
 
-  if (!word) return null;
-  const guess = input.trim().toLowerCase();
-  const allRight = checked && guess === word;
+  if (!sentence) return null;
+  const guess = norm(input);
+  const allRight = checked && guess === sentence;
 
   return (
     <div className="receive">
       <button
         className={`listen-btn${lampOn ? ' lamp-on' : ''}`}
-        onClick={() => play(word)}
-        aria-label="Play the word again"
+        onClick={() => play(sentence)}
+        aria-label="Play the sentence again"
       >
         <span className="listen-icon" aria-hidden="true">🔊</span>
         <span>Listen</span>
       </button>
 
-      <p className="receive-prompt">Type the word you heard</p>
+      <p className="receive-prompt">Type the phrase you heard ({sentence.split(' ').length} words)</p>
 
       {checked && (
-        <div className="word-bricks">
-          {word.split('').map((ch, i) => {
-            const right = guess[i] === ch;
+        <div className="sentence-review">
+          {sentence.split(' ').map((w, wi) => {
+            const gWords = guess.split(' ');
+            const gw = gWords[wi] ?? '';
+            const right = gw === w;
             return (
-              <span key={i} className={`brick ${right ? 'done' : 'missed'}`}>
-                {(right ? ch : guess[i] || '·').toUpperCase()}
+              <span key={wi} className={`sr-word ${right ? 'done' : 'missed'}`}>
+                {right ? w.toUpperCase() : (gw || '—').toUpperCase()}
               </span>
             );
           })}
@@ -114,17 +117,16 @@ export function WordReceive() {
           className="word-input"
           value={input}
           onChange={(e) => {
-            setInput(e.target.value.replace(/[^a-zA-Z]/g, ''));
+            setInput(e.target.value.replace(/[^a-zA-Z ]/g, ''));
             setChecked(false);
           }}
-          placeholder="type here…"
+          placeholder="type the words…"
           autoFocus
           autoCapitalize="none"
           autoCorrect="off"
           autoComplete="off"
           spellCheck={false}
-          inputMode="text"
-          aria-label="Type the word you heard"
+          aria-label="Type the phrase you heard"
         />
         <button type="submit" className="btn primary" disabled={!guess}>
           {allRight ? 'Nice!' : 'Check'}
@@ -132,8 +134,8 @@ export function WordReceive() {
       </form>
 
       <div className="receive-controls">
-        <button className="rc-btn" onClick={() => play(word)}>↻ Replay</button>
-        <button className="rc-btn" onClick={() => play(word, SLOW_WPM)}>🐢 Slower</button>
+        <button className="rc-btn" onClick={() => play(sentence)}>↻ Replay</button>
+        <button className="rc-btn" onClick={() => play(sentence, SLOW_WPM)}>🐢 Slower</button>
         <button className="rc-btn" onClick={reveal}>👁 Reveal</button>
       </div>
     </div>
