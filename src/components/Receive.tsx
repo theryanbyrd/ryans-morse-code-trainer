@@ -1,18 +1,24 @@
 import { useEffect, useState } from 'react';
 import { useApp } from '../state/AppContext';
-import { knownLetters, receivePhase } from '../lib/receive';
+import { WORDS_TO_UNLOCK_SENTENCES } from '../lib/receive';
+import type { ReceivePhase } from '../lib/receive';
 import { ReceiveHud } from './ReceiveHud';
 import { LetterQuiz } from './LetterQuiz';
 import { WordReceive } from './WordReceive';
 import { SentenceReceive } from './SentenceReceive';
 import { BadgesModal } from './BadgesModal';
 
-export function Receive() {
-  const { progress, receive, receiveToasts, dismissToast } = useApp();
+export function Receive({ section }: { section: 'letters' | 'words' }) {
+  const { receive, receiveToasts, dismissToast } = useApp();
   const [showBadges, setShowBadges] = useState(false);
 
-  const pool = knownLetters(progress);
-  const phase = receivePhase(receive, pool);
+  // The "Hear words" section grows into sentences once enough words are copied.
+  const phase: ReceivePhase =
+    section === 'letters'
+      ? 'letters'
+      : receive.wordsCompleted < WORDS_TO_UNLOCK_SENTENCES
+        ? 'words'
+        : 'sentences';
 
   return (
     <div className="receive-wrap">

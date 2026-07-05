@@ -19,11 +19,12 @@ export function ModeSelect() {
   const heardMastered = receiveMasteredCount(receive, pool);
 
   const choose = (m: Mode) => {
-    // Both are user gestures — unlock the relevant audio path here.
     if (m === 'send') unlockAudio();
     else unlockMorse();
     setMode(m);
   };
+
+  const lockNote = `Learn ${MIN_LETTERS_TO_RECEIVE} letters first`;
 
   return (
     <div className="mode-select">
@@ -34,25 +35,38 @@ export function ModeSelect() {
           onClick={() => choose('send')}
         >
           <span className="mode-emoji" aria-hidden="true">✍️</span>
-          <span className="mode-name">Send</span>
-          <span className="mode-desc">Tap the code for each letter</span>
+          <span className="mode-name">Learn</span>
+          <span className="mode-desc">Learn the code — tap each letter</span>
           <span className="mode-meta">{learned}/26 letters learned</span>
         </button>
 
         <button
-          className={`mode-card${lastMode === 'receive' ? ' recommended' : ''}${canReceive ? '' : ' locked'}`}
-          onClick={() => canReceive && choose('receive')}
+          className={`mode-card${lastMode === 'receive-letters' ? ' recommended' : ''}${canReceive ? '' : ' locked'}`}
+          onClick={() => canReceive && choose('receive-letters')}
           disabled={!canReceive}
         >
           <span className="mode-emoji" aria-hidden="true">👂</span>
-          <span className="mode-name">Receive</span>
-          <span className="mode-desc">Hear the code and name the letter</span>
+          <span className="mode-name">Hear letters</span>
+          <span className="mode-desc">Decode words one letter at a time</span>
           {canReceive ? (
             <span className="mode-meta">{heardMastered}/{pool.length} letters mastered by ear</span>
           ) : (
-            <span className="mode-meta lock">
-              Learn {MIN_LETTERS_TO_RECEIVE} letters in Send to unlock
-            </span>
+            <span className="mode-meta lock">{lockNote}</span>
+          )}
+        </button>
+
+        <button
+          className={`mode-card${lastMode === 'receive-words' ? ' recommended' : ''}${canReceive ? '' : ' locked'}`}
+          onClick={() => canReceive && choose('receive-words')}
+          disabled={!canReceive}
+        >
+          <span className="mode-emoji" aria-hidden="true">📻</span>
+          <span className="mode-name">Hear words</span>
+          <span className="mode-desc">Copy whole words &amp; phrases by ear</span>
+          {canReceive ? (
+            <span className="mode-meta">{receive.wordsCompleted} words copied</span>
+          ) : (
+            <span className="mode-meta lock">{lockNote}</span>
           )}
         </button>
       </div>

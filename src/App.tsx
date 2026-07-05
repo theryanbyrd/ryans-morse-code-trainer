@@ -43,7 +43,7 @@ export default function App() {
   };
 
   const inSend = started && onboarded && mode === 'send';
-  const inReceive = started && onboarded && mode === 'receive';
+  const modeLabel = mode === 'send' ? 'Learn' : mode === 'receive-letters' ? 'Hear letters' : 'Hear words';
 
   return (
     <div className="app">
@@ -54,7 +54,7 @@ export default function App() {
           </button>
           {mode && (
             <button className="board-btn" onClick={() => setMode(null)} aria-label="Switch mode">
-              ⇄ {mode === 'send' ? 'Send' : 'Receive'}
+              ⇄ {modeLabel}
             </button>
           )}
           {settings.morseBoard && inSend && (
@@ -80,8 +80,10 @@ export default function App() {
           <Onboarding onDone={finishOnboarding} />
         ) : !mode ? (
           <ModeSelect />
-        ) : inReceive ? (
-          <Receive />
+        ) : mode === 'receive-letters' ? (
+          <Receive section="letters" />
+        ) : mode === 'receive-words' ? (
+          <Receive section="words" />
         ) : (
           <Game key={progressVersion} onOpenStats={() => setOverlay('stats')} />
         )}

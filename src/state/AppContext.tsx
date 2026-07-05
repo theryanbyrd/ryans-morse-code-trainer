@@ -34,7 +34,7 @@ import { loadRemote, mergeSaveState, saveRemote } from '../lib/cloud';
 const ONBOARDED_KEY = 'rmct.onboarded';
 const MODE_KEY = 'rmct.mode';
 
-export type Mode = 'send' | 'receive';
+export type Mode = 'send' | 'receive-letters' | 'receive-words';
 
 type Ctx = {
   settings: Settings;
@@ -77,7 +77,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [mode, setModeState] = useState<Mode | null>(null);
   const [lastMode, setLastMode] = useState<Mode | null>(() => {
     const m = localStorage.getItem(MODE_KEY);
-    return m === 'send' || m === 'receive' ? m : null;
+    return m === 'send' || m === 'receive-letters' || m === 'receive-words' ? m : null;
   });
 
   const settingsRef = useRef(settings);

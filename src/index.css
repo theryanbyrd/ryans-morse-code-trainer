@@ -287,6 +287,17 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 .brick.done { background: var(--cream-strong); color: var(--ink); }
 .brick.current { background: var(--red); color: #fff; transform: translateY(-3px) scale(1.06); }
 .brick.upcoming { background: #ece4d3; color: #c3b89f; }
+.brick.missed { background: #fde7e5; color: var(--red-deep); }
+.brick.pop { animation: brick-pop 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes brick-pop { 0% { transform: scale(0.6); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+
+/* Completed-word reveal in the letter phase */
+.word-complete {
+  margin-top: 14px; background: var(--green); color: #fff;
+  font-weight: 800; font-size: clamp(24px, 7vw, 34px); letter-spacing: 2px;
+  padding: 14px 28px; border-radius: 18px; box-shadow: var(--shadow);
+  animation: toast-in 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
 
 .mnemonic { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .mnemonic-art { width: 116px; height: 116px; color: var(--ink); }
@@ -372,18 +383,18 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
   display: flex; flex-direction: column; align-items: center; gap: 20px;
 }
 .mode-title { color: #fff; font-size: clamp(26px, 6vw, 36px); font-weight: 800; margin: 0; text-align: center; }
-.mode-cards { display: flex; flex-direction: column; gap: 14px; width: 100%; }
+.mode-cards { display: flex; flex-direction: column; gap: 12px; width: 100%; }
 .mode-card {
   background: var(--card); color: var(--ink);
-  border: none; border-radius: 22px; padding: 22px 20px;
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  border: none; border-radius: 20px; padding: 16px 18px;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
   box-shadow: var(--shadow); transition: transform 0.1s, box-shadow 0.1s;
 }
 .mode-card:active { transform: translateY(2px); }
 .mode-card.recommended { outline: 3px solid #fff; outline-offset: 3px; }
 .mode-card.locked { opacity: 0.62; cursor: default; box-shadow: none; }
-.mode-emoji { font-size: 44px; line-height: 1; }
-.mode-name { font-size: 26px; font-weight: 800; color: var(--red); }
+.mode-emoji { font-size: 38px; line-height: 1; }
+.mode-name { font-size: 23px; font-weight: 800; color: var(--red); }
 .mode-desc { font-size: 15px; color: var(--ink-soft); }
 .mode-meta { font-size: 13px; color: var(--ink-soft); margin-top: 4px; font-weight: 600; }
 .mode-meta.lock { color: var(--red-deep); }
