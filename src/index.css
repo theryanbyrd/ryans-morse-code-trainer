@@ -654,6 +654,8 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 .modal.about p { color: var(--ink); }
 .credits { font-size: 14px; color: var(--ink-soft) !important; }
 .credits.small { font-size: 12.5px; }
+.attr-h { font-size: 15px; font-weight: 800; color: var(--ink); margin: 16px 0 4px; }
+.modal code { background: #eef0f2; padding: 1px 6px; border-radius: 6px; font-size: 13px; }
 
 /* Code modals */
 .code-box {

@@ -12,10 +12,11 @@ import { StatsScreen } from './components/StatsScreen';
 import { AboutScreen } from './components/AboutScreen';
 import { GetCodeModal, LoadCodeModal } from './components/CodeModals';
 import { MorseBoard } from './components/MorseBoard';
+import { Attributions } from './components/Attributions';
 import { AccountButton } from './components/Account';
 import { GearIcon, HelpIcon } from './components/Icons';
 
-type Overlay = 'none' | 'settings' | 'stats' | 'about' | 'getcode' | 'loadcode' | 'board';
+type Overlay = 'none' | 'settings' | 'stats' | 'about' | 'getcode' | 'loadcode' | 'board' | 'attributions';
 
 export default function App() {
   const { started, onboarded, mode, settings, progress, progressVersion, start, finishOnboarding, setMode } =
@@ -98,7 +99,10 @@ export default function App() {
         />
       )}
       {overlay === 'stats' && <StatsScreen onClose={closeOverlay} />}
-      {overlay === 'about' && <AboutScreen onClose={closeOverlay} />}
+      {overlay === 'about' && (
+        <AboutScreen onClose={closeOverlay} onShowAttributions={() => setOverlay('attributions')} />
+      )}
+      {overlay === 'attributions' && <Attributions onClose={closeOverlay} />}
       {overlay === 'getcode' && <GetCodeModal onClose={closeOverlay} />}
       {overlay === 'loadcode' && <LoadCodeModal onClose={closeOverlay} />}
       {overlay === 'board' && <MorseBoard onClose={closeOverlay} />}

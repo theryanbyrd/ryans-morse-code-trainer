@@ -1,7 +1,15 @@
 {
   "name": "ryans-morse-code-trainer",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "description": "Learn to send and receive Morse code with picture/sound mnemonics. A React remake inspired by Ace Centre's Morse Learn.",
+  "license": "Apache-2.0",
+  "author": "Ryan Byrd",
+  "homepage": "https://ryans-morse-code-trainer.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/theryanbyrd/ryans-morse-code-trainer"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",

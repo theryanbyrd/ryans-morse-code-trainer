@@ -1,6 +1,12 @@
 import { CloseIcon } from './Icons';
 
-export function AboutScreen({ onClose }: { onClose: () => void }) {
+export function AboutScreen({
+  onClose,
+  onShowAttributions,
+}: {
+  onClose: () => void;
+  onShowAttributions: () => void;
+}) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal about" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="About">
@@ -33,6 +39,9 @@ export function AboutScreen({ onClose }: { onClose: () => void }) {
           </a>{' '}
           · Apache 2.0
         </p>
+        <button className="btn" onClick={onShowAttributions} style={{ width: '100%', marginTop: 8 }}>
+          Attributions &amp; license →
+        </button>
       </div>
     </div>
   );

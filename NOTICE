@@ -1,0 +1,22 @@
+Ryan's Morse Code Trainer
+Copyright 2026 Ryan Byrd
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this work except in compliance with the License. See the LICENSE file, or obtain
+a copy at http://www.apache.org/licenses/LICENSE-2.0.
+
+--------------------------------------------------------------------------------
+
+This product is a derivative of Morse Learn by Ace Centre
+(https://github.com/AceCentre/morse-learn), Copyright Ace Centre and
+contributors, also licensed under the Apache License, Version 2.0. Morse Learn is
+itself based on the original Morse typing trainer created by Tania Finlayson, Use
+All Five, and the Google Creative Lab.
+
+Bundled image and audio assets under public/assets/ are taken from Morse Learn
+(Apache License 2.0). The "sounds-alike" audio was created by voice artist
+Matthew Wade. See public/assets/ATTRIBUTION.md for the full list and for local
+modifications (e.g. the letter "O" clip was re-recorded to say "Oh my gosh").
+
+The application code, the hand-drawn SVG mnemonics (src/data/mnemonics.tsx), and
+the receive/gamification features are original to this project.
