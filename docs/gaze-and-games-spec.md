@@ -136,8 +136,9 @@ QsoSend keying and QsoReceive copying components almost wholesale.
 
 1. ~~**Signal Squadron (MVP)**~~ — ✅ **SHIPPED 2026-07-06** (`src/components/SignalSquadron.tsx`,
    mode `squadron`). ZType-style: key the invader's character + FIRE.
-2. **Cave of Echoes (MVP)** — highest learning value; reuses QSO send/receive
-   components; a bit more content work.
+2. ~~**Cave of Echoes (MVP)**~~ — ✅ **SHIPPED 2026-07-06** (`src/components/CaveQuest.tsx`
+   + `CaveDuel.tsx`, `src/data/cave.ts`, mode `cave`). Key directions to move; STRIKE
+   by keying a monster's weak rune, DEFEND by copying its attack; locked gate + boss.
 3. **Gaze decoder** — highest-impact accessibility feature but needs
    webcam testing and webgazer integration; build behind `gazeInput` (default
    off), lazy-loaded, after a device-testing pass.
