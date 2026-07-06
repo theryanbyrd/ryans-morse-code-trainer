@@ -9,11 +9,12 @@ import {
 } from '../lib/receive';
 import { masteredCount } from '../lib/numbers';
 import { NUM_SYM_ORDER } from '../data/numsym';
+import { KOCH_LESSONS } from '../data/koch';
 import { unlockAudio } from '../lib/audio';
 import { unlockMorse } from '../lib/morsePlayer';
 
 export function ModeSelect() {
-  const { progress, receive, numbers, lastMode, setMode } = useApp();
+  const { progress, receive, numbers, koch, lastMode, setMode } = useApp();
 
   const learned = learnedCount(progress);
   const numsMastered = masteredCount(numbers);
@@ -54,6 +55,17 @@ export function ModeSelect() {
           <span className="mode-name">Numbers &amp; symbols</span>
           <span className="mode-desc">Learn to send 0–9 and punctuation</span>
           <span className="mode-meta">{numsMastered}/{NUM_SYM_ORDER.length} mastered</span>
+        </button>
+
+        <button
+          className={`mode-card${lastMode === 'koch' ? ' recommended' : ''}`}
+          onClick={() => choose('koch')}
+        >
+          <span className="mode-badge tool">Method</span>
+          <span className="mode-emoji" aria-hidden="true">🎧</span>
+          <span className="mode-name">Koch course</span>
+          <span className="mode-desc">The classic method — copy at real speed</span>
+          <span className="mode-meta">Lesson {koch.lesson} / {KOCH_LESSONS}</span>
         </button>
 
         <button

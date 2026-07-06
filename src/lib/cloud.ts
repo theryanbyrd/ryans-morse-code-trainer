@@ -3,7 +3,7 @@
 // (guest) state with the cloud state so nothing is lost, then keep the cloud in
 // sync as the learner plays.
 import { supabase } from './supabase';
-import type { LetterStat, NumbersProgress, Progress, ReceiveLetterStat, ReceiveProgress, SaveState, Settings } from './storage';
+import type { KochProgress, LetterStat, NumbersProgress, Progress, ReceiveLetterStat, ReceiveProgress, SaveState, Settings } from './storage';
 
 const TABLE = 'user_state';
 
@@ -94,6 +94,12 @@ function mergeNumbers(a: NumbersProgress, b: NumbersProgress): NumbersProgress {
   };
 }
 
+function mergeKoch(a: KochProgress, b: KochProgress): KochProgress {
+  const best: Record<string, number> = { ...(a?.best ?? {}) };
+  for (const [k, v] of Object.entries(b?.best ?? {})) best[k] = Math.max(best[k] ?? 0, v);
+  return { lesson: Math.max(a?.lesson ?? 1, b?.lesson ?? 1), best };
+}
+
 export function mergeSaveState(local: SaveState, remote: SaveState): SaveState {
   const settings: Settings = { ...local.settings, ...(remote.settings ?? {}) };
   return {
@@ -101,5 +107,6 @@ export function mergeSaveState(local: SaveState, remote: SaveState): SaveState {
     progress: mergeProgress(local.progress, remote.progress),
     receive: mergeReceive(local.receive, remote.receive),
     numbers: mergeNumbers(local.numbers, remote.numbers),
+    koch: mergeKoch(local.koch, remote.koch),
   };
 }

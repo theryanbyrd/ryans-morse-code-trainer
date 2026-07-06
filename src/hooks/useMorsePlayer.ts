@@ -13,11 +13,15 @@ export function useMorsePlayer() {
 
   const play = useCallback((text: string, wpm?: number) => {
     playback.current?.stop();
+    const s = settingsRef.current;
     playback.current = playMorse(text, {
-      wpm: wpm ?? settingsRef.current.wpm,
-      farnsworth: settingsRef.current.farnsworth,
-      onFlash: settingsRef.current.visual ? setLampOn : undefined,
-      haptic: settingsRef.current.visual,
+      wpm: wpm ?? s.wpm,
+      // An explicit slow-replay speed plays uniformly (no Farnsworth stretch).
+      effWpm: wpm != null ? wpm : s.effWpm,
+      freq: s.tone,
+      volume: s.volume,
+      onFlash: s.visual ? setLampOn : undefined,
+      haptic: s.visual,
     });
   }, []);
 

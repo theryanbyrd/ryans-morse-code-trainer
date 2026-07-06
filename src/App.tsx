@@ -9,6 +9,7 @@ import { Receive } from './components/Receive';
 import { Qso } from './components/Qso';
 import { Translator } from './components/Translator';
 import { NumbersDrill } from './components/NumbersDrill';
+import { KochCourse } from './components/KochCourse';
 import { AlphabetBar } from './components/AlphabetBar';
 import { SettingsModal } from './components/SettingsModal';
 import { StatsScreen } from './components/StatsScreen';
@@ -47,18 +48,16 @@ export default function App() {
   };
 
   const inSend = started && onboarded && mode === 'send';
-  const modeLabel =
-    mode === 'send'
-      ? 'Learn'
-      : mode === 'receive-letters'
-        ? 'Hear letters'
-        : mode === 'receive-words'
-          ? 'Hear words'
-          : mode === 'qso'
-            ? 'On the air'
-            : mode === 'numbers'
-              ? 'Numbers & symbols'
-              : 'Translator';
+  const MODE_LABELS: Record<string, string> = {
+    send: 'Learn',
+    'receive-letters': 'Hear letters',
+    'receive-words': 'Hear words',
+    qso: 'On the air',
+    numbers: 'Numbers & symbols',
+    koch: 'Koch course',
+    translator: 'Translator',
+  };
+  const modeLabel = mode ? MODE_LABELS[mode] : '';
 
   return (
     <div className="app">
@@ -105,6 +104,8 @@ export default function App() {
           <Translator />
         ) : mode === 'numbers' ? (
           <NumbersDrill />
+        ) : mode === 'koch' ? (
+          <KochCourse />
         ) : (
           <Game key={progressVersion} onOpenStats={() => setOverlay('stats')} />
         )}

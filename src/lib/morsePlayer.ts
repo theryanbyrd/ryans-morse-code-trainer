@@ -67,8 +67,8 @@ export function keyUp(): void {
 
 export type PlayOptions = {
   wpm: number; // character speed
-  farnsworth: boolean; // stretch inter-char / word gaps for beginners
-  freq?: number; // sidetone frequency
+  effWpm?: number; // effective (Farnsworth) speed ≤ wpm; stretches the gaps
+  freq?: number; // sidetone frequency (Hz)
   volume?: number;
   onFlash?: (on: boolean) => void; // drive an on-screen lamp in sync
   haptic?: boolean; // vibrate the device in time with the tones
@@ -85,10 +85,10 @@ export function playMorse(text: string, opts: PlayOptions): Playback {
   const freq = opts.freq ?? 640;
   const volume = opts.volume ?? 0.22;
 
-  // Element timing runs at the character WPM; gaps run at the (slower)
-  // Farnsworth WPM when enabled so characters stay crisp but spaced out.
+  // Element timing runs at the character WPM; gaps run at the (slower) effective
+  // WPM so characters stay crisp but are spaced out (Farnsworth).
   const unit = 1.2 / opts.wpm; // seconds per dit at character speed
-  const effWpm = opts.farnsworth ? Math.min(opts.wpm, 7) : opts.wpm;
+  const effWpm = Math.min(opts.effWpm ?? opts.wpm, opts.wpm);
   const gapUnit = 1.2 / effWpm;
 
   if (!ac) return { stop: () => {}, durationMs: 0 };

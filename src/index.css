@@ -914,3 +914,40 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 /* Brand wordmark */
 .start-title.brand { font-size: clamp(72px, 22vw, 150px); letter-spacing: -3px; }
 .start-tagline { margin: -6px 0 0; color: var(--on-dark-soft); font-size: clamp(15px, 3.6vw, 20px); font-weight: 600; }
+
+/* Koch course */
+.koch { width: 100%; max-width: 520px; display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
+.koch .mode-title { text-align: center; }
+.koch-intro { color: var(--on-dark-soft); text-align: center; font-size: 13.5px; margin: 0 4px; }
+.koch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(66px, 1fr)); gap: 8px; }
+.koch-cell {
+  background: var(--card); border: 1px solid rgba(255,255,255,0.5); border-radius: 12px;
+  padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 1px;
+  box-shadow: var(--shadow-card);
+}
+.koch-cell.locked { opacity: 0.4; filter: grayscale(1); box-shadow: none; }
+.koch-cell.active { outline: 2px solid var(--amber); outline-offset: 2px; }
+.kc-n { font-weight: 800; color: var(--ink); font-size: 15px; }
+.kc-ch { font-family: ui-monospace, monospace; font-weight: 800; color: var(--red); font-size: 13px; }
+.kc-best { font-size: 11px; color: var(--green-dark); font-weight: 700; }
+
+.koch-chars { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; }
+.kchip {
+  min-width: 26px; height: 28px; padding: 0 6px; border-radius: 7px; display: grid; place-items: center;
+  font-family: ui-monospace, monospace; font-weight: 800; font-size: 15px;
+  background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6);
+}
+.kchip.new { background: var(--red); color: #fff; }
+
+.koch-panel { background: var(--card); border: 1px solid rgba(255,255,255,0.5); border-radius: 16px; padding: 20px; text-align: center; box-shadow: var(--shadow-card); }
+.koch-panel p { color: var(--ink-soft); margin: 0 0 14px; }
+.koch-input { min-height: 70px; resize: vertical; text-align: left; letter-spacing: 2px; font-family: ui-monospace, monospace; }
+
+.koch-result { background: var(--card); border: 1px solid rgba(255,255,255,0.5); border-radius: 18px; padding: 20px; text-align: center; box-shadow: var(--shadow-card); }
+.koch-score { font-size: 44px; font-weight: 800; color: var(--red-deep); }
+.koch-score.pass { color: var(--green-dark); }
+.koch-result p { color: var(--ink-soft); margin: 4px 0 12px; }
+.koch-sent { font-size: 13px; color: var(--ink-soft); word-break: break-word; }
+.koch-sent code { font-family: ui-monospace, monospace; color: var(--ink); }
+.koch-per { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 10px 0; }
+.kper { font-size: 12px; font-weight: 700; background: #ffe1e4; color: var(--red-deep); border-radius: 8px; padding: 2px 8px; }

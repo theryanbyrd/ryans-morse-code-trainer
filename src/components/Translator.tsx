@@ -31,12 +31,14 @@ export function Translator() {
       if (!t) return;
       playback.current = playMorse(t, {
         wpm: settings.wpm,
-        farnsworth: settings.farnsworth,
+        effWpm: settings.effWpm,
+        freq: settings.tone,
+        volume: settings.volume,
         onFlash: visual ? setLampOn : undefined,
         haptic: visual && settings.visual,
       });
     },
-    [text, morse, settings.wpm, settings.farnsworth, settings.visual],
+    [text, morse, settings.wpm, settings.effWpm, settings.tone, settings.volume, settings.visual],
   );
 
   const copy = async (which: 'text' | 'morse') => {

@@ -120,7 +120,13 @@ export function QsoSend({ text, onDone }: { text: string; onDone: () => void }) 
       </div>
 
       {settings.straightKey ? (
-        <StraightKey onSymbol={(s) => key(s)} onDelete={() => key('delete')} wpm={settings.sendWpm} />
+        <StraightKey
+          onSymbol={(s) => key(s)}
+          onDelete={() => key('delete')}
+          wpm={settings.sendWpm}
+          freq={settings.tone}
+          volume={settings.volume}
+        />
       ) : (
         <Keypad onAction={key} scanIndex={null} oneSwitch={false} />
       )}

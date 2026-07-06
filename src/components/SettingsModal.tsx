@@ -8,7 +8,6 @@ type ToggleKey =
   | 'visualHints'
   | 'morseBoard'
   | 'oneSwitch'
-  | 'farnsworth'
   | 'visual'
   | 'straightKey'
   | 'qsoFreeform'
@@ -21,7 +20,6 @@ const TOGGLES: { key: ToggleKey; label: string; help: string }[] = [
   { key: 'visualHints', label: 'Visual Hints', help: 'Show the mnemonic picture for each letter' },
   { key: 'morseBoard', label: 'Morse Board', help: 'Show the A–Z reference board button' },
   { key: 'oneSwitch', label: 'One-Switch Mode', help: 'Operate everything from a single switch' },
-  { key: 'farnsworth', label: 'Beginner spacing', help: 'Extra space between letters when receiving' },
   { key: 'visual', label: 'Flash & vibrate', help: 'Blink and buzz in time with the code (Receive)' },
   { key: 'straightKey', label: 'Straight-key mode', help: 'On the air: one key — tap = dit, hold = dah' },
   { key: 'qsoFreeform', label: 'Freeform QSOs', help: 'Add randomly-generated contacts to On the air' },
@@ -87,16 +85,52 @@ export function SettingsModal({
 
           <label className="toggle-row slider-row">
             <span className="toggle-text">
-              <span className="toggle-label">Receive speed</span>
-              <span className="toggle-help">{settings.wpm} WPM (how fast the code plays)</span>
+              <span className="toggle-label">Character speed</span>
+              <span className="toggle-help">{settings.wpm} WPM — how fast each character is sent</span>
+            </span>
+            <input
+              type="range"
+              min={8}
+              max={35}
+              step={1}
+              value={settings.wpm}
+              onChange={(e) => {
+                const v = Number(e.target.value);
+                setSetting('wpm', v);
+                if (settings.effWpm > v) setSetting('effWpm', v);
+              }}
+            />
+          </label>
+
+          <label className="toggle-row slider-row">
+            <span className="toggle-text">
+              <span className="toggle-label">Effective speed</span>
+              <span className="toggle-help">
+                {settings.effWpm} WPM — Farnsworth spacing{settings.effWpm < settings.wpm ? '' : ' (off)'}
+              </span>
             </span>
             <input
               type="range"
               min={5}
-              max={25}
+              max={settings.wpm}
               step={1}
-              value={settings.wpm}
-              onChange={(e) => setSetting('wpm', Number(e.target.value))}
+              value={settings.effWpm}
+              onChange={(e) => setSetting('effWpm', Number(e.target.value))}
+            />
+          </label>
+
+          <label className="toggle-row slider-row">
+            <span className="toggle-text">
+              <span className="toggle-label">Tone</span>
+              <span className="toggle-help">{settings.tone} Hz — sidetone pitch</span>
+            </span>
+            <input
+              type="range"
+              min={400}
+              max={1000}
+              step={10}
+              value={settings.tone}
+              onChange={(e) => setSetting('tone', Number(e.target.value))}
             />
           </label>
 

@@ -4,13 +4,15 @@ import {
   DEFAULT_SETTINGS,
   decodeProgress,
   freshProgress,
+  freshKochProgress,
   freshNumbersProgress,
   freshReceiveProgress,
   load,
   save,
 } from '../lib/storage';
-import type { NumbersProgress, Progress, ReceiveProgress, Settings } from '../lib/storage';
+import type { KochProgress, NumbersProgress, Progress, ReceiveProgress, Settings } from '../lib/storage';
 import { applyNumberAnswer } from '../lib/numbers';
+import { KOCH_LESSONS, KOCH_PASS } from '../data/koch';
 import {
   applyLetterAnswer,
   applyWordEnd,
@@ -36,7 +38,7 @@ import { loadRemote, mergeSaveState, saveRemote } from '../lib/cloud';
 const ONBOARDED_KEY = 'rmct.onboarded';
 const MODE_KEY = 'rmct.mode';
 
-export type Mode = 'send' | 'receive-letters' | 'receive-words' | 'qso' | 'translator' | 'numbers';
+export type Mode = 'send' | 'receive-letters' | 'receive-words' | 'qso' | 'translator' | 'numbers' | 'koch';
 
 type Ctx = {
   settings: Settings;
@@ -59,6 +61,8 @@ type Ctx = {
   numbers: NumbersProgress;
   answerNumber: (ch: string, correct: boolean) => NumbersProgress;
   addNumbersPlayTime: (ms: number) => void;
+  koch: KochProgress;
+  recordKoch: (lesson: number, pct: number) => void;
   completeReceiveWord: () => void;
   completeReceiveSentence: () => void;
   receiveToasts: ReceiveToast[];
@@ -77,6 +81,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [progress, setProgress] = useState<Progress>(initial.progress);
   const [receive, setReceive] = useState<ReceiveProgress>(initial.receive);
   const [numbers, setNumbers] = useState<NumbersProgress>(initial.numbers);
+  const [koch, setKoch] = useState<KochProgress>(initial.koch);
   const [started, setStarted] = useState(false);
   const [onboarded, setOnboarded] = useState(() => localStorage.getItem(ONBOARDED_KEY) === '1');
   const [progressVersion, setProgressVersion] = useState(0);
@@ -88,7 +93,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       m === 'receive-words' ||
       m === 'qso' ||
       m === 'translator' ||
-      m === 'numbers'
+      m === 'numbers' ||
+      m === 'koch'
       ? m
       : null;
   });
@@ -97,14 +103,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const progressRef = useRef(progress);
   const receiveRef = useRef(receive);
   const numbersRef = useRef(numbers);
+  const kochRef = useRef(koch);
   settingsRef.current = settings;
   progressRef.current = progress;
   receiveRef.current = receive;
   numbersRef.current = numbers;
+  kochRef.current = koch;
 
   useEffect(() => {
-    save({ settings, progress, receive, numbers });
-  }, [settings, progress, receive, numbers]);
+    save({ settings, progress, receive, numbers, koch });
+  }, [settings, progress, receive, numbers, koch]);
 
   // ----- Cloud sync (only active when Supabase is configured + signed in) -----
   const { user } = useAuth();
@@ -126,6 +134,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         progress: progressRef.current,
         receive: receiveRef.current,
         numbers: numbersRef.current,
+        koch: kochRef.current,
       };
       const remote = await loadRemote(uid);
       const merged = remote ? mergeSaveState(local, remote) : local;
@@ -133,6 +142,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setProgress(merged.progress);
       setReceive(merged.receive);
       setNumbers(merged.numbers);
+      setKoch(merged.koch);
       setProgressVersion((v) => v + 1);
       await saveRemote(uid, merged);
       syncReadyForUser.current = uid;
@@ -144,9 +154,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const uid = user?.id;
     if (!uid || syncReadyForUser.current !== uid) return;
-    const t = setTimeout(() => void saveRemote(uid, { settings, progress, receive, numbers }), 800);
+    const t = setTimeout(() => void saveRemote(uid, { settings, progress, receive, numbers, koch }), 800);
     return () => clearTimeout(t);
-  }, [settings, progress, receive, numbers, user]);
+  }, [settings, progress, receive, numbers, koch, user]);
 
   const setSetting = useCallback<Ctx['setSetting']>((key, value) => {
     setSettings((s) => ({ ...s, [key]: value }));
@@ -251,10 +261,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setNumbers((n) => ({ ...n, playMs: n.playMs + ms }));
   }, []);
 
+  const recordKoch = useCallback<Ctx['recordKoch']>((lesson, pct) => {
+    setKoch((k) => {
+      const key = String(lesson);
+      const best = { ...k.best, [key]: Math.max(k.best[key] ?? 0, pct) };
+      const lessonNum =
+        pct >= KOCH_PASS && lesson === k.lesson && lesson < KOCH_LESSONS ? k.lesson + 1 : k.lesson;
+      return { lesson: lessonNum, best };
+    });
+  }, []);
+
   const resetProgress = useCallback(() => {
     setProgress(freshProgress());
     setReceive(freshReceiveProgress());
     setNumbers(freshNumbersProgress());
+    setKoch(freshKochProgress());
     setProgressVersion((v) => v + 1);
   }, []);
 
@@ -285,6 +306,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       numbers,
       answerNumber,
       addNumbersPlayTime,
+      koch,
+      recordKoch,
       completeReceiveWord,
       completeReceiveSentence,
       receiveToasts,
@@ -294,7 +317,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       resetProgress,
       loadFromCode,
     }),
-    [settings, progress, receive, numbers, started, onboarded, progressVersion, mode, lastMode, receiveToasts, setSetting, start, finishOnboarding, setMode, answerLetter, answerReceive, answerNumber, addNumbersPlayTime, completeReceiveWord, completeReceiveSentence, dismissToast, addPlayTime, addReceivePlayTime, resetProgress, loadFromCode],
+    [settings, progress, receive, numbers, koch, started, onboarded, progressVersion, mode, lastMode, receiveToasts, setSetting, start, finishOnboarding, setMode, answerLetter, answerReceive, answerNumber, addNumbersPlayTime, recordKoch, completeReceiveWord, completeReceiveSentence, dismissToast, addPlayTime, addReceivePlayTime, resetProgress, loadFromCode],
   );
 
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>;

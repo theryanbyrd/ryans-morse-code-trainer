@@ -14,9 +14,12 @@ export type Settings = {
   oneSwitch: boolean;
   trackingConsent: boolean;
   scanIntervalMs: number; // one-switch dwell time
-  // Receive mode: character speed (WPM) and Farnsworth (extra-spaced) timing.
+  // Receive/playback timing & tone. wpm = character speed; effWpm = effective
+  // (Farnsworth) speed ≤ wpm that stretches the gaps; tone = sidetone Hz.
   wpm: number;
-  farnsworth: boolean;
+  effWpm: number;
+  tone: number;
+  volume: number;
   // Receive: mirror the audio with an on-screen flash + device vibration.
   visual: boolean;
   // Advanced (default off): straight-key keying + send speed, and freeform QSOs.
@@ -75,6 +78,12 @@ export type NumbersProgress = {
   playMs: number;
 };
 
+// Koch-method receive course: current unlocked lesson + best score per lesson.
+export type KochProgress = {
+  lesson: number; // highest unlocked lesson (1-based)
+  best: Record<string, number>; // lesson number -> best % copy
+};
+
 export const START_LETTERS = 3;
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -85,8 +94,10 @@ export const DEFAULT_SETTINGS: Settings = {
   oneSwitch: false,
   trackingConsent: false,
   scanIntervalMs: 1200,
-  wpm: 12,
-  farnsworth: true,
+  wpm: 18,
+  effWpm: 12,
+  tone: 640,
+  volume: 0.2,
   visual: false,
   straightKey: false,
   sendWpm: 13,
@@ -94,12 +105,24 @@ export const DEFAULT_SETTINGS: Settings = {
   morseTree: false,
 };
 
+// Carry the old boolean `farnsworth` + `wpm` into the new char/effective model.
+function migrateSettings(s: Settings, raw?: Partial<Settings> & { farnsworth?: boolean }): Settings {
+  if (raw && raw.effWpm === undefined) {
+    s = { ...s, effWpm: raw.farnsworth ? Math.min(s.wpm, 7) : s.wpm };
+  }
+  return s;
+}
+
 export function freshProgress(): Progress {
   const letters: Record<string, LetterStat> = {};
   for (const l of TEACHING_ORDER) {
     letters[l] = { attempts: 0, correct: 0, wrong: 0, score: 0, hideHint: false };
   }
   return { letters, lettersInPlay: START_LETTERS, consecutiveCorrect: 0, totalAnswered: 0, playMs: 0 };
+}
+
+export function freshKochProgress(): KochProgress {
+  return { lesson: 1, best: {} };
 }
 
 export function freshNumbersProgress(): NumbersProgress {
@@ -133,10 +156,11 @@ export function load(): SaveState {
     if (raw) {
       const parsed = JSON.parse(raw) as Partial<SaveState>;
       return {
-        settings: { ...DEFAULT_SETTINGS, ...(parsed.settings ?? {}) },
+        settings: migrateSettings({ ...DEFAULT_SETTINGS, ...(parsed.settings ?? {}) }, parsed.settings),
         progress: hydrateProgress(parsed.progress),
         receive: hydrateReceive(parsed.receive),
         numbers: hydrateNumbers(parsed.numbers),
+        koch: hydrateKoch(parsed.koch),
       };
     }
   } catch {
@@ -147,6 +171,7 @@ export function load(): SaveState {
     progress: freshProgress(),
     receive: freshReceiveProgress(),
     numbers: freshNumbersProgress(),
+    koch: freshKochProgress(),
   };
 }
 
@@ -155,7 +180,12 @@ export type SaveState = {
   progress: Progress;
   receive: ReceiveProgress;
   numbers: NumbersProgress;
+  koch: KochProgress;
 };
+
+function hydrateKoch(k?: Partial<KochProgress>): KochProgress {
+  return { lesson: Math.max(1, k?.lesson ?? 1), best: k?.best ?? {} };
+}
 
 function hydrateNumbers(n?: Partial<NumbersProgress>): NumbersProgress {
   const base = freshNumbersProgress();

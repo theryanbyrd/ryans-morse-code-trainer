@@ -8,23 +8,29 @@ export function StraightKey({
   onSymbol,
   onDelete,
   wpm,
+  freq = 640,
+  volume = 0.22,
 }: {
   onSymbol: (sym: 'dot' | 'dash') => void;
   onDelete: () => void;
   wpm: number;
+  freq?: number;
+  volume?: number;
 }) {
   const [held, setHeld] = useState(false);
   const heldRef = useRef(false);
   const startRef = useRef(0);
   const wpmRef = useRef(wpm);
   wpmRef.current = wpm;
+  const toneRef = useRef({ freq, volume });
+  toneRef.current = { freq, volume };
 
   const press = useCallback(() => {
     if (heldRef.current) return;
     heldRef.current = true;
     setHeld(true);
     startRef.current = performance.now();
-    keyDown();
+    keyDown(toneRef.current.freq, toneRef.current.volume);
   }, []);
 
   const release = useCallback(() => {
