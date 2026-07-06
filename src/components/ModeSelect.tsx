@@ -23,7 +23,7 @@ export function ModeSelect() {
   const heardMastered = receiveMasteredCount(receive, pool);
 
   const choose = (m: Mode) => {
-    if (m === 'send' || m === 'numbers') unlockAudio();
+    if (m === 'send' || m === 'numbers' || m === 'squadron') unlockAudio();
     else if (m === 'qso') {
       unlockAudio();
       unlockMorse();
@@ -112,6 +112,17 @@ export function ModeSelect() {
           ) : (
             <span className="mode-meta lock">{lockNote}</span>
           )}
+        </button>
+
+        <button
+          className={`mode-card${lastMode === 'squadron' ? ' recommended' : ''}`}
+          onClick={() => choose('squadron')}
+        >
+          <span className="mode-badge game">Game</span>
+          <span className="mode-emoji" aria-hidden="true">🚀</span>
+          <span className="mode-name">Signal Squadron</span>
+          <span className="mode-desc">Blast invaders by keying their letter</span>
+          <span className="mode-meta">Arcade sending practice</span>
         </button>
 
         <button

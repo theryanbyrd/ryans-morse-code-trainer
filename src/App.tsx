@@ -10,6 +10,7 @@ import { Qso } from './components/Qso';
 import { Translator } from './components/Translator';
 import { NumbersDrill } from './components/NumbersDrill';
 import { KochCourse } from './components/KochCourse';
+import { SignalSquadron } from './components/SignalSquadron';
 import { AlphabetBar } from './components/AlphabetBar';
 import { SettingsModal } from './components/SettingsModal';
 import { StatsScreen } from './components/StatsScreen';
@@ -55,6 +56,7 @@ export default function App() {
     qso: 'On the air',
     numbers: 'Numbers & symbols',
     koch: 'Koch course',
+    squadron: 'Signal Squadron',
     translator: 'Translator',
   };
   const modeLabel = mode ? MODE_LABELS[mode] : '';
@@ -106,6 +108,8 @@ export default function App() {
           <NumbersDrill />
         ) : mode === 'koch' ? (
           <KochCourse />
+        ) : mode === 'squadron' ? (
+          <SignalSquadron />
         ) : (
           <Game key={progressVersion} onOpenStats={() => setOverlay('stats')} />
         )}
