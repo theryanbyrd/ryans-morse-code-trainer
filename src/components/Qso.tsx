@@ -4,11 +4,14 @@ import type { QsoScenario } from '../data/qso';
 import { useApp } from '../state/AppContext';
 import { QsoSend } from './QsoSend';
 import { QsoReceive } from './QsoReceive';
+import { CwGuide } from './CwGuide';
 
 export function Qso() {
   const { settings } = useApp();
   const [scenario, setScenario] = useState<QsoScenario | null>(null);
   const [turnIndex, setTurnIndex] = useState(0);
+  const [showGuide, setShowGuide] = useState(false);
+  const guide = showGuide ? <CwGuide onClose={() => setShowGuide(false)} /> : null;
 
   const startScenario = (s: QsoScenario) => {
     setScenario(s);
@@ -20,6 +23,7 @@ export function Qso() {
       <div className="qso-list">
         <h1 className="mode-title">On the air</h1>
         <p className="qso-intro">Pick a scenario and work a full CW contact — send each transmission, then copy the reply.</p>
+        <button className="qso-guide-link" onClick={() => setShowGuide(true)}>📖 CW shorthand guide</button>
         {settings.qsoFreeform && (
           <button className="qso-random" onClick={() => startScenario(generateQso())}>
             🎲 Random QSO — a fresh, unscripted contact
@@ -41,6 +45,7 @@ export function Qso() {
             </button>
           ))}
         </div>
+        {guide}
       </div>
     );
   }
@@ -53,7 +58,10 @@ export function Qso() {
       <div className="qso-head">
         <button className="qso-back" onClick={() => setScenario(null)}>‹ Scenarios</button>
         <span className="qso-head-title">{scenario.title}</span>
-        <span className="qso-head-prog">{Math.min(turnIndex, scenario.turns.length)}/{scenario.turns.length}</span>
+        <div className="qso-head-right">
+          <button className="qso-guide-btn" onClick={() => setShowGuide(true)} aria-label="CW shorthand guide">📖</button>
+          <span className="qso-head-prog">{Math.min(turnIndex, scenario.turns.length)}/{scenario.turns.length}</span>
+        </div>
       </div>
 
       <Log scenario={scenario} upto={turnIndex} />
@@ -80,6 +88,7 @@ export function Qso() {
           )}
         </>
       )}
+      {guide}
     </div>
   );
 }

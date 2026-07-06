@@ -829,3 +829,36 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
   box-shadow: 0 0 0 5px rgba(255,176,32,0.35), 0 3px 8px rgba(8,10,30,0.35);
 }
 .straight-key.down .sk-hint { color: #6a5400; }
+
+/* CW shorthand guide */
+.qso-guide-link {
+  width: 100%; border: 1px solid rgba(255,255,255,0.14); border-radius: 999px;
+  background: var(--glass); color: var(--on-dark); font-weight: 700; font-size: 14px; padding: 10px;
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+}
+.qso-guide-link:hover { background: var(--glass-strong); }
+.qso-head-right { display: flex; align-items: center; gap: 10px; }
+.qso-guide-btn {
+  background: var(--glass); border: 1px solid rgba(255,255,255,0.14); border-radius: 999px;
+  color: var(--on-dark); font-size: 15px; padding: 4px 10px; line-height: 1;
+}
+.qso-guide-btn:hover { background: var(--glass-strong); }
+
+.modal.cw-guide { max-width: 480px; }
+.cw-search {
+  width: 100%; border: 1px solid #ddd; border-radius: 12px; padding: 11px 14px;
+  font-size: 16px; color: var(--ink); margin-bottom: 8px; background: #fff;
+}
+.cw-search:focus { outline: 2px solid var(--green); }
+.cw-group { margin-top: 12px; }
+.cw-h {
+  font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px;
+  color: var(--green-dark); margin: 0 0 6px;
+}
+.cw-list { margin: 0; }
+.cw-row {
+  display: grid; grid-template-columns: 100px 1fr; gap: 10px; align-items: baseline;
+  padding: 6px 0; border-bottom: 1px solid #f1f1f3;
+}
+.cw-term { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-weight: 800; color: var(--red); font-size: 14px; }
+.cw-mean { margin: 0; color: var(--ink-soft); font-size: 14px; line-height: 1.4; }
