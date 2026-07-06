@@ -5,7 +5,7 @@
 //   word gap = 7. Farnsworth stretches the GAPS (not the elements) so beginners
 //   hear crisp characters with extra breathing room.
 
-import { MORSE } from '../data/morse';
+import { MORSE_FULL as MORSE } from '../data/morse';
 
 let ctx: AudioContext | null = null;
 

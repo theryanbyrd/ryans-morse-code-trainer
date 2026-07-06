@@ -20,7 +20,10 @@ export function ModeSelect() {
 
   const choose = (m: Mode) => {
     if (m === 'send') unlockAudio();
-    else unlockMorse();
+    else if (m === 'qso') {
+      unlockAudio();
+      unlockMorse();
+    } else unlockMorse();
     setMode(m);
   };
 
@@ -65,6 +68,22 @@ export function ModeSelect() {
           <span className="mode-desc">Copy whole words &amp; phrases by ear</span>
           {canReceive ? (
             <span className="mode-meta">{receive.wordsCompleted} words copied</span>
+          ) : (
+            <span className="mode-meta lock">{lockNote}</span>
+          )}
+        </button>
+
+        <button
+          className={`mode-card${lastMode === 'qso' ? ' recommended' : ''}${canReceive ? '' : ' locked'}`}
+          onClick={() => canReceive && choose('qso')}
+          disabled={!canReceive}
+        >
+          <span className="mode-badge">Advanced</span>
+          <span className="mode-emoji" aria-hidden="true">📡</span>
+          <span className="mode-name">On the air</span>
+          <span className="mode-desc">Work a real CW contact — send &amp; copy a QSO</span>
+          {canReceive ? (
+            <span className="mode-meta">20 ham radio scenarios</span>
           ) : (
             <span className="mode-meta lock">{lockNote}</span>
           )}

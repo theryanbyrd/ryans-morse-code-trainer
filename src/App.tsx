@@ -6,6 +6,7 @@ import { Onboarding } from './components/Onboarding';
 import { Game } from './components/Game';
 import { ModeSelect } from './components/ModeSelect';
 import { Receive } from './components/Receive';
+import { Qso } from './components/Qso';
 import { AlphabetBar } from './components/AlphabetBar';
 import { SettingsModal } from './components/SettingsModal';
 import { StatsScreen } from './components/StatsScreen';
@@ -44,7 +45,14 @@ export default function App() {
   };
 
   const inSend = started && onboarded && mode === 'send';
-  const modeLabel = mode === 'send' ? 'Learn' : mode === 'receive-letters' ? 'Hear letters' : 'Hear words';
+  const modeLabel =
+    mode === 'send'
+      ? 'Learn'
+      : mode === 'receive-letters'
+        ? 'Hear letters'
+        : mode === 'receive-words'
+          ? 'Hear words'
+          : 'On the air';
 
   return (
     <div className="app">
@@ -85,6 +93,8 @@ export default function App() {
           <Receive section="letters" />
         ) : mode === 'receive-words' ? (
           <Receive section="words" />
+        ) : mode === 'qso' ? (
+          <Qso />
         ) : (
           <Game key={progressVersion} onOpenStats={() => setOverlay('stats')} />
         )}

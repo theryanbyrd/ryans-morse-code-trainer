@@ -35,6 +35,34 @@ export const PATTERN_TO_LETTER: Record<string, string> = Object.fromEntries(
   Object.entries(MORSE).map(([letter, pattern]) => [pattern, letter]),
 );
 
+// Digits + the punctuation/prosigns used on the air (for the QSO simulator).
+export const MORSE_EXTRA: Record<string, string> = {
+  '0': '-----',
+  '1': '.----',
+  '2': '..---',
+  '3': '...--',
+  '4': '....-',
+  '5': '.....',
+  '6': '-....',
+  '7': '--...',
+  '8': '---..',
+  '9': '----.',
+  '/': '-..-.', // portable / callsign slash
+  '?': '..--..',
+  '.': '.-.-.-',
+  ',': '--..--',
+  '=': '-...-', // BT — the "break" separator ham ops send between thoughts
+  '+': '.-.-.', // AR — end of message
+};
+
+/** Full character set: letters + digits + punctuation/prosigns. */
+export const MORSE_FULL: Record<string, string> = { ...MORSE, ...MORSE_EXTRA };
+
+/** Morse pattern for any supported character ('' if unsupported). */
+export function patternForChar(ch: string): string {
+  return MORSE_FULL[ch.toLowerCase()] ?? '';
+}
+
 // Teaching order taken from the original Morse Learn config: simplest /
 // most-frequent signals first, not strict alphabetical order.
 export const TEACHING_ORDER = [
