@@ -1,4 +1,6 @@
-# Ryan's Morse Code Trainer
+# Ditty — Learn Morse Code
+
+*Morse code, one dit at a time.* (Formerly "Ryan's Morse Code Trainer".)
 
 Learn the Morse alphabet the friendly way — every letter is paired with a
 memorable picture and sound, so you recall a *rhythm* instead of memorising

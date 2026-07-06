@@ -910,3 +910,7 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 }
 .np-chip.done { background: rgba(255,176,32,0.22); color: var(--amber-soft); }
 .np-chip.current { background: var(--red); color: #fff; box-shadow: 0 4px 12px rgba(255,79,109,0.4); }
+
+/* Brand wordmark */
+.start-title.brand { font-size: clamp(72px, 22vw, 150px); letter-spacing: -3px; }
+.start-tagline { margin: -6px 0 0; color: var(--on-dark-soft); font-size: clamp(15px, 3.6vw, 20px); font-weight: 600; }

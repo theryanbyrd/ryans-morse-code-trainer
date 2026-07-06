@@ -18,9 +18,9 @@ export function AboutScreen({
         </header>
 
         <p>
-          <b>Ryan's Morse Code Trainer</b> makes learning Morse code more fun by pairing every
-          letter with a memorable picture and sound. Recall the code and tap it in with the on-screen
-          buttons, your keyboard, or the input device of your choice.
+          <b>Ditty</b> makes learning Morse code more fun by pairing every letter with a memorable
+          picture and sound. Recall the code and tap it in with the on-screen buttons, your keyboard,
+          or the input device of your choice — then send and copy real contacts on the air.
         </p>
         <p>
           It's built for everyone — including audio-first learners and people who drive everything
