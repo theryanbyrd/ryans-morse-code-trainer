@@ -126,6 +126,12 @@ export function playLetterName(letter: string): void {
   play(url.letter(letter));
 }
 
+/** Spoken name for a number/symbol drill character (audio key, e.g. "question"). */
+export function playNumName(audioKey: string): void {
+  cancelSpeech();
+  hintAudio = play(`${BASE}/numsym/${audioKey}.mp3`);
+}
+
 // ----- SpeechSynthesis fallback (completion message only) --------------------
 
 export function speak(text: string, rate = 1): void {

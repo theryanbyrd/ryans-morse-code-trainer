@@ -899,3 +899,14 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
   border-radius: 14px; padding: 8px; overflow-x: auto;
 }
 .morse-tree svg { min-width: 460px; display: block; }
+
+/* Numbers & symbols drill progress chips */
+.num-progress { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; width: 100%; }
+.np-chip {
+  min-width: 24px; height: 26px; padding: 0 6px; border-radius: 7px;
+  display: grid; place-items: center; font-weight: 800; font-size: 14px;
+  font-family: ui-monospace, monospace;
+  background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5);
+}
+.np-chip.done { background: rgba(255,176,32,0.22); color: var(--amber-soft); }
+.np-chip.current { background: var(--red); color: #fff; box-shadow: 0 4px 12px rgba(255,79,109,0.4); }

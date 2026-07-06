@@ -2,6 +2,7 @@
 // No account required — progress lives on the device and can be exported as a code.
 
 import { TEACHING_ORDER } from '../data/morse';
+import { NUM_SYM_ORDER } from '../data/numsym';
 
 const KEY = 'rmct.v1';
 
@@ -67,6 +68,13 @@ export type ReceiveProgress = {
   badges: string[]; // earned badge ids
 };
 
+// Numbers & symbols drill — same per-character shape as letters.
+export type NumbersProgress = {
+  chars: Record<string, LetterStat>;
+  totalAnswered: number;
+  playMs: number;
+};
+
 export const START_LETTERS = 3;
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -92,6 +100,12 @@ export function freshProgress(): Progress {
     letters[l] = { attempts: 0, correct: 0, wrong: 0, score: 0, hideHint: false };
   }
   return { letters, lettersInPlay: START_LETTERS, consecutiveCorrect: 0, totalAnswered: 0, playMs: 0 };
+}
+
+export function freshNumbersProgress(): NumbersProgress {
+  const chars: Record<string, LetterStat> = {};
+  for (const c of NUM_SYM_ORDER) chars[c] = { attempts: 0, correct: 0, wrong: 0, score: 0, hideHint: false };
+  return { chars, totalAnswered: 0, playMs: 0 };
 }
 
 export function freshReceiveProgress(): ReceiveProgress {
@@ -122,19 +136,36 @@ export function load(): SaveState {
         settings: { ...DEFAULT_SETTINGS, ...(parsed.settings ?? {}) },
         progress: hydrateProgress(parsed.progress),
         receive: hydrateReceive(parsed.receive),
+        numbers: hydrateNumbers(parsed.numbers),
       };
     }
   } catch {
     /* ignore corrupt storage */
   }
-  return { settings: { ...DEFAULT_SETTINGS }, progress: freshProgress(), receive: freshReceiveProgress() };
+  return {
+    settings: { ...DEFAULT_SETTINGS },
+    progress: freshProgress(),
+    receive: freshReceiveProgress(),
+    numbers: freshNumbersProgress(),
+  };
 }
 
 export type SaveState = {
   settings: Settings;
   progress: Progress;
   receive: ReceiveProgress;
+  numbers: NumbersProgress;
 };
+
+function hydrateNumbers(n?: Partial<NumbersProgress>): NumbersProgress {
+  const base = freshNumbersProgress();
+  if (!n) return base;
+  return {
+    chars: { ...base.chars, ...(n.chars ?? {}) },
+    totalAnswered: n.totalAnswered ?? 0,
+    playMs: n.playMs ?? 0,
+  };
+}
 
 function hydrateReceive(r?: Partial<ReceiveProgress>): ReceiveProgress {
   const base = freshReceiveProgress();

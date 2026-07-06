@@ -3,7 +3,7 @@
 // (guest) state with the cloud state so nothing is lost, then keep the cloud in
 // sync as the learner plays.
 import { supabase } from './supabase';
-import type { LetterStat, Progress, ReceiveLetterStat, ReceiveProgress, SaveState, Settings } from './storage';
+import type { LetterStat, NumbersProgress, Progress, ReceiveLetterStat, ReceiveProgress, SaveState, Settings } from './storage';
 
 const TABLE = 'user_state';
 
@@ -83,11 +83,23 @@ function mergeReceive(a: ReceiveProgress, b: ReceiveProgress): ReceiveProgress {
  * receive stats take the higher score per letter; settings prefer the cloud
  * (the account is canonical) but fall back to local when the cloud has none.
  */
+function mergeNumbers(a: NumbersProgress, b: NumbersProgress): NumbersProgress {
+  const keys = new Set([...Object.keys(a?.chars ?? {}), ...Object.keys(b?.chars ?? {})]);
+  const chars: Record<string, LetterStat> = {};
+  for (const k of keys) chars[k] = mergeLetter(a?.chars?.[k], b?.chars?.[k]);
+  return {
+    chars,
+    totalAnswered: Math.max(a?.totalAnswered ?? 0, b?.totalAnswered ?? 0),
+    playMs: Math.max(a?.playMs ?? 0, b?.playMs ?? 0),
+  };
+}
+
 export function mergeSaveState(local: SaveState, remote: SaveState): SaveState {
   const settings: Settings = { ...local.settings, ...(remote.settings ?? {}) };
   return {
     settings,
     progress: mergeProgress(local.progress, remote.progress),
     receive: mergeReceive(local.receive, remote.receive),
+    numbers: mergeNumbers(local.numbers, remote.numbers),
   };
 }

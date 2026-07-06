@@ -4,11 +4,13 @@ import {
   DEFAULT_SETTINGS,
   decodeProgress,
   freshProgress,
+  freshNumbersProgress,
   freshReceiveProgress,
   load,
   save,
 } from '../lib/storage';
-import type { Progress, ReceiveProgress, Settings } from '../lib/storage';
+import type { NumbersProgress, Progress, ReceiveProgress, Settings } from '../lib/storage';
+import { applyNumberAnswer } from '../lib/numbers';
 import {
   applyLetterAnswer,
   applyWordEnd,
@@ -34,7 +36,7 @@ import { loadRemote, mergeSaveState, saveRemote } from '../lib/cloud';
 const ONBOARDED_KEY = 'rmct.onboarded';
 const MODE_KEY = 'rmct.mode';
 
-export type Mode = 'send' | 'receive-letters' | 'receive-words' | 'qso' | 'translator';
+export type Mode = 'send' | 'receive-letters' | 'receive-words' | 'qso' | 'translator' | 'numbers';
 
 type Ctx = {
   settings: Settings;
@@ -54,6 +56,9 @@ type Ctx = {
   setMode: (mode: Mode | null) => void;
   answerLetter: (letter: string, correct: boolean, wordEnd: boolean, wordClean: boolean) => Progress;
   answerReceive: (letter: string, correct: boolean) => ReceiveProgress;
+  numbers: NumbersProgress;
+  answerNumber: (ch: string, correct: boolean) => NumbersProgress;
+  addNumbersPlayTime: (ms: number) => void;
   completeReceiveWord: () => void;
   completeReceiveSentence: () => void;
   receiveToasts: ReceiveToast[];
@@ -71,13 +76,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<Settings>(initial.settings);
   const [progress, setProgress] = useState<Progress>(initial.progress);
   const [receive, setReceive] = useState<ReceiveProgress>(initial.receive);
+  const [numbers, setNumbers] = useState<NumbersProgress>(initial.numbers);
   const [started, setStarted] = useState(false);
   const [onboarded, setOnboarded] = useState(() => localStorage.getItem(ONBOARDED_KEY) === '1');
   const [progressVersion, setProgressVersion] = useState(0);
   const [mode, setModeState] = useState<Mode | null>(null);
   const [lastMode, setLastMode] = useState<Mode | null>(() => {
     const m = localStorage.getItem(MODE_KEY);
-    return m === 'send' || m === 'receive-letters' || m === 'receive-words' || m === 'qso' || m === 'translator'
+    return m === 'send' ||
+      m === 'receive-letters' ||
+      m === 'receive-words' ||
+      m === 'qso' ||
+      m === 'translator' ||
+      m === 'numbers'
       ? m
       : null;
   });
@@ -85,13 +96,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const settingsRef = useRef(settings);
   const progressRef = useRef(progress);
   const receiveRef = useRef(receive);
+  const numbersRef = useRef(numbers);
   settingsRef.current = settings;
   progressRef.current = progress;
   receiveRef.current = receive;
+  numbersRef.current = numbers;
 
   useEffect(() => {
-    save({ settings, progress, receive });
-  }, [settings, progress, receive]);
+    save({ settings, progress, receive, numbers });
+  }, [settings, progress, receive, numbers]);
 
   // ----- Cloud sync (only active when Supabase is configured + signed in) -----
   const { user } = useAuth();
@@ -108,12 +121,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (syncReadyForUser.current === uid || pendingUser.current === uid) return;
     pendingUser.current = uid;
     void (async () => {
-      const local = { settings: settingsRef.current, progress: progressRef.current, receive: receiveRef.current };
+      const local = {
+        settings: settingsRef.current,
+        progress: progressRef.current,
+        receive: receiveRef.current,
+        numbers: numbersRef.current,
+      };
       const remote = await loadRemote(uid);
       const merged = remote ? mergeSaveState(local, remote) : local;
       setSettings(merged.settings);
       setProgress(merged.progress);
       setReceive(merged.receive);
+      setNumbers(merged.numbers);
       setProgressVersion((v) => v + 1);
       await saveRemote(uid, merged);
       syncReadyForUser.current = uid;
@@ -125,9 +144,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const uid = user?.id;
     if (!uid || syncReadyForUser.current !== uid) return;
-    const t = setTimeout(() => void saveRemote(uid, { settings, progress, receive }), 800);
+    const t = setTimeout(() => void saveRemote(uid, { settings, progress, receive, numbers }), 800);
     return () => clearTimeout(t);
-  }, [settings, progress, receive, user]);
+  }, [settings, progress, receive, numbers, user]);
 
   const setSetting = useCallback<Ctx['setSetting']>((key, value) => {
     setSettings((s) => ({ ...s, [key]: value }));
@@ -221,9 +240,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setReceive((r) => ({ ...r, playMs: r.playMs + ms }));
   }, []);
 
+  const answerNumber = useCallback<Ctx['answerNumber']>((ch, correct) => {
+    const next = applyNumberAnswer(numbersRef.current, ch, correct);
+    setNumbers(next);
+    track({ type: 'answer', letter: ch, correct }, settingsRef.current.trackingConsent);
+    return next;
+  }, []);
+
+  const addNumbersPlayTime = useCallback((ms: number) => {
+    setNumbers((n) => ({ ...n, playMs: n.playMs + ms }));
+  }, []);
+
   const resetProgress = useCallback(() => {
     setProgress(freshProgress());
     setReceive(freshReceiveProgress());
+    setNumbers(freshNumbersProgress());
     setProgressVersion((v) => v + 1);
   }, []);
 
@@ -251,6 +282,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setMode,
       answerLetter,
       answerReceive,
+      numbers,
+      answerNumber,
+      addNumbersPlayTime,
       completeReceiveWord,
       completeReceiveSentence,
       receiveToasts,
@@ -260,7 +294,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       resetProgress,
       loadFromCode,
     }),
-    [settings, progress, receive, started, onboarded, progressVersion, mode, lastMode, receiveToasts, setSetting, start, finishOnboarding, setMode, answerLetter, answerReceive, completeReceiveWord, completeReceiveSentence, dismissToast, addPlayTime, addReceivePlayTime, resetProgress, loadFromCode],
+    [settings, progress, receive, numbers, started, onboarded, progressVersion, mode, lastMode, receiveToasts, setSetting, start, finishOnboarding, setMode, answerLetter, answerReceive, answerNumber, addNumbersPlayTime, completeReceiveWord, completeReceiveSentence, dismissToast, addPlayTime, addReceivePlayTime, resetProgress, loadFromCode],
   );
 
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>;

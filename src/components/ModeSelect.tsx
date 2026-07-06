@@ -7,19 +7,22 @@ import {
   receiveMasteredCount,
   MIN_LETTERS_TO_RECEIVE,
 } from '../lib/receive';
+import { masteredCount } from '../lib/numbers';
+import { NUM_SYM_ORDER } from '../data/numsym';
 import { unlockAudio } from '../lib/audio';
 import { unlockMorse } from '../lib/morsePlayer';
 
 export function ModeSelect() {
-  const { progress, receive, lastMode, setMode } = useApp();
+  const { progress, receive, numbers, lastMode, setMode } = useApp();
 
   const learned = learnedCount(progress);
+  const numsMastered = masteredCount(numbers);
   const pool = knownLetters(progress);
   const canReceive = receiveUnlocked(progress);
   const heardMastered = receiveMasteredCount(receive, pool);
 
   const choose = (m: Mode) => {
-    if (m === 'send') unlockAudio();
+    if (m === 'send' || m === 'numbers') unlockAudio();
     else if (m === 'qso') {
       unlockAudio();
       unlockMorse();
@@ -41,6 +44,16 @@ export function ModeSelect() {
           <span className="mode-name">Learn</span>
           <span className="mode-desc">Learn the code — tap each letter</span>
           <span className="mode-meta">{learned}/26 letters learned</span>
+        </button>
+
+        <button
+          className={`mode-card${lastMode === 'numbers' ? ' recommended' : ''}`}
+          onClick={() => choose('numbers')}
+        >
+          <span className="mode-emoji" aria-hidden="true">🔢</span>
+          <span className="mode-name">Numbers &amp; symbols</span>
+          <span className="mode-desc">Learn to send 0–9 and punctuation</span>
+          <span className="mode-meta">{numsMastered}/{NUM_SYM_ORDER.length} mastered</span>
         </button>
 
         <button
