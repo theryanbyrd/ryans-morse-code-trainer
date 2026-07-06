@@ -88,6 +88,17 @@ export function ModeSelect() {
             <span className="mode-meta lock">{lockNote}</span>
           )}
         </button>
+
+        <button
+          className={`mode-card${lastMode === 'translator' ? ' recommended' : ''}`}
+          onClick={() => choose('translator')}
+        >
+          <span className="mode-badge tool">Tool</span>
+          <span className="mode-emoji" aria-hidden="true">🔤</span>
+          <span className="mode-name">Translator</span>
+          <span className="mode-desc">Text ↔ Morse — play it or flash it</span>
+          <span className="mode-meta">Encode &amp; decode any message</span>
+        </button>
       </div>
     </div>
   );

@@ -15,6 +15,7 @@ import { LiveDecode } from './LiveDecode';
 import { Keypad, SCAN_ORDER } from './Keypad';
 import type { KeyAction } from './Keypad';
 import { Completion } from './Completion';
+import { MorseTree } from './MorseTree';
 
 const WORD_DELAY = 850; // pause after finishing a word
 const LETTER_DELAY = 480; // pause between letters (lets "Correct!" be heard)
@@ -209,6 +210,8 @@ export function Game({ onOpenStats }: { onOpenStats: () => void }) {
       </button>
 
       <LiveDecode input={input} />
+
+      {settings.morseTree && <MorseTree input={input} />}
 
       <Keypad onAction={handleAction} scanIndex={scanIndex} oneSwitch={settings.oneSwitch} />
 

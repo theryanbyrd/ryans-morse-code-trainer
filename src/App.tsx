@@ -7,6 +7,7 @@ import { Game } from './components/Game';
 import { ModeSelect } from './components/ModeSelect';
 import { Receive } from './components/Receive';
 import { Qso } from './components/Qso';
+import { Translator } from './components/Translator';
 import { AlphabetBar } from './components/AlphabetBar';
 import { SettingsModal } from './components/SettingsModal';
 import { StatsScreen } from './components/StatsScreen';
@@ -52,7 +53,9 @@ export default function App() {
         ? 'Hear letters'
         : mode === 'receive-words'
           ? 'Hear words'
-          : 'On the air';
+          : mode === 'qso'
+            ? 'On the air'
+            : 'Translator';
 
   return (
     <div className="app">
@@ -95,6 +98,8 @@ export default function App() {
           <Receive section="words" />
         ) : mode === 'qso' ? (
           <Qso />
+        ) : mode === 'translator' ? (
+          <Translator />
         ) : (
           <Game key={progressVersion} onOpenStats={() => setOverlay('stats')} />
         )}

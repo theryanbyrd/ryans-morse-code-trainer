@@ -63,6 +63,43 @@ export function patternForChar(ch: string): string {
   return MORSE_FULL[ch.toLowerCase()] ?? '';
 }
 
+/** Reverse: dot/dash pattern -> character (letters, digits, punctuation). */
+export const PATTERN_TO_CHAR_FULL: Record<string, string> = Object.fromEntries(
+  Object.entries(MORSE_FULL).map(([ch, pattern]) => [pattern, ch]),
+);
+
+/** Convert alphanumeric text to Morse (chars space-separated, words " / "). */
+export function textToMorse(text: string): string {
+  return text
+    .trim()
+    .split(/\s+/)
+    .map((word) =>
+      word
+        .split('')
+        .map((ch) => MORSE_FULL[ch.toLowerCase()] ?? '')
+        .filter(Boolean)
+        .join(' '),
+    )
+    .filter(Boolean)
+    .join(' / ');
+}
+
+/** Convert Morse (dots/dashes, spaces between chars, "/" between words) to text. */
+export function morseToText(morse: string): string {
+  return morse
+    .trim()
+    .split(/\s*\/\s*|\s{3,}/) // word boundary: "/" or 3+ spaces
+    .map((word) =>
+      word
+        .trim()
+        .split(/\s+/)
+        .map((tok) => PATTERN_TO_CHAR_FULL[tok] ?? '')
+        .join(''),
+    )
+    .join(' ')
+    .toUpperCase();
+}
+
 // Teaching order taken from the original Morse Learn config: simplest /
 // most-frequent signals first, not strict alphabetical order.
 export const TEACHING_ORDER = [

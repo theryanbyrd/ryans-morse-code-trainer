@@ -22,6 +22,8 @@ export type Settings = {
   straightKey: boolean;
   sendWpm: number;
   qsoFreeform: boolean;
+  // Show the dot/dash binary tree lighting up while you key (Learn).
+  morseTree: boolean;
 };
 
 export type LetterStat = {
@@ -81,6 +83,7 @@ export const DEFAULT_SETTINGS: Settings = {
   straightKey: false,
   sendWpm: 13,
   qsoFreeform: false,
+  morseTree: false,
 };
 
 export function freshProgress(): Progress {

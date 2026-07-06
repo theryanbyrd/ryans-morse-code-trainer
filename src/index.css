@@ -862,3 +862,40 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 }
 .cw-term { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-weight: 800; color: var(--red); font-size: 14px; }
 .cw-mean { margin: 0; color: var(--ink-soft); font-size: 14px; line-height: 1.4; }
+
+/* Translator tool */
+.mode-badge.tool { background: var(--green); box-shadow: 0 6px 14px rgba(22,199,154,0.4); }
+.translator { width: 100%; max-width: 520px; display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
+.translator .mode-title { text-align: center; }
+.flash-lamp {
+  height: 10px; border-radius: 999px; background: rgba(255,255,255,0.1);
+  transition: background 0.03s, box-shadow 0.03s;
+}
+.flash-lamp.on { background: var(--amber); box-shadow: 0 0 26px 6px rgba(255,176,32,0.7); }
+.tr-panel {
+  background: var(--card); border: 1px solid rgba(255,255,255,0.5); border-radius: 16px;
+  box-shadow: var(--shadow-card); overflow: hidden;
+}
+.tr-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; font-weight: 800; color: var(--ink); font-size: 14px;
+  border-bottom: 1px solid #eee;
+}
+.tr-mini { background: #eef0f2; border: none; border-radius: 8px; padding: 4px 10px; font-weight: 700; font-size: 12px; color: var(--ink); }
+.tr-mini:hover { background: #e3e6e9; }
+.tr-area {
+  width: 100%; border: none; resize: vertical; min-height: 78px; padding: 12px 14px;
+  font-size: 16px; color: var(--ink); background: var(--card); display: block;
+}
+.tr-area.morse { font-family: ui-monospace, 'SF Mono', Menlo, monospace; letter-spacing: 1px; }
+.tr-area:focus { outline: none; }
+.tr-actions { display: flex; gap: 10px; }
+.tr-actions .btn { flex: 1; }
+.tr-hint { color: var(--on-dark-soft); font-size: 12.5px; text-align: center; margin: 0; }
+
+/* Dot-dash tree */
+.morse-tree {
+  width: 100%; background: rgba(6, 8, 22, 0.5); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px; padding: 8px; overflow-x: auto;
+}
+.morse-tree svg { min-width: 460px; display: block; }
