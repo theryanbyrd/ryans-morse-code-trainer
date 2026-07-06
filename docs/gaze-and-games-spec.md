@@ -134,8 +134,8 @@ QsoSend keying and QsoReceive copying components almost wholesale.
 
 ## 4. Recommendation & build order
 
-1. **Signal Squadron (MVP)** — most fun-per-effort, pure client-side, reuses
-   keying; great retention hook. Ship first.
+1. ~~**Signal Squadron (MVP)**~~ — ✅ **SHIPPED 2026-07-06** (`src/components/SignalSquadron.tsx`,
+   mode `squadron`). ZType-style: key the invader's character + FIRE.
 2. **Cave of Echoes (MVP)** — highest learning value; reuses QSO send/receive
    components; a bit more content work.
 3. **Gaze decoder** — highest-impact accessibility feature but needs
