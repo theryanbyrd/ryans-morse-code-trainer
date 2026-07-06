@@ -1,18 +1,30 @@
 import { useEffect, useRef, useState } from 'react';
-import { QSO_SCENARIOS, normalizeQso } from '../data/qso';
+import { QSO_SCENARIOS, generateQso, normalizeQso } from '../data/qso';
 import type { QsoScenario } from '../data/qso';
+import { useApp } from '../state/AppContext';
 import { QsoSend } from './QsoSend';
 import { QsoReceive } from './QsoReceive';
 
 export function Qso() {
+  const { settings } = useApp();
   const [scenario, setScenario] = useState<QsoScenario | null>(null);
   const [turnIndex, setTurnIndex] = useState(0);
+
+  const startScenario = (s: QsoScenario) => {
+    setScenario(s);
+    setTurnIndex(0);
+  };
 
   if (!scenario) {
     return (
       <div className="qso-list">
         <h1 className="mode-title">On the air</h1>
         <p className="qso-intro">Pick a scenario and work a full CW contact — send each transmission, then copy the reply.</p>
+        {settings.qsoFreeform && (
+          <button className="qso-random" onClick={() => startScenario(generateQso())}>
+            🎲 Random QSO — a fresh, unscripted contact
+          </button>
+        )}
         <div className="qso-cards">
           {QSO_SCENARIOS.map((s) => (
             <button

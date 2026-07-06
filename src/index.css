@@ -803,3 +803,29 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 @media (max-width: 380px) {
   .qso-cards { grid-template-columns: 1fr; }
 }
+
+/* Straight key + freeform QSO */
+.qso-random {
+  width: 100%; border: none; border-radius: 16px; padding: 14px;
+  background: var(--accent-grad); color: #fff; font-weight: 800; font-size: 15px;
+  box-shadow: 0 10px 24px rgba(255,79,109,0.4);
+}
+.qso-random:active { transform: translateY(2px); }
+
+.straight-key-wrap { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+.straight-key {
+  width: 100%; height: 110px; border: none; border-radius: 20px;
+  background: var(--card); color: var(--red);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  box-shadow: 0 8px 18px rgba(8,10,30,0.35), inset 0 1px 0 rgba(255,255,255,0.8);
+  transition: transform 0.05s, box-shadow 0.05s, background 0.05s;
+  touch-action: none; user-select: none;
+}
+.straight-key .sk-glyph { font-size: 46px; line-height: 1; font-weight: 800; }
+.straight-key .sk-hint { font-size: 13px; font-weight: 600; color: var(--ink-soft); }
+.straight-key.down {
+  background: linear-gradient(135deg, #ffca3a, #ffb020); color: #4a3a00;
+  transform: translateY(3px);
+  box-shadow: 0 0 0 5px rgba(255,176,32,0.35), 0 3px 8px rgba(8,10,30,0.35);
+}
+.straight-key.down .sk-hint { color: #6a5400; }

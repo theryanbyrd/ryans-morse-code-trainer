@@ -31,6 +31,50 @@ export function normalizeQso(s: string): string {
     .trim();
 }
 
+// ----- Freeform (randomly generated) QSOs -----------------------------------
+const CALLS = [
+  'W1ABC', 'K2XYZ', 'N5DX', 'VE3ZZ', 'G3ABC', 'DL1XX', 'JA1QRP', 'VK2XX', 'F5AB',
+  'W8XX', 'K9AA', 'N0XX', 'W6WX', 'W4AB', 'G0OLD', 'K3SK', 'EA5XY', 'PY2ZZ', 'K7AZ', 'W0BR',
+];
+const NAMES = ['TOM', 'BOB', 'JIM', 'KEN', 'AL', 'SAM', 'JEN', 'MAX', 'JOHN', 'STEVE', 'ANN', 'ED', 'RON', 'LIZ', 'DAN', 'SUE', 'PAT', 'GUS'];
+const QTHS = ['MA', 'TX', 'CA', 'OH', 'UT', 'NY', 'FL', 'CO', 'WA', 'IL', 'AZ', 'OR', 'GA', 'VA', 'ME', 'MT', 'NC', 'TN'];
+const RSTS = ['599', '579', '559', '589', '449', '569', '339', '588'];
+
+function rnd<T>(a: T[]): T {
+  return a[Math.floor(Math.random() * a.length)];
+}
+
+/** Build a fresh, random QSO (either you answer their CQ, or you call CQ). */
+export function generateQso(): QsoScenario {
+  const call = rnd(CALLS);
+  const name = rnd(NAMES);
+  const qth = rnd(QTHS);
+  const urRst = rnd(RSTS);
+  const myRst = rnd(RSTS);
+  const me = MY_CALL;
+
+  const turns: QsoTurn[] =
+    Math.random() < 0.5
+      ? [
+          { d: 'r', t: `CQ CQ CQ DE ${call} ${call} K` },
+          { d: 's', t: `${call} DE ${me} ${me} K` },
+          { d: 'r', t: `${me} DE ${call} = UR RST ${urRst} = OP ${name} QTH ${qth} = HW? K` },
+          { d: 's', t: `${call} DE ${me} = TU ${name} UR RST ${myRst} = OP RYAN QTH UT = K` },
+          { d: 'r', t: `${me} DE ${call} = FB RYAN TNX QSO = 73 SK` },
+          { d: 's', t: `${call} DE ${me} = 73 SK` },
+        ]
+      : [
+          { d: 's', t: `CQ CQ CQ DE ${me} ${me} K` },
+          { d: 'r', t: `${me} DE ${call} ${call} K` },
+          { d: 's', t: `${call} DE ${me} = UR RST ${myRst} = NAME RYAN QTH UT = HW? K` },
+          { d: 'r', t: `${me} DE ${call} = TU RST ${urRst} = NAME ${name} QTH ${qth} = K` },
+          { d: 's', t: `${call} DE ${me} = FB ${name} TNX = 73 SK` },
+          { d: 'r', t: `${me} DE ${call} = 73 EE` },
+        ];
+
+  return { id: `freeform-${Math.floor(Math.random() * 1e9)}`, title: `Random: ${call}`, tag: 'Freeform', turns };
+}
+
 export const QSO_SCENARIOS: QsoScenario[] = [
   {
     id: 'answer-cq',

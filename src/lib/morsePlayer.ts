@@ -27,6 +27,44 @@ export function unlockMorse(): void {
   audioCtx();
 }
 
+// ----- Straight-key sidetone (held while the key is down) --------------------
+let sidetoneOsc: OscillatorNode | null = null;
+let sidetoneGain: GainNode | null = null;
+
+/** Start the continuous sidetone (key pressed). */
+export function keyDown(freq = 640, volume = 0.22): void {
+  const ac = audioCtx();
+  if (!ac) return;
+  keyUp();
+  const osc = ac.createOscillator();
+  const g = ac.createGain();
+  osc.type = 'sine';
+  osc.frequency.value = freq;
+  g.gain.setValueAtTime(0, ac.currentTime);
+  g.gain.linearRampToValueAtTime(volume, ac.currentTime + 0.006);
+  osc.connect(g).connect(ac.destination);
+  osc.start();
+  sidetoneOsc = osc;
+  sidetoneGain = g;
+}
+
+/** Stop the sidetone (key released). */
+export function keyUp(): void {
+  if (!sidetoneOsc) return;
+  const ac = audioCtx();
+  try {
+    if (ac && sidetoneGain) {
+      sidetoneGain.gain.setValueAtTime(sidetoneGain.gain.value, ac.currentTime);
+      sidetoneGain.gain.linearRampToValueAtTime(0, ac.currentTime + 0.008);
+    }
+    sidetoneOsc.stop(ac ? ac.currentTime + 0.02 : 0);
+  } catch {
+    /* already stopped */
+  }
+  sidetoneOsc = null;
+  sidetoneGain = null;
+}
+
 export type PlayOptions = {
   wpm: number; // character speed
   farnsworth: boolean; // stretch inter-char / word gaps for beginners

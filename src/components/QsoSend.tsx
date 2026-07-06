@@ -5,6 +5,7 @@ import { playCorrect, playDash, playDot, playWrong, playPattern } from '../lib/a
 import { Pattern } from './Pattern';
 import { Keypad } from './Keypad';
 import type { KeyAction } from './Keypad';
+import { StraightKey } from './StraightKey';
 
 const CHAR_DELAY = 160;
 const WRONG_DELAY = 550;
@@ -59,7 +60,8 @@ export function QsoSend({ text, onDone }: { text: string; onDone: () => void }) 
       const upd = inputRef.current + sym;
       inputRef.current = upd;
       setInput(upd);
-      if (settingsRef.current.sound) (a === 'dot' ? playDot : playDash)();
+      // The straight key sounds its own held sidetone, so skip the tap tone then.
+      if (settingsRef.current.sound && !settingsRef.current.straightKey) (a === 'dot' ? playDot : playDash)();
       if (upd.length >= tgt.length) {
         const correct = upd === tgt;
         setFeedback(correct ? 'ok' : 'bad');
@@ -83,9 +85,12 @@ export function QsoSend({ text, onDone }: { text: string; onDone: () => void }) 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const k = e.key.toLowerCase();
-      if (k === 'j' || e.key === '.') keyRef.current('dot');
-      else if (k === 'k' || e.key === '-') keyRef.current('dash');
-      else if (e.key === 'Backspace' || e.key === 'Delete') {
+      // In straight-key mode the key (Space/Enter) is owned by StraightKey.
+      if (!settingsRef.current.straightKey) {
+        if (k === 'j' || e.key === '.') return keyRef.current('dot');
+        if (k === 'k' || e.key === '-') return keyRef.current('dash');
+      }
+      if (e.key === 'Backspace' || e.key === 'Delete') {
         e.preventDefault();
         keyRef.current('delete');
       }
@@ -114,7 +119,11 @@ export function QsoSend({ text, onDone }: { text: string; onDone: () => void }) 
         </div>
       </div>
 
-      <Keypad onAction={key} scanIndex={null} oneSwitch={false} />
+      {settings.straightKey ? (
+        <StraightKey onSymbol={(s) => key(s)} onDelete={() => key('delete')} wpm={settings.sendWpm} />
+      ) : (
+        <Keypad onAction={key} scanIndex={null} oneSwitch={false} />
+      )}
       <button
         type="button"
         className="rc-btn"

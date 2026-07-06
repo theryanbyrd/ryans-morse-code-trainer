@@ -18,6 +18,10 @@ export type Settings = {
   farnsworth: boolean;
   // Receive: mirror the audio with an on-screen flash + device vibration.
   visual: boolean;
+  // Advanced (default off): straight-key keying + send speed, and freeform QSOs.
+  straightKey: boolean;
+  sendWpm: number;
+  qsoFreeform: boolean;
 };
 
 export type LetterStat = {
@@ -74,6 +78,9 @@ export const DEFAULT_SETTINGS: Settings = {
   wpm: 12,
   farnsworth: true,
   visual: false,
+  straightKey: false,
+  sendWpm: 13,
+  qsoFreeform: false,
 };
 
 export function freshProgress(): Progress {

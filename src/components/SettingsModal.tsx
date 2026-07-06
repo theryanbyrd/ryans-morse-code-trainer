@@ -10,6 +10,8 @@ type ToggleKey =
   | 'oneSwitch'
   | 'farnsworth'
   | 'visual'
+  | 'straightKey'
+  | 'qsoFreeform'
   | 'trackingConsent';
 
 const TOGGLES: { key: ToggleKey; label: string; help: string }[] = [
@@ -20,6 +22,8 @@ const TOGGLES: { key: ToggleKey; label: string; help: string }[] = [
   { key: 'oneSwitch', label: 'One-Switch Mode', help: 'Operate everything from a single switch' },
   { key: 'farnsworth', label: 'Beginner spacing', help: 'Extra space between letters when receiving' },
   { key: 'visual', label: 'Flash & vibrate', help: 'Blink and buzz in time with the code (Receive)' },
+  { key: 'straightKey', label: 'Straight-key mode', help: 'On the air: one key — tap = dit, hold = dah' },
+  { key: 'qsoFreeform', label: 'Freeform QSOs', help: 'Add randomly-generated contacts to On the air' },
   { key: 'trackingConsent', label: 'Tracking Consent', help: 'Share anonymous learning analytics' },
 ];
 
@@ -93,6 +97,23 @@ export function SettingsModal({
               onChange={(e) => setSetting('wpm', Number(e.target.value))}
             />
           </label>
+
+          {settings.straightKey && (
+            <label className="toggle-row slider-row">
+              <span className="toggle-text">
+                <span className="toggle-label">Send speed</span>
+                <span className="toggle-help">{settings.sendWpm} WPM (straight-key dit/dah timing)</span>
+              </span>
+              <input
+                type="range"
+                min={8}
+                max={25}
+                step={1}
+                value={settings.sendWpm}
+                onChange={(e) => setSetting('sendWpm', Number(e.target.value))}
+              />
+            </label>
+          )}
         </div>
 
         <div className="action-grid">
