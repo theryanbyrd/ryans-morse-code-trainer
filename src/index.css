@@ -984,3 +984,57 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
   flex: 1.3; height: 72px; font-size: 18px; font-weight: 900; letter-spacing: 1px;
   background: linear-gradient(135deg, #ff9f43, #ff5b6a); color: #fff;
 }
+
+/* Cave of Echoes */
+.cave { width: 100%; max-width: 480px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.cave-scene { width: 100%; display: flex; align-items: center; gap: 14px;
+  background: linear-gradient(135deg, rgba(157,123,255,0.14), rgba(20,21,42,0.4));
+  border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 12px 16px; }
+.cave-art { font-size: 46px; line-height: 1; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5)); }
+.cave-scene-info { flex: 1; min-width: 0; }
+.cave-title { margin: 0 0 4px; color: var(--on-dark); font-size: 19px; }
+.cave-status { display: flex; align-items: center; gap: 12px; font-size: 13px; }
+.cave-hp { letter-spacing: 1px; }
+.cave-depth { color: var(--on-dark-soft); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; font-size: 11px; }
+.cave-inv { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.inv-chip { font-size: 11px; font-weight: 700; color: var(--on-dark); background: rgba(255,255,255,0.08); border-radius: 8px; padding: 2px 8px; }
+.cave-narration { margin: 0; color: var(--on-dark-soft); text-align: center; font-size: 15px; line-height: 1.6; max-width: 420px; }
+.cave-toast { background: rgba(22,199,154,0.16); color: var(--green); border: 1px solid rgba(22,199,154,0.4);
+  border-radius: 999px; padding: 6px 16px; font-weight: 700; font-size: 13px; }
+.cave-deadend { color: var(--on-dark-soft); font-style: italic; padding: 20px; }
+
+.cave-nav { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.cave-exits { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.cave-exit { display: flex; align-items: center; gap: 8px; background: rgba(251,247,239,0.06);
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 6px 12px; color: var(--on-dark); font-weight: 700; }
+.ce-arrow { font-size: 18px; color: var(--amber); }
+.ce-dir { font-size: 13px; }
+.ce-lock { font-size: 13px; }
+.cave-keyhint { color: var(--on-dark-soft); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+.cave-keyed { display: flex; align-items: center; gap: 14px; min-height: 34px;
+  background: rgba(251,247,239,0.06); border-radius: 12px; padding: 6px 18px; }
+.cave-decoded { font-size: 24px; font-weight: 800; color: var(--amber); min-width: 24px; text-align: center; }
+.cave-go { width: 100%; max-width: 320px; height: 48px; margin-top: 2px; }
+
+/* Duel */
+.cave-duel { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.duel-foes { width: 100%; display: flex; justify-content: space-around; gap: 12px; }
+.foe { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.foe-art { font-size: 40px; line-height: 1; }
+.foe-name { font-size: 12px; font-weight: 800; color: var(--on-dark); text-transform: uppercase; letter-spacing: 0.5px; }
+.foe-hp { font-size: 14px; letter-spacing: 1px; }
+.cave-log { width: 100%; max-width: 420px; min-height: 66px; background: rgba(8,10,30,0.4);
+  border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 8px 14px;
+  font-size: 13px; color: var(--on-dark-soft); display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; }
+.cave-log .log-now { color: var(--on-dark); font-weight: 700; }
+.duel-phase { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.duel-cue { font-size: 15px; font-weight: 700; color: var(--on-dark); text-align: center;
+  background: rgba(255,176,32,0.12); border-radius: 12px; padding: 8px 16px; }
+.duel-cue.defend-cue { background: rgba(157,123,255,0.16); }
+.duel-cue.banish-cue { background: rgba(22,199,154,0.16); }
+.duel-cue b { color: var(--amber); letter-spacing: 2px; }
+
+.cave-end { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; max-width: 380px; padding: 20px; }
+.cave-end-art { font-size: 64px; }
+.cave-end h2 { margin: 0; color: var(--on-dark); font-size: 26px; }
+.cave-end p { margin: 0; color: var(--on-dark-soft); font-size: 15px; line-height: 1.6; }

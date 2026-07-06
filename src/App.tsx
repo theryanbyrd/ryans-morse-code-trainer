@@ -11,6 +11,7 @@ import { Translator } from './components/Translator';
 import { NumbersDrill } from './components/NumbersDrill';
 import { KochCourse } from './components/KochCourse';
 import { SignalSquadron } from './components/SignalSquadron';
+import { CaveQuest } from './components/CaveQuest';
 import { AlphabetBar } from './components/AlphabetBar';
 import { SettingsModal } from './components/SettingsModal';
 import { StatsScreen } from './components/StatsScreen';
@@ -57,6 +58,7 @@ export default function App() {
     numbers: 'Numbers & symbols',
     koch: 'Koch course',
     squadron: 'Signal Squadron',
+    cave: 'Cave of Echoes',
     translator: 'Translator',
   };
   const modeLabel = mode ? MODE_LABELS[mode] : '';
@@ -110,6 +112,8 @@ export default function App() {
           <KochCourse />
         ) : mode === 'squadron' ? (
           <SignalSquadron />
+        ) : mode === 'cave' ? (
+          <CaveQuest />
         ) : (
           <Game key={progressVersion} onOpenStats={() => setOverlay('stats')} />
         )}

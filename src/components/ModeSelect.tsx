@@ -24,7 +24,7 @@ export function ModeSelect() {
 
   const choose = (m: Mode) => {
     if (m === 'send' || m === 'numbers' || m === 'squadron') unlockAudio();
-    else if (m === 'qso') {
+    else if (m === 'qso' || m === 'cave') {
       unlockAudio();
       unlockMorse();
     } else unlockMorse();
@@ -32,6 +32,9 @@ export function ModeSelect() {
   };
 
   const lockNote = `Learn ${MIN_LETTERS_TO_RECEIVE} letters first`;
+  const caveBeaten = (() => {
+    try { return !!JSON.parse(localStorage.getItem('rmct.cave') || '{}').completed; } catch { return false; }
+  })();
 
   return (
     <div className="mode-select">
@@ -123,6 +126,17 @@ export function ModeSelect() {
           <span className="mode-name">Signal Squadron</span>
           <span className="mode-desc">Blast invaders by keying their letter</span>
           <span className="mode-meta">Arcade sending practice</span>
+        </button>
+
+        <button
+          className={`mode-card${lastMode === 'cave' ? ' recommended' : ''}`}
+          onClick={() => choose('cave')}
+        >
+          <span className="mode-badge game">Game</span>
+          <span className="mode-emoji" aria-hidden="true">🗺️</span>
+          <span className="mode-name">Cave of Echoes</span>
+          <span className="mode-desc">Crawl a cave — fight monsters in Morse</span>
+          <span className="mode-meta">{caveBeaten ? '✓ Cave cleared' : 'Send & copy adventure'}</span>
         </button>
 
         <button
