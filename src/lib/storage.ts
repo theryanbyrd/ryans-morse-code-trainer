@@ -28,6 +28,8 @@ export type Settings = {
   qsoFreeform: boolean;
   // Show the dot/dash binary tree lighting up while you key (Learn).
   morseTree: boolean;
+  // Accessibility (default off): webcam eye-gaze input — look left = dit, right = dah.
+  gazeInput: boolean;
 };
 
 export type LetterStat = {
@@ -103,6 +105,7 @@ export const DEFAULT_SETTINGS: Settings = {
   sendWpm: 13,
   qsoFreeform: false,
   morseTree: false,
+  gazeInput: false,
 };
 
 // Carry the old boolean `farnsworth` + `wpm` into the new char/effective model.

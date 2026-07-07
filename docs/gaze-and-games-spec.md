@@ -2,7 +2,7 @@
 
 **Status:** Draft for review · **Date:** 2026-07-04
 Three specs: (1) a webcam **gaze decoder** input, (2) a **space-shooter** game,
-(3) a **cave-crawl** adventure. Games 2 & 3 are new menu options in Ditty; the
+(3) a **cave-crawl** adventure. Games 2 & 3 are new menu options in Ditdah; the
 gaze decoder is a new input method / mini-tool.
 
 > Build note: the gaze decoder needs a real webcam to test, which our dev/preview
@@ -17,7 +17,7 @@ gaze decoder is a new input method / mini-tool.
 **right = dah**; the screen splits into a green "dit" half and a red "dah" half.
 
 **Goal.** Let someone key Morse **with their eyes** — a powerful accessibility
-input for people who can't use hands/switches. Fits Ditty's audio-first,
+input for people who can't use hands/switches. Fits Ditdah's audio-first,
 switch-friendly ethos.
 
 **How it works.**
@@ -74,7 +74,7 @@ Reinforces *sending* under gentle time pressure — the fun counterpart to drill
   invader reaching the bottom costs a life.
 
 **Difficulty ↔ learning.** Character set grows with level (start with the letters
-you've *learned* in Ditty, then add numbers/symbols). Enemy descent speed maps to
+you've *learned* in Ditdah, then add numbers/symbols). Enemy descent speed maps to
 your **effective WPM** — faster copy/keying = harder.
 
 **Controls.** Reuse the existing keypad (dot/dash/delete) or the **straight key**;
@@ -139,8 +139,11 @@ QsoSend keying and QsoReceive copying components almost wholesale.
 2. ~~**Cave of Echoes (MVP)**~~ — ✅ **SHIPPED 2026-07-06** (`src/components/CaveQuest.tsx`
    + `CaveDuel.tsx`, `src/data/cave.ts`, mode `cave`). Key directions to move; STRIKE
    by keying a monster's weak rune, DEFEND by copying its attack; locked gate + boss.
-3. **Gaze decoder** — highest-impact accessibility feature but needs
-   webcam testing and webgazer integration; build behind `gazeInput` (default
-   off), lazy-loaded, after a device-testing pass.
+3. ~~**Gaze decoder**~~ — ✅ **BUILT 2026-07-07** (`src/components/GazeDecoder.tsx`,
+   mode `gaze`, behind `settings.gazeInput` default-off). WebGazer.js lazy-loaded
+   (~1.2MB chunk, only when used), 9-point calibration, DIT/rest/DAH split screen,
+   dwell→emit→commit decode machine. **⚠️ Needs real-webcam tuning** — the decode
+   logic + UI are verified via a dev simulator, but live eye-tracking accuracy
+   (dwell time, zone width, mirror) must be tested on-device and adjusted.
 
 All three are additive menu options / inputs — none disturb the existing modes.

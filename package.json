@@ -2,7 +2,7 @@
   "name": "ryans-morse-code-trainer",
   "private": true,
   "version": "0.1.0",
-  "description": "Ditty — learn to send and receive Morse code with picture/sound mnemonics, a QSO simulator, and a translator. A React remake inspired by Ace Centre's Morse Learn.",
+  "description": "Ditdah — learn to send and receive Morse code with picture/sound mnemonics, a QSO simulator, and a translator. A React remake inspired by Ace Centre's Morse Learn.",
   "license": "Apache-2.0",
   "author": "Ryan Byrd",
   "homepage": "https://ryans-morse-code-trainer.vercel.app",
@@ -20,7 +20,8 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.110.0",
     "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "react-dom": "^19.2.7",
+    "webgazer": "^3.5.3"
   },
   "devDependencies": {
     "@types/node": "^24.13.2",

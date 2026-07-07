@@ -1038,3 +1038,62 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 .cave-end-art { font-size: 64px; }
 .cave-end h2 { margin: 0; color: var(--on-dark); font-size: 26px; }
 .cave-end p { margin: 0; color: var(--on-dark-soft); font-size: 15px; line-height: 1.6; }
+
+/* Gaze decoder */
+.mode-badge.a11y { background: linear-gradient(135deg, #4d96ff, #16c79a); box-shadow: 0 6px 14px rgba(77,150,255,0.4); }
+
+.gaze-intro { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; max-width: 420px; padding: 12px; }
+.gaze-eye { font-size: 56px; }
+.gaze-intro h2 { margin: 0; color: var(--on-dark); font-size: 26px; }
+.gaze-lead { margin: 0; color: var(--on-dark-soft); font-size: 15px; line-height: 1.6; }
+.gaze-lead .dit-word { color: var(--green); }
+.gaze-lead .dah-word { color: var(--red); }
+.gaze-privacy { font-size: 13px; color: var(--on-dark-soft); background: rgba(77,150,255,0.1);
+  border: 1px solid rgba(77,150,255,0.28); border-radius: 12px; padding: 10px 14px; line-height: 1.55; }
+.gaze-error { font-size: 13px; color: var(--red); background: rgba(255,91,106,0.1);
+  border: 1px solid rgba(255,91,106,0.3); border-radius: 12px; padding: 10px 14px; }
+.gaze-start { width: 100%; max-width: 320px; height: 50px; margin-top: 4px; }
+
+/* Calibration overlay (fixed to the viewport so gaze coords line up) */
+.gaze-calibrate { position: fixed; inset: 0; z-index: 60; background: rgba(12,14,36,0.94); }
+.gaze-calib-hint { position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+  background: rgba(251,247,239,0.95); color: var(--ink); border-radius: 12px; padding: 10px 16px;
+  font-size: 13px; max-width: 90vw; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+.gaze-dot { position: fixed; transform: translate(-50%, -50%); width: 40px; height: 40px; border-radius: 50%;
+  border: 3px solid #fff; background: var(--red); color: #fff; font-weight: 800; font-size: 14px;
+  display: grid; place-items: center; cursor: pointer; box-shadow: 0 0 18px rgba(255,91,106,0.7); }
+.gaze-dot.done { background: var(--green); box-shadow: 0 0 18px rgba(22,199,154,0.7); }
+.gaze-calib-actions { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px; }
+
+/* Decode split screen */
+.gaze-decode { width: 100%; max-width: 640px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.gaze-split { width: 100%; height: 42vh; min-height: 240px; display: grid; grid-template-columns: 1fr 0.7fr 1fr;
+  border-radius: 18px; overflow: hidden; box-shadow: 0 12px 30px rgba(8,10,30,0.5); }
+.gaze-zone { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; transition: filter 0.12s, background 0.12s; }
+.gaze-zone.dit { background: linear-gradient(160deg, #0f6f57, #16c79a); color: #eafff8; }
+.gaze-zone.dah { background: linear-gradient(200deg, #a11f2c, #ff5b6a); color: #fff0f1; }
+.gaze-zone.rest { background: #171938; color: var(--on-dark-soft); }
+.gaze-zone.active { filter: brightness(1.35) saturate(1.2); }
+.gaze-zone.rest.active { background: #23264f; }
+.gaze-zone-label { font-size: 30px; font-weight: 900; letter-spacing: 2px; }
+.gaze-zone-sub { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.85; }
+.gaze-rest-hint { font-size: 12px; text-align: center; line-height: 1.5; opacity: 0.8; }
+.dwell-ring { position: absolute; bottom: 14px; width: 34px; height: 34px; border-radius: 50%;
+  background: conic-gradient(#fff calc(var(--pct) * 360deg), rgba(255,255,255,0.22) 0); }
+.dwell-ring::after { content: ''; position: absolute; inset: 5px; border-radius: 50%; background: inherit; filter: brightness(0.6); background: rgba(0,0,0,0.25); }
+
+.gaze-readout { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.gaze-buffer { display: flex; align-items: center; gap: 12px; min-height: 30px;
+  background: rgba(251,247,239,0.06); border-radius: 12px; padding: 6px 18px; }
+.gaze-preview { font-size: 22px; font-weight: 800; color: var(--amber); }
+.gaze-text { width: 100%; min-height: 44px; background: rgba(8,10,30,0.4); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 10px 14px; font-family: ui-monospace, monospace; font-size: 20px; letter-spacing: 2px;
+  color: var(--on-dark); word-break: break-word; }
+.gaze-text-ph, .gaze-text .gaze-text-ph { color: var(--on-dark-soft); font-family: inherit; font-size: 14px; letter-spacing: 0; }
+.gaze-controls { width: 100%; display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; align-items: center; }
+.gaze-slider { display: flex; flex-direction: column; align-items: center; font-size: 12px; color: var(--on-dark-soft); gap: 3px; }
+.gaze-slider input { width: 130px; }
+.gaze-check { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--on-dark-soft); }
+.gaze-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }

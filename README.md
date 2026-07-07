@@ -1,4 +1,4 @@
-# Ditty — Learn Morse Code
+# Ditdah — Learn Morse Code
 
 *Morse code, one dit at a time.* (Formerly "Ryan's Morse Code Trainer".)
 

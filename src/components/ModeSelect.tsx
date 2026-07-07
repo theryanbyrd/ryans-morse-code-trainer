@@ -14,7 +14,7 @@ import { unlockAudio } from '../lib/audio';
 import { unlockMorse } from '../lib/morsePlayer';
 
 export function ModeSelect() {
-  const { progress, receive, numbers, koch, lastMode, setMode } = useApp();
+  const { progress, receive, numbers, koch, lastMode, settings, setMode } = useApp();
 
   const learned = learnedCount(progress);
   const numsMastered = masteredCount(numbers);
@@ -23,7 +23,7 @@ export function ModeSelect() {
   const heardMastered = receiveMasteredCount(receive, pool);
 
   const choose = (m: Mode) => {
-    if (m === 'send' || m === 'numbers' || m === 'squadron') unlockAudio();
+    if (m === 'send' || m === 'numbers' || m === 'squadron' || m === 'gaze') unlockAudio();
     else if (m === 'qso' || m === 'cave') {
       unlockAudio();
       unlockMorse();
@@ -149,6 +149,19 @@ export function ModeSelect() {
           <span className="mode-desc">Text ↔ Morse — play it or flash it</span>
           <span className="mode-meta">Encode &amp; decode any message</span>
         </button>
+
+        {settings.gazeInput && (
+          <button
+            className={`mode-card${lastMode === 'gaze' ? ' recommended' : ''}`}
+            onClick={() => choose('gaze')}
+          >
+            <span className="mode-badge a11y">Beta</span>
+            <span className="mode-emoji" aria-hidden="true">👁️</span>
+            <span className="mode-name">Gaze input</span>
+            <span className="mode-desc">Key with your eyes — look left = dit, right = dah</span>
+            <span className="mode-meta">Webcam · on-device</span>
+          </button>
+        )}
       </div>
     </div>
   );

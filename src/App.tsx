@@ -12,6 +12,7 @@ import { NumbersDrill } from './components/NumbersDrill';
 import { KochCourse } from './components/KochCourse';
 import { SignalSquadron } from './components/SignalSquadron';
 import { CaveQuest } from './components/CaveQuest';
+import { GazeDecoder } from './components/GazeDecoder';
 import { AlphabetBar } from './components/AlphabetBar';
 import { SettingsModal } from './components/SettingsModal';
 import { StatsScreen } from './components/StatsScreen';
@@ -59,6 +60,7 @@ export default function App() {
     koch: 'Koch course',
     squadron: 'Signal Squadron',
     cave: 'Cave of Echoes',
+    gaze: 'Gaze input',
     translator: 'Translator',
   };
   const modeLabel = mode ? MODE_LABELS[mode] : '';
@@ -114,6 +116,8 @@ export default function App() {
           <SignalSquadron />
         ) : mode === 'cave' ? (
           <CaveQuest />
+        ) : mode === 'gaze' ? (
+          <GazeDecoder />
         ) : (
           <Game key={progressVersion} onOpenStats={() => setOverlay('stats')} />
         )}

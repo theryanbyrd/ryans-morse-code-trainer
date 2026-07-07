@@ -38,7 +38,7 @@ import { loadRemote, mergeSaveState, saveRemote } from '../lib/cloud';
 const ONBOARDED_KEY = 'rmct.onboarded';
 const MODE_KEY = 'rmct.mode';
 
-export type Mode = 'send' | 'receive-letters' | 'receive-words' | 'qso' | 'translator' | 'numbers' | 'koch' | 'squadron' | 'cave';
+export type Mode = 'send' | 'receive-letters' | 'receive-words' | 'qso' | 'translator' | 'numbers' | 'koch' | 'squadron' | 'cave' | 'gaze';
 
 type Ctx = {
   settings: Settings;

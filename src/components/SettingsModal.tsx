@@ -12,6 +12,7 @@ type ToggleKey =
   | 'straightKey'
   | 'qsoFreeform'
   | 'morseTree'
+  | 'gazeInput'
   | 'trackingConsent';
 
 const TOGGLES: { key: ToggleKey; label: string; help: string }[] = [
@@ -24,6 +25,7 @@ const TOGGLES: { key: ToggleKey; label: string; help: string }[] = [
   { key: 'straightKey', label: 'Straight-key mode', help: 'On the air: one key — tap = dit, hold = dah' },
   { key: 'qsoFreeform', label: 'Freeform QSOs', help: 'Add randomly-generated contacts to On the air' },
   { key: 'morseTree', label: 'Dot-dash tree', help: 'Light up the Morse tree as you key (Learn)' },
+  { key: 'gazeInput', label: 'Gaze input (beta)', help: 'Key with your eyes via webcam — look left = dit, right = dah' },
   { key: 'trackingConsent', label: 'Tracking Consent', help: 'Share anonymous learning analytics' },
 ];
 
