@@ -8,6 +8,7 @@ import { decode, patternForChar } from '../data/morse';
 import { playWrong } from '../lib/audio';
 import { Keypad } from './Keypad';
 import type { KeyAction } from './Keypad';
+import { StraightKey } from './StraightKey';
 import { Pattern } from './Pattern';
 import { QsoSend } from './QsoSend';
 import { CaveDuel } from './CaveDuel';
@@ -34,7 +35,7 @@ function load(): Save {
 type Phase = 'explore' | 'fight' | 'door' | 'lose' | 'win';
 
 export function CaveQuest() {
-  const { setMode } = useApp();
+  const { setMode, settings } = useApp();
   const [save, setSave] = useState<Save>(load);
   const [phase, setPhase] = useState<Phase>('explore');
   const [navInput, setNavInput] = useState('');
@@ -205,12 +206,24 @@ export function CaveQuest() {
             ))}
           </div>
 
-          <div className="cave-keyhint">Key a direction, then GO</div>
+          <div className="cave-keyhint">
+            {settings.singleKey ? 'Key a direction (short = dit, long = dah), then GO' : 'Key a direction, then GO'}
+          </div>
           <div className={`cave-keyed${navShake ? ' shake' : ''}`}>
             {navInput ? <Pattern pattern={navInput} size={16} /> : <span className="qso-keyed-ph">key it…</span>}
             <span className="cave-decoded">{decoded ? decoded.toUpperCase() : '·'}</span>
           </div>
-          <Keypad onAction={onKey} scanIndex={null} oneSwitch={false} />
+          {settings.singleKey ? (
+            <StraightKey
+              onSymbol={(s) => onKey(s === 'dot' ? 'dot' : 'dash')}
+              onDelete={() => onKey('delete')}
+              wpm={settings.sendWpm}
+              freq={settings.tone}
+              volume={settings.volume}
+            />
+          ) : (
+            <Keypad onAction={onKey} scanIndex={null} oneSwitch={false} />
+          )}
           <button className="btn primary cave-go" onClick={tryGo} disabled={!navInput}>GO ▸</button>
         </div>
       )}

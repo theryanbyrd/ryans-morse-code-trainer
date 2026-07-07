@@ -60,8 +60,9 @@ export function QsoSend({ text, onDone }: { text: string; onDone: () => void }) 
       const upd = inputRef.current + sym;
       inputRef.current = upd;
       setInput(upd);
-      // The straight key sounds its own held sidetone, so skip the tap tone then.
-      if (settingsRef.current.sound && !settingsRef.current.straightKey) (a === 'dot' ? playDot : playDash)();
+      // The straight/single key sounds its own held sidetone, so skip the tap tone then.
+      if (settingsRef.current.sound && !settingsRef.current.straightKey && !settingsRef.current.singleKey)
+        (a === 'dot' ? playDot : playDash)();
       if (upd.length >= tgt.length) {
         const correct = upd === tgt;
         setFeedback(correct ? 'ok' : 'bad');
@@ -85,8 +86,8 @@ export function QsoSend({ text, onDone }: { text: string; onDone: () => void }) 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const k = e.key.toLowerCase();
-      // In straight-key mode the key (Space/Enter) is owned by StraightKey.
-      if (!settingsRef.current.straightKey) {
+      // In straight/single-key mode the key (Space/Enter) is owned by StraightKey.
+      if (!settingsRef.current.straightKey && !settingsRef.current.singleKey) {
         if (k === 'j' || e.key === '.') return keyRef.current('dot');
         if (k === 'k' || e.key === '-') return keyRef.current('dash');
       }
@@ -119,7 +120,7 @@ export function QsoSend({ text, onDone }: { text: string; onDone: () => void }) 
         </div>
       </div>
 
-      {settings.straightKey ? (
+      {settings.straightKey || settings.singleKey ? (
         <StraightKey
           onSymbol={(s) => key(s)}
           onDelete={() => key('delete')}

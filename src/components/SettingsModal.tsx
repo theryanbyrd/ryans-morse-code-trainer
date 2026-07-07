@@ -22,7 +22,7 @@ const TOGGLES: { key: ToggleKey; label: string; help: string }[] = [
   { key: 'visualHints', label: 'Visual Hints', help: 'Show the mnemonic picture for each letter' },
   { key: 'morseBoard', label: 'Morse Board', help: 'Show the A–Z reference board button' },
   { key: 'oneSwitch', label: 'One-Switch Mode', help: 'Operate everything from a single switch' },
-  { key: 'singleKey', label: 'Single Key', help: 'Learn: one key — short press = dit, long press = dah' },
+  { key: 'singleKey', label: 'Single Key', help: 'One key everywhere you send — short press = dit, long press = dah' },
   { key: 'visual', label: 'Flash & vibrate', help: 'Blink and buzz in time with the code (Receive)' },
   { key: 'straightKey', label: 'Straight-key mode', help: 'On the air: one key — tap = dit, hold = dah' },
   { key: 'qsoFreeform', label: 'Freeform QSOs', help: 'Add randomly-generated contacts to On the air' },

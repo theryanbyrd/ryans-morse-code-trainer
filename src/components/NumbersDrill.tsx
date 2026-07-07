@@ -9,6 +9,7 @@ import { Pattern } from './Pattern';
 import { LiveDecode } from './LiveDecode';
 import { Keypad } from './Keypad';
 import type { KeyAction } from './Keypad';
+import { StraightKey } from './StraightKey';
 import { MorseTree } from './MorseTree';
 
 const ADVANCE_DELAY = 800;
@@ -93,7 +94,8 @@ export function NumbersDrill() {
       const upd = inputRef.current + sym;
       inputRef.current = upd;
       setInput(upd);
-      if (settingsRef.current.sound) (a === 'dot' ? playDot : playDash)();
+      // In single-key mode StraightKey sounds its own held sidetone, so skip the tap tone.
+      if (settingsRef.current.sound && !settingsRef.current.singleKey) (a === 'dot' ? playDot : playDash)();
       if (upd.length >= patternForChar(currentRef.current).length) evaluate(upd);
     },
     [evaluate],
@@ -103,6 +105,8 @@ export function NumbersDrill() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      // Single key owns Space/Enter (held for dit/dah) via StraightKey.
+      if (settingsRef.current.singleKey) return;
       const k = e.key.toLowerCase();
       if (k === 'j' || e.key === '.') actionRef.current('dot');
       else if (k === 'k' || e.key === '-') actionRef.current('dash');
@@ -161,7 +165,22 @@ export function NumbersDrill() {
 
       {settings.morseTree && <MorseTree input={input} />}
 
-      <Keypad onAction={handleAction} scanIndex={null} oneSwitch={false} />
+      {settings.singleKey ? (
+        <>
+          <StraightKey
+            onSymbol={(s) => handleAction(s === 'dot' ? 'dot' : 'dash')}
+            onDelete={() => handleAction('delete')}
+            wpm={settings.sendWpm}
+            freq={settings.tone}
+            volume={settings.volume}
+          />
+          <p className="key-hint one-switch-hint">
+            <b>Single key:</b> short press = dit, longer press = dah. Use the button, your switch, or <b>Space</b>.
+          </p>
+        </>
+      ) : (
+        <Keypad onAction={handleAction} scanIndex={null} oneSwitch={false} />
+      )}
     </div>
   );
 }
