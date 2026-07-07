@@ -14,6 +14,7 @@ import { WordCard } from './WordCard';
 import { LiveDecode } from './LiveDecode';
 import { Keypad, SCAN_ORDER } from './Keypad';
 import type { KeyAction } from './Keypad';
+import { StraightKey } from './StraightKey';
 import { Completion } from './Completion';
 import { MorseTree } from './MorseTree';
 
@@ -138,7 +139,8 @@ export function Game({ onOpenStats }: { onOpenStats: () => void }) {
         const upd = inputRef.current + sym;
         inputRef.current = upd;
         setInput(upd);
-        if (settingsRef.current.sound) (a === 'dot' ? playDot : playDash)();
+        // In single-key mode StraightKey sounds its own held sidetone, so skip the tap tone.
+        if (settingsRef.current.sound && !settingsRef.current.singleKey) (a === 'dot' ? playDot : playDash)();
         if (upd.length >= MORSE[l].length) evaluate(upd);
       }
     },
@@ -148,8 +150,9 @@ export function Game({ onOpenStats }: { onOpenStats: () => void }) {
   handleActionRef.current = handleAction;
 
   // One-switch scanning: cycle the highlight; a single activation selects it.
+  // Single-key mode uses press-duration instead, so it takes precedence.
   useEffect(() => {
-    if (!settings.oneSwitch) {
+    if (!settings.oneSwitch || settings.singleKey) {
       setScanIndex(null);
       return;
     }
@@ -159,7 +162,7 @@ export function Game({ onOpenStats }: { onOpenStats: () => void }) {
       setScanIndex((i) => ((i ?? -1) + 1) % SCAN_ORDER.length);
     }, settings.scanIntervalMs);
     return () => clearInterval(t);
-  }, [settings.oneSwitch, settings.scanIntervalMs]);
+  }, [settings.oneSwitch, settings.singleKey, settings.scanIntervalMs]);
 
   const selectScanned = useCallback(() => {
     const i = scanIndexRef.current;
@@ -170,6 +173,8 @@ export function Game({ onOpenStats }: { onOpenStats: () => void }) {
   // Keyboard input.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      // Single key owns Space/Enter (held for dit/dah) via StraightKey.
+      if (settingsRef.current.singleKey) return;
       if (settingsRef.current.oneSwitch) {
         if (e.key === ' ' || e.key === 'Enter') {
           e.preventDefault();
@@ -213,12 +218,28 @@ export function Game({ onOpenStats }: { onOpenStats: () => void }) {
 
       {settings.morseTree && <MorseTree input={input} />}
 
-      <Keypad onAction={handleAction} scanIndex={scanIndex} oneSwitch={settings.oneSwitch} />
-
-      {settings.oneSwitch && (
-        <button type="button" className="switch-button" onClick={selectScanned}>
-          SWITCH — select highlighted
-        </button>
+      {settings.singleKey ? (
+        <>
+          <StraightKey
+            onSymbol={(s) => handleAction(s === 'dot' ? 'dot' : 'dash')}
+            onDelete={() => handleAction('delete')}
+            wpm={settings.sendWpm}
+            freq={settings.tone}
+            volume={settings.volume}
+          />
+          <p className="key-hint one-switch-hint">
+            <b>Single key:</b> short press = dit, longer press = dah. Use the button, your switch, or <b>Space</b>.
+          </p>
+        </>
+      ) : (
+        <>
+          <Keypad onAction={handleAction} scanIndex={scanIndex} oneSwitch={settings.oneSwitch} />
+          {settings.oneSwitch && (
+            <button type="button" className="switch-button" onClick={selectScanned}>
+              SWITCH — select highlighted
+            </button>
+          )}
+        </>
       )}
     </div>
   );

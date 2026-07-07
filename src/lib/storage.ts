@@ -30,6 +30,9 @@ export type Settings = {
   morseTree: boolean;
   // Accessibility (default off): webcam eye-gaze input — look left = dit, right = dah.
   gazeInput: boolean;
+  // Accessibility (default off): SINGLE KEY — one button in Learn; short press = dit,
+  // long press = dah (threshold scaled to sendWpm).
+  singleKey: boolean;
 };
 
 export type LetterStat = {
@@ -106,6 +109,7 @@ export const DEFAULT_SETTINGS: Settings = {
   qsoFreeform: false,
   morseTree: false,
   gazeInput: false,
+  singleKey: false,
 };
 
 // Carry the old boolean `farnsworth` + `wpm` into the new char/effective model.

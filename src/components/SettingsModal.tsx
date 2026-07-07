@@ -13,6 +13,7 @@ type ToggleKey =
   | 'qsoFreeform'
   | 'morseTree'
   | 'gazeInput'
+  | 'singleKey'
   | 'trackingConsent';
 
 const TOGGLES: { key: ToggleKey; label: string; help: string }[] = [
@@ -21,6 +22,7 @@ const TOGGLES: { key: ToggleKey; label: string; help: string }[] = [
   { key: 'visualHints', label: 'Visual Hints', help: 'Show the mnemonic picture for each letter' },
   { key: 'morseBoard', label: 'Morse Board', help: 'Show the A–Z reference board button' },
   { key: 'oneSwitch', label: 'One-Switch Mode', help: 'Operate everything from a single switch' },
+  { key: 'singleKey', label: 'Single Key', help: 'Learn: one key — short press = dit, long press = dah' },
   { key: 'visual', label: 'Flash & vibrate', help: 'Blink and buzz in time with the code (Receive)' },
   { key: 'straightKey', label: 'Straight-key mode', help: 'On the air: one key — tap = dit, hold = dah' },
   { key: 'qsoFreeform', label: 'Freeform QSOs', help: 'Add randomly-generated contacts to On the air' },
@@ -136,11 +138,11 @@ export function SettingsModal({
             />
           </label>
 
-          {settings.straightKey && (
+          {(settings.straightKey || settings.singleKey) && (
             <label className="toggle-row slider-row">
               <span className="toggle-text">
                 <span className="toggle-label">Send speed</span>
-                <span className="toggle-help">{settings.sendWpm} WPM (straight-key dit/dah timing)</span>
+                <span className="toggle-help">{settings.sendWpm} WPM (single-key dit/dah timing)</span>
               </span>
               <input
                 type="range"
