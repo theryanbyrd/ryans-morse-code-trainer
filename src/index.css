@@ -392,8 +392,15 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 .key-glyph { width: 46px; height: 46px; color: var(--red); }
 .key-text { font-weight: 700; font-size: 16px; color: var(--ink); }
 .key-row.secondary .key { background: rgba(251,247,239,0.9); }
-.key.scanning { outline: 5px solid var(--amber); outline-offset: 2px; }
+.key.scanning { outline: 5px solid var(--amber); outline-offset: 2px; animation: scan-pulse 0.9s ease-in-out infinite; }
+@keyframes scan-pulse {
+  0%, 100% { outline-color: var(--amber); box-shadow: 0 0 0 0 rgba(255,176,32,0.5); }
+  50% { outline-color: #ffd27a; box-shadow: 0 0 22px 4px rgba(255,176,32,0.55); }
+}
+@media (prefers-reduced-motion: reduce) { .key.scanning { animation: none; } }
 .key-hint { color: var(--on-dark-soft); font-size: 12.5px; text-align: center; margin: 2px 0 0; line-height: 1.5; }
+.one-switch-hint { color: var(--amber); background: rgba(255,176,32,0.1); border: 1px solid rgba(255,176,32,0.3);
+  border-radius: 12px; padding: 8px 14px; }
 .key-hint b { color: var(--on-dark); }
 
 .switch-button {

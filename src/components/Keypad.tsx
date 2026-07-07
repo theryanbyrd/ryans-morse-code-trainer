@@ -44,7 +44,12 @@ export function Keypad({
       <div className="key-row secondary">
         {tile('delete', <span className="key-text">⌫ Delete</span>)}
       </div>
-      {!oneSwitch && (
+      {oneSwitch ? (
+        <p className="key-hint one-switch-hint">
+          <b>One-switch:</b> the highlight moves on its own — press your switch, the{' '}
+          <b>SWITCH</b> button below, or <b>Space</b> when it lands on the option you want.
+        </p>
+      ) : (
         <p className="key-hint">
           Keyboard: <b>J</b> or <b>.</b> = dot · <b>K</b> or <b>-</b> = dash · <b>⌫</b> = delete.
           Answers check themselves once the code is complete.
