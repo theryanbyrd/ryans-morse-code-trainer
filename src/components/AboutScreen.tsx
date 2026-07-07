@@ -26,6 +26,13 @@ export function AboutScreen({
           It's built for everyone — including audio-first learners and people who drive everything
           from a single switch.
         </p>
+        <p className="byline">
+          Made by <b>Ryan Byrd</b>, built with AI. Want to build things like this yourself?{' '}
+          <a href="https://codingwithaibook.com/" target="_blank" rel="noreferrer">
+            Coding with AI
+          </a>{' '}
+          shows you how.
+        </p>
         <p className="credits">
           A personal remake inspired by <b>Morse Learn</b> from Ace Centre, itself built on the
           original trainer by <b>Tania Finlayson</b>, <b>Use All Five</b>, and the{' '}

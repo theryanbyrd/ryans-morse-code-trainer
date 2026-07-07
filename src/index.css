@@ -1097,3 +1097,8 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 .gaze-slider input { width: 130px; }
 .gaze-check { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--on-dark-soft); }
 .gaze-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+
+/* About: author byline */
+.modal.about .byline { font-size: 14px; line-height: 1.6; color: var(--ink); background: rgba(22,199,154,0.1);
+  border: 1px solid rgba(22,199,154,0.3); border-radius: 12px; padding: 10px 14px; }
+.modal.about .byline a { color: var(--green-dark, #0e9b78); font-weight: 700; }
