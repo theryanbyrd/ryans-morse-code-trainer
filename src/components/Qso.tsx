@@ -5,6 +5,7 @@ import { useApp } from '../state/AppContext';
 import { QsoSend } from './QsoSend';
 import { QsoReceive } from './QsoReceive';
 import { CwGuide } from './CwGuide';
+import { LicenseBlurb } from './LicenseBlurb';
 
 export function Qso() {
   const { settings } = useApp();
@@ -45,6 +46,7 @@ export function Qso() {
             </button>
           ))}
         </div>
+        <LicenseBlurb compact />
         {guide}
       </div>
     );

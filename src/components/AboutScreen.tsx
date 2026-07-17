@@ -1,4 +1,5 @@
 import { CloseIcon } from './Icons';
+import { LicenseBlurb } from './LicenseBlurb';
 
 export function AboutScreen({
   onClose,
@@ -33,6 +34,9 @@ export function AboutScreen({
           </a>{' '}
           shows you how.
         </p>
+
+        <LicenseBlurb />
+
         <p className="credits">
           A personal remake inspired by <b>Morse Learn</b> from Ace Centre, itself built on the
           original trainer by <b>Tania Finlayson</b>, <b>Use All Five</b>, and the{' '}

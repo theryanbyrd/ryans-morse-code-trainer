@@ -1109,3 +1109,28 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 .modal.about .byline { font-size: 14px; line-height: 1.6; color: var(--ink); background: rgba(22,199,154,0.1);
   border: 1px solid rgba(22,199,154,0.3); border-radius: 12px; padding: 10px 14px; }
 .modal.about .byline a { color: var(--green-dark, #0e9b78); font-weight: 700; }
+
+/* CallSignReady cross-link blurb */
+.license-blurb {
+  display: flex; align-items: center; gap: 12px; text-decoration: none;
+  width: 100%; max-width: 480px; box-sizing: border-box;
+  background: linear-gradient(135deg, rgba(77,150,255,0.16), rgba(157,123,255,0.16));
+  border: 1px solid rgba(77,150,255,0.42);
+  border-radius: 14px; padding: 12px 14px;
+  transition: transform 0.1s, box-shadow 0.1s, border-color 0.1s;
+}
+.license-blurb:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(77,150,255,0.28); border-color: rgba(77,150,255,0.7); }
+.license-blurb:active { transform: translateY(0); }
+.lb-icon { font-size: 26px; line-height: 1; flex: none; }
+.lb-text { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.lb-title { font-weight: 800; font-size: 14.5px; color: var(--ink); }
+.lb-sub { font-size: 12.5px; line-height: 1.5; color: var(--ink-soft); }
+.lb-sub b { color: #2f6fd0; }
+.lb-arrow { font-weight: 800; font-size: 18px; color: #2f6fd0; flex: none; }
+
+/* On the dark twilight background (On the air) */
+.license-blurb.compact { margin-top: 4px; }
+.license-blurb.compact .lb-title { color: var(--on-dark); }
+.license-blurb.compact .lb-sub { color: var(--on-dark-soft); }
+.license-blurb.compact .lb-sub b { color: #8fbaff; }
+.license-blurb.compact .lb-arrow { color: #8fbaff; }
