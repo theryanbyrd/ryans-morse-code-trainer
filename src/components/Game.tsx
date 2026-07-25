@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { SpeakerIcon } from './Icons';
 import { MORSE } from '../data/morse';
 import { useApp } from '../state/AppContext';
 import { hintActive, isCourseComplete, pickWord } from '../lib/session';
@@ -211,7 +212,7 @@ export function Game({ onOpenStats }: { onOpenStats: () => void }) {
         className="play-pattern"
         onClick={() => settingsRef.current.sound && playPattern(MORSE[letter])}
       >
-        ♪ Hear the code
+        <SpeakerIcon size={16} /> Hear the code
       </button>
 
       <LiveDecode input={input} />

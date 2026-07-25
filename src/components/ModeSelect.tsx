@@ -11,6 +11,10 @@ import { masteredCount } from '../lib/numbers';
 import { NUM_SYM_ORDER } from '../data/numsym';
 import { KOCH_LESSONS } from '../data/koch';
 import { unlockAudio } from '../lib/audio';
+import {
+  PencilIcon, HashIcon, HeadphonesIcon, EarIcon, RadioIcon, AntennaIcon,
+  RocketIcon, MapIcon, EyeIcon, TranslateIcon,
+} from './Icons';
 import { unlockMorse } from '../lib/morsePlayer';
 
 export function ModeSelect() {
@@ -44,7 +48,7 @@ export function ModeSelect() {
           className={`mode-card${lastMode === 'send' ? ' recommended' : ''}`}
           onClick={() => choose('send')}
         >
-          <span className="mode-emoji" aria-hidden="true">✍️</span>
+          <span className="mode-icon" aria-hidden="true"><PencilIcon /></span>
           <span className="mode-name">Learn</span>
           <span className="mode-desc">Learn the code — tap each letter</span>
           <span className="mode-meta">{learned}/26 letters learned</span>
@@ -54,7 +58,7 @@ export function ModeSelect() {
           className={`mode-card${lastMode === 'numbers' ? ' recommended' : ''}`}
           onClick={() => choose('numbers')}
         >
-          <span className="mode-emoji" aria-hidden="true">🔢</span>
+          <span className="mode-icon" aria-hidden="true"><HashIcon /></span>
           <span className="mode-name">Numbers &amp; symbols</span>
           <span className="mode-desc">Learn to send 0–9 and punctuation</span>
           <span className="mode-meta">{numsMastered}/{NUM_SYM_ORDER.length} mastered</span>
@@ -65,7 +69,7 @@ export function ModeSelect() {
           onClick={() => choose('koch')}
         >
           <span className="mode-badge tool">Method</span>
-          <span className="mode-emoji" aria-hidden="true">🎧</span>
+          <span className="mode-icon" aria-hidden="true"><HeadphonesIcon /></span>
           <span className="mode-name">Koch course</span>
           <span className="mode-desc">The classic method — copy at real speed</span>
           <span className="mode-meta">Lesson {koch.lesson} / {KOCH_LESSONS}</span>
@@ -76,7 +80,7 @@ export function ModeSelect() {
           onClick={() => canReceive && choose('receive-letters')}
           disabled={!canReceive}
         >
-          <span className="mode-emoji" aria-hidden="true">👂</span>
+          <span className="mode-icon" aria-hidden="true"><EarIcon /></span>
           <span className="mode-name">Hear letters</span>
           <span className="mode-desc">Decode words one letter at a time</span>
           {canReceive ? (
@@ -91,7 +95,7 @@ export function ModeSelect() {
           onClick={() => canReceive && choose('receive-words')}
           disabled={!canReceive}
         >
-          <span className="mode-emoji" aria-hidden="true">📻</span>
+          <span className="mode-icon" aria-hidden="true"><RadioIcon /></span>
           <span className="mode-name">Hear words</span>
           <span className="mode-desc">Copy whole words &amp; phrases by ear</span>
           {canReceive ? (
@@ -107,7 +111,7 @@ export function ModeSelect() {
           disabled={!canReceive}
         >
           <span className="mode-badge">Advanced</span>
-          <span className="mode-emoji" aria-hidden="true">📡</span>
+          <span className="mode-icon" aria-hidden="true"><AntennaIcon /></span>
           <span className="mode-name">On the air</span>
           <span className="mode-desc">Work a real CW contact — send &amp; copy a QSO</span>
           {canReceive ? (
@@ -122,7 +126,7 @@ export function ModeSelect() {
           onClick={() => choose('squadron')}
         >
           <span className="mode-badge game">Game</span>
-          <span className="mode-emoji" aria-hidden="true">🚀</span>
+          <span className="mode-icon" aria-hidden="true"><RocketIcon /></span>
           <span className="mode-name">Signal Squadron</span>
           <span className="mode-desc">Blast invaders by keying their letter</span>
           <span className="mode-meta">Arcade sending practice</span>
@@ -133,7 +137,7 @@ export function ModeSelect() {
           onClick={() => choose('cave')}
         >
           <span className="mode-badge game">Game</span>
-          <span className="mode-emoji" aria-hidden="true">🗺️</span>
+          <span className="mode-icon" aria-hidden="true"><MapIcon /></span>
           <span className="mode-name">Cave of Echoes</span>
           <span className="mode-desc">Crawl a cave — fight monsters in Morse</span>
           <span className="mode-meta">{caveBeaten ? '✓ Cave cleared' : 'Send & copy adventure'}</span>
@@ -144,7 +148,7 @@ export function ModeSelect() {
           onClick={() => choose('translator')}
         >
           <span className="mode-badge tool">Tool</span>
-          <span className="mode-emoji" aria-hidden="true">🔤</span>
+          <span className="mode-icon" aria-hidden="true"><TranslateIcon /></span>
           <span className="mode-name">Translator</span>
           <span className="mode-desc">Text ↔ Morse — play it or flash it</span>
           <span className="mode-meta">Encode &amp; decode any message</span>
@@ -156,7 +160,7 @@ export function ModeSelect() {
             onClick={() => choose('gaze')}
           >
             <span className="mode-badge a11y">Beta</span>
-            <span className="mode-emoji" aria-hidden="true">👁️</span>
+            <span className="mode-icon" aria-hidden="true"><EyeIcon /></span>
             <span className="mode-name">Gaze input</span>
             <span className="mode-desc">Key with your eyes — look left = dit, right = dah</span>
             <span className="mode-meta">Webcam · on-device</span>

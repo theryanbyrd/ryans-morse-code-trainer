@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { BookIcon, DiceIcon } from './Icons';
 import { QSO_SCENARIOS, generateQso, normalizeQso } from '../data/qso';
 import type { QsoScenario } from '../data/qso';
 import { useApp } from '../state/AppContext';
@@ -24,10 +25,10 @@ export function Qso() {
       <div className="qso-list">
         <h1 className="mode-title">On the air</h1>
         <p className="qso-intro">Pick a scenario and work a full CW contact — send each transmission, then copy the reply.</p>
-        <button className="qso-guide-link" onClick={() => setShowGuide(true)}>📖 CW shorthand guide</button>
+        <button className="qso-guide-link" onClick={() => setShowGuide(true)}><BookIcon /> CW shorthand guide</button>
         {settings.qsoFreeform && (
           <button className="qso-random" onClick={() => startScenario(generateQso())}>
-            🎲 Random QSO — a fresh, unscripted contact
+            <DiceIcon /> Random QSO — a fresh, unscripted contact
           </button>
         )}
         <div className="qso-cards">
@@ -61,7 +62,7 @@ export function Qso() {
         <button className="qso-back" onClick={() => setScenario(null)}>‹ Scenarios</button>
         <span className="qso-head-title">{scenario.title}</span>
         <div className="qso-head-right">
-          <button className="qso-guide-btn" onClick={() => setShowGuide(true)} aria-label="CW shorthand guide">📖</button>
+          <button className="qso-guide-btn" onClick={() => setShowGuide(true)} aria-label="CW shorthand guide"><BookIcon size={20} /></button>
           <span className="qso-head-prog">{Math.min(turnIndex, scenario.turns.length)}/{scenario.turns.length}</span>
         </div>
       </div>

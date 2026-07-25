@@ -440,7 +440,12 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 .mode-card:active { transform: translateY(1px); }
 .mode-card.recommended { outline: 2px solid var(--amber); outline-offset: 3px; }
 .mode-card.locked { opacity: 0.62; cursor: default; box-shadow: none; }
-.mode-emoji { font-size: 38px; line-height: 1; }
+.mode-icon {
+  width: 54px; height: 54px; border-radius: 17px; display: grid; place-items: center;
+  background: var(--accent-grad); color: #fff; margin-bottom: 4px;
+  box-shadow: 0 6px 16px rgba(255, 90, 106, 0.35), inset 0 1px 0 rgba(255,255,255,0.35);
+}
+.mode-icon svg { width: 28px; height: 28px; }
 .mode-name { font-size: 23px; font-weight: 800; color: var(--red); }
 .mode-desc { font-size: 15px; color: var(--ink-soft); }
 .mode-meta { font-size: 13px; color: var(--ink-soft); margin-top: 4px; font-weight: 600; }
@@ -459,7 +464,12 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
   font-size: 20px; font-weight: 700;
 }
 .listen-btn:active { transform: scale(0.98); }
-.listen-icon { font-size: 56px; line-height: 1; }
+.listen-icon {
+  width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--accent-grad); color: #fff;
+  box-shadow: 0 8px 20px rgba(255, 90, 106, 0.35);
+}
+.listen-icon svg { width: 30px; height: 30px; }
 .receive-prompt { color: var(--on-dark); font-weight: 600; font-size: 17px; margin: 0; text-align: center; }
 .choices { display: grid; gap: 12px; width: 100%; grid-template-columns: 1fr 1fr; }
 .choices-2, .choices-3 { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); }
@@ -560,7 +570,8 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 @media (max-height: 760px) {
   .receive { gap: 12px; }
   .listen-btn { padding: 20px; }
-  .listen-icon { font-size: 44px; }
+  .listen-icon { width: 52px; height: 52px; }
+  .listen-icon svg { width: 24px; height: 24px; }
   .choice { padding: 16px 0; font-size: 28px; }
 }
 
@@ -1134,3 +1145,50 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 .license-blurb.compact .lb-sub { color: var(--on-dark-soft); }
 .license-blurb.compact .lb-sub b { color: #8fbaff; }
 .license-blurb.compact .lb-arrow { color: #8fbaff; }
+
+/* ---------- UI/UX Pro Max craft pass ---------- */
+:root {
+  /* motion tokens: one rhythm everywhere */
+  --dur-fast: 150ms;
+  --dur-med: 250ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Keyboard accessibility: a clear ring, only for keyboard focus.
+   (No border-radius here — outlines follow the element's own radius, and
+   setting one would reshape pill buttons while focused.) */
+:focus-visible {
+  outline: 3px solid var(--amber);
+  outline-offset: 3px;
+}
+/* On cream modal surfaces the amber ring lacks contrast — darken it there. */
+.modal :focus-visible { outline-color: #b45309; }
+
+/* Icon + label buttons align as a row */
+.play-pattern, .rc-btn, .qso-guide-link, .qso-random, .board-btn, .sq-fire, .listen-btn span:not(.listen-icon) {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+}
+.play-pattern svg, .rc-btn svg, .qso-guide-link svg, .qso-random svg { flex: none; }
+.qso-guide-btn { display: grid; place-items: center; }
+
+/* Consistent press feedback (Apple HIG scale-feedback).
+   .btn already has its own :active rule earlier — not duplicated here. */
+.rc-btn:active, .play-pattern:active, .qso-card:active,
+.qso-guide-link:active, .choice:active, .board-btn:active { transform: scale(0.97); }
+.btn, .rc-btn, .play-pattern, .qso-card, .qso-guide-link, .choice, .board-btn {
+  transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast), box-shadow var(--dur-fast);
+}
+
+/* Respect reduced motion globally */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0.01ms !important; /* staggered delays (start-loader) must collapse too */
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* The 'game' badge modifier must not inherit the .game screen-container rule */
+.mode-badge.game { width: auto; display: inline-block; }

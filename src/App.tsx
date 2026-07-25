@@ -21,7 +21,7 @@ import { GetCodeModal, LoadCodeModal } from './components/CodeModals';
 import { MorseBoard } from './components/MorseBoard';
 import { Attributions } from './components/Attributions';
 import { AccountButton } from './components/Account';
-import { GearIcon, HelpIcon } from './components/Icons';
+import { GearIcon, HelpIcon, SwapIcon } from './components/Icons';
 
 type Overlay = 'none' | 'settings' | 'stats' | 'about' | 'getcode' | 'loadcode' | 'board' | 'attributions';
 
@@ -74,7 +74,7 @@ export default function App() {
           </button>
           {mode && (
             <button className="board-btn" onClick={() => setMode(null)} aria-label="Switch mode">
-              ⇄ {modeLabel}
+              <SwapIcon size={14} /> {modeLabel}
             </button>
           )}
           {settings.morseBoard && inSend && (

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { SpeakerIcon } from './Icons';
 import { useApp } from '../state/AppContext';
 import { playCorrect, playWrong } from '../lib/audio';
 import { useMorsePlayer } from '../hooks/useMorsePlayer';
@@ -49,7 +50,7 @@ export function QsoReceive({ text, onDone }: { text: string; onDone: () => void 
         onClick={() => play(text)}
         aria-label="Play the transmission again"
       >
-        <span className="listen-icon" aria-hidden="true">📡</span>
+        <span className="listen-icon" aria-hidden="true"><SpeakerIcon size={26} /></span>
         <span>Copy the reply</span>
       </button>
 

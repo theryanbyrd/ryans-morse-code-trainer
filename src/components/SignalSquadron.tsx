@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { PATTERN_TO_CHAR_FULL, TEACHING_ORDER } from '../data/morse';
 import { playCorrect, playDash, playDot, playWrong } from '../lib/audio';
 import { useApp } from '../state/AppContext';
-import { DotIcon, DashIcon } from './Icons';
+import { DotIcon, DashIcon, FlameIcon } from './Icons';
 
 // Signal Squadron — a Morse "ZType": invaders drift down wearing a character.
 // Key that character's code and FIRE to shoot it. Clear the wave, don't let one
@@ -350,7 +350,7 @@ export function SignalSquadron() {
       <div className="sq-keys">
         <button className="key big" onClick={() => key('.')} aria-label="Dot"><span className="key-glyph"><DotIcon /></span></button>
         <button className="key big" onClick={() => key('-')} aria-label="Dash"><span className="key-glyph"><DashIcon /></span></button>
-        <button className="key sq-fire" onClick={fire} aria-label="Fire">🔥 FIRE</button>
+        <button className="key sq-fire" onClick={fire} aria-label="Fire"><FlameIcon size={20} /> FIRE</button>
       </div>
     </div>
   );

@@ -30,3 +30,6 @@ dist-ssr
 # local env
 .env.local
 .env
+
+# uipro-installed skills (third-party, regenerate with `uipro init --ai claude`)
+.claude/skills/

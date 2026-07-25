@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { SpeakerIcon } from './Icons';
 import { useApp } from '../state/AppContext';
 import { useMorsePlayer } from '../hooks/useMorsePlayer';
 import {
@@ -110,7 +111,7 @@ export function KochCourse() {
             onClick={() => play(sent)}
             aria-label="Replay"
           >
-            <span className="listen-icon" aria-hidden="true">🎧</span>
+            <span className="listen-icon" aria-hidden="true"><SpeakerIcon size={26} /></span>
             <span>{phase === 'result' ? 'Replay' : 'Copying…'}</span>
           </button>
 

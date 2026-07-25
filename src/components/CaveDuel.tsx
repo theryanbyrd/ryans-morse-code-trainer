@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { SpeakerIcon } from './Icons';
 import type { Monster } from '../data/cave';
 import { useApp } from '../state/AppContext';
 import { playCorrect, playWrong } from '../lib/audio';
@@ -131,7 +132,7 @@ export function CaveDuel({
         <div className={`duel-phase${defendResult === 'bad' ? ' shake' : ''}`}>
           <div className="duel-cue defend-cue">🛡️ It strikes! Copy the rune to parry.</div>
           <button className="listen-btn" onClick={() => play(attack)}>
-            <span className="listen-icon" aria-hidden="true">🔊</span>
+            <span className="listen-icon" aria-hidden="true"><SpeakerIcon size={26} /></span>
             <span>Hear the blow</span>
           </button>
           {defendResult === 'bad' && <div className="qso-reveal-line">It was: <b>{attack}</b></div>}

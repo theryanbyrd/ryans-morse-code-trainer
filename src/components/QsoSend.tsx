@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { SpeakerIcon } from './Icons';
 import { patternForChar } from '../data/morse';
 import { useApp } from '../state/AppContext';
 import { playCorrect, playDash, playDot, playWrong, playPattern } from '../lib/audio';
@@ -136,7 +137,7 @@ export function QsoSend({ text, onDone }: { text: string; onDone: () => void }) 
         className="rc-btn"
         onClick={() => settingsRef.current.sound && current && playPattern(target)}
       >
-        ♪ Hear this character
+        <SpeakerIcon size={16} /> Hear this character
       </button>
     </div>
   );

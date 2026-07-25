@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { SpeakerIcon } from './Icons';
 import { patternForChar } from '../data/morse';
 import { NUM_SYM_BY_CH, NUM_SYM_ORDER } from '../data/numsym';
 import { NUM_SYM_ART } from '../data/numSymArt';
@@ -158,7 +159,7 @@ export function NumbersDrill() {
         className="play-pattern"
         onClick={() => settingsRef.current.sound && playPattern(target)}
       >
-        ♪ Hear the code
+        <SpeakerIcon size={16} /> Hear the code
       </button>
 
       <LiveDecode input={input} />
