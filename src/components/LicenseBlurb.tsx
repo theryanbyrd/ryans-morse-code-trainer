@@ -1,4 +1,4 @@
-// Cross-link to CallSignReady — the companion app for the Ham Radio Technician
+// Cross-link to CallSignReady, the companion app for the Ham Radio Technician
 // exam. Ditdah teaches the code; CallSignReady gets you the callsign to use it.
 export function LicenseBlurb({ compact = false }: { compact?: boolean }) {
   return (
@@ -12,7 +12,7 @@ export function LicenseBlurb({ compact = false }: { compact?: boolean }) {
       <span className="lb-text">
         <span className="lb-title">Ready for your license?</span>
         <span className="lb-sub">
-          <b>CallSignReady</b> turns the Ham Radio Technician exam into a game — earn your callsign and
+          <b>CallSignReady</b> turns the Ham Radio Technician exam into a game. Earn your callsign and
           put this code on the air for real.
         </span>
       </span>

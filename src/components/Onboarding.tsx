@@ -15,7 +15,7 @@ const SLIDES = [
   },
   {
     title: 'Pictures help you memorise each letter',
-    body: 'A is an archer — the dot is the nock, the dash is the long arrow. Picture it and the code sticks.',
+    body: 'A is an archer, the dot is the nock, the dash is the long arrow. Picture it and the code sticks.',
     art: (
       <div className="ob-letter">
         <img className="ob-mnemonic-img" src="/assets/images/final/A.png" alt="" />

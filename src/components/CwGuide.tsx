@@ -30,7 +30,7 @@ export function CwGuide({ onClose }: { onClose: () => void }) {
           className="cw-search"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search — e.g. QSL, 73, weather…"
+          placeholder="Search, e.g. QSL, 73, weather…"
           autoCapitalize="none"
           autoCorrect="off"
           spellCheck={false}

@@ -40,7 +40,7 @@ export function GetCodeModal({ onClose }: { onClose: () => void }) {
           </button>
         </header>
         <p>Save this code or move it to another device. Paste it into “Load From Code” to restore your progress.</p>
-        {empty && <p className="note">You haven't learned anything yet — this code represents a fresh start.</p>}
+        {empty && <p className="note">You haven't learned anything yet, this code represents a fresh start.</p>}
         <textarea className="code-box" readOnly value={code} onFocus={(e) => e.target.select()} />
         <div className="action-grid two">
           <button className="btn primary" onClick={copy}>{copied ? 'Copied!' : 'Copy code'}</button>

@@ -99,7 +99,7 @@ export function SentenceReceive() {
             const right = gw === w;
             return (
               <span key={wi} className={`sr-word ${right ? 'done' : 'missed'}`}>
-                {right ? w.toUpperCase() : (gw || '—').toUpperCase()}
+                {right ? w.toUpperCase() : (gw || '-').toUpperCase()}
               </span>
             );
           })}

@@ -1,4 +1,4 @@
-// Cave of Echoes — a Morse cave-crawl. Move by keying a direction; fight monsters
+// Cave of Echoes, a Morse cave-crawl. Move by keying a direction; fight monsters
 // by keying their weak rune (send) and copying their attacks by ear (receive).
 // Content is a small hand-authored graph of rooms + monsters, easy to extend.
 
@@ -79,7 +79,7 @@ export const ROOMS: Record<string, Room> = {
     title: 'Mouth of the Cave',
     art: '🕳️',
     narration:
-      'Cold air breathes up from the dark. Somewhere far below, a signal pulses — dit, dah, dit. You step in.',
+      'Cold air breathes up from the dark. Somewhere far below, a signal pulses, dit, dah, dit. You step in.',
     exits: [{ dir: 'N', to: 'hall' }],
   },
   hall: {
@@ -104,7 +104,7 @@ export const ROOMS: Record<string, Room> = {
     id: 'cache',
     title: 'Echo Cache',
     art: '💎',
-    narration: 'A hollow lined with humming crystals. You pocket a Signal Charm — warmth spreads through you.',
+    narration: 'A hollow lined with humming crystals. You pocket a Signal Charm, warmth spreads through you.',
     loot: { name: 'Signal Charm', heal: 2 },
     exits: [{ dir: 'W', to: 'junction' }],
   },
@@ -128,12 +128,12 @@ export const ROOMS: Record<string, Room> = {
     title: "The Static's Lair",
     art: '🌀',
     narration:
-      'The Static coils in the dark — the beast that swallowed the mountain’s signals. Time to silence it for good.',
+      'The Static coils in the dark, the beast that swallowed the mountain’s signals. Time to silence it for good.',
     monster: 'static',
     boss: true,
     exits: [],
   },
 };
 
-/** How many rooms deep — for a simple progress readout. */
+/** How many rooms deep, for a simple progress readout. */
 export const ROOM_COUNT = Object.keys(ROOMS).length;

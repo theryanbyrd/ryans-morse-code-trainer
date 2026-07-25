@@ -24,11 +24,11 @@ export function Qso() {
     return (
       <div className="qso-list">
         <h1 className="mode-title">On the air</h1>
-        <p className="qso-intro">Pick a scenario and work a full CW contact — send each transmission, then copy the reply.</p>
+        <p className="qso-intro">Pick a scenario and work a full CW contact, send each transmission, then copy the reply.</p>
         <button className="qso-guide-link" onClick={() => setShowGuide(true)}><BookIcon /> CW shorthand guide</button>
         {settings.qsoFreeform && (
           <button className="qso-random" onClick={() => startScenario(generateQso())}>
-            <DiceIcon /> Random QSO — a fresh, unscripted contact
+            <DiceIcon /> Random QSO, a fresh, unscripted contact
           </button>
         )}
         <div className="qso-cards">
@@ -82,7 +82,7 @@ export function Qso() {
       ) : (
         <>
           <div className={`qso-cue ${turn.d === 's' ? 'tx' : 'rx'}`}>
-            {turn.d === 's' ? 'TX — key this transmission' : 'RX — copy the reply'}
+            {turn.d === 's' ? 'TX: key this transmission' : 'RX: copy the reply'}
           </div>
           {turn.d === 's' ? (
             <QsoSend key={turnIndex} text={turn.t} onDone={() => setTurnIndex((i) => i + 1)} />
@@ -102,7 +102,7 @@ function Log({ scenario, upto }: { scenario: QsoScenario; upto: number }) {
     ref.current?.scrollTo({ top: ref.current.scrollHeight, behavior: 'smooth' });
   }, [upto]);
 
-  if (upto === 0) return <div className="qso-log empty" ref={ref}>— log is empty — start sending —</div>;
+  if (upto === 0) return <div className="qso-log empty" ref={ref}>Log is empty. Start sending.</div>;
 
   return (
     <div className="qso-log" ref={ref}>

@@ -20,14 +20,14 @@ const TOGGLES: { key: ToggleKey; label: string; help: string }[] = [
   { key: 'sound', label: 'Sound', help: 'Dot/dash tones and correct/wrong cues' },
   { key: 'speechHints', label: 'Speech Hints', help: 'Speak each letter and its picture word' },
   { key: 'visualHints', label: 'Visual Hints', help: 'Show the mnemonic picture for each letter' },
-  { key: 'morseBoard', label: 'Morse Board', help: 'Show the A–Z reference board button' },
+  { key: 'morseBoard', label: 'Morse Board', help: 'Show the A-Z reference board button' },
   { key: 'oneSwitch', label: 'One-Switch Mode', help: 'Operate everything from a single switch' },
-  { key: 'singleKey', label: 'Single Key', help: 'One key everywhere you send — short press = dit, long press = dah' },
+  { key: 'singleKey', label: 'Single Key', help: 'One key everywhere you send, short press = dit, long press = dah' },
   { key: 'visual', label: 'Flash & vibrate', help: 'Blink and buzz in time with the code (Receive)' },
-  { key: 'straightKey', label: 'Straight-key mode', help: 'On the air: one key — tap = dit, hold = dah' },
+  { key: 'straightKey', label: 'Straight-key mode', help: 'On the air: one key, tap = dit, hold = dah' },
   { key: 'qsoFreeform', label: 'Freeform QSOs', help: 'Add randomly-generated contacts to On the air' },
   { key: 'morseTree', label: 'Dot-dash tree', help: 'Light up the Morse tree as you key (Learn)' },
-  { key: 'gazeInput', label: 'Gaze input (beta)', help: 'Key with your eyes via webcam — look left = dit, right = dah' },
+  { key: 'gazeInput', label: 'Gaze input (beta)', help: 'Key with your eyes via webcam, look left = dit, right = dah' },
   { key: 'trackingConsent', label: 'Tracking Consent', help: 'Share anonymous learning analytics' },
 ];
 
@@ -90,7 +90,7 @@ export function SettingsModal({
           <label className="toggle-row slider-row">
             <span className="toggle-text">
               <span className="toggle-label">Character speed</span>
-              <span className="toggle-help">{settings.wpm} WPM — how fast each character is sent</span>
+              <span className="toggle-help">{settings.wpm} WPM, how fast each character is sent</span>
             </span>
             <input
               type="range"
@@ -110,7 +110,7 @@ export function SettingsModal({
             <span className="toggle-text">
               <span className="toggle-label">Effective speed</span>
               <span className="toggle-help">
-                {settings.effWpm} WPM — Farnsworth spacing{settings.effWpm < settings.wpm ? '' : ' (off)'}
+                {settings.effWpm} WPM, Farnsworth spacing{settings.effWpm < settings.wpm ? '' : ' (off)'}
               </span>
             </span>
             <input
@@ -126,7 +126,7 @@ export function SettingsModal({
           <label className="toggle-row slider-row">
             <span className="toggle-text">
               <span className="toggle-label">Tone</span>
-              <span className="toggle-help">{settings.tone} Hz — sidetone pitch</span>
+              <span className="toggle-help">{settings.tone} Hz, sidetone pitch</span>
             </span>
             <input
               type="range"

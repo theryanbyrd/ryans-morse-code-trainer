@@ -18,7 +18,7 @@ const FIRST_PLAY_DELAY = 350;
 const SLOW_WPM = 7;
 
 // Decode a word one letter at a time: hear A, pick A; hear T, pick T; … to
-// spell the word — the receive mirror of the Send word trainer. When the last
+// spell the word, the receive mirror of the Send word trainer. When the last
 // letter lands, the whole word is revealed with a ✓ before the next one.
 export function LetterQuiz() {
   const { progress, receive, settings, answerReceive, addReceivePlayTime } = useApp();
@@ -62,7 +62,7 @@ export function LetterQuiz() {
     return () => clearInterval(t);
   }, [addReceivePlayTime]);
 
-  // Play the current letter whenever the POSITION changes — keyed on word+index,
+  // Play the current letter whenever the POSITION changes, keyed on word+index,
   // not the letter value, so a repeated consecutive letter (e.g. the E's in
   // "seem", or landing back on the same letter after a wrong→right) still plays.
   useEffect(() => {
@@ -116,7 +116,7 @@ export function LetterQuiz() {
       }
 
       if (i + 1 >= w.length) {
-        // Last letter — reveal the whole finished word, then move on.
+        // Last letter, reveal the whole finished word, then move on.
         window.setTimeout(() => {
           setFeedback('idle');
           setPicked(null);
@@ -244,7 +244,7 @@ export function LetterQuiz() {
 
       {settings.oneSwitch && (
         <button type="button" className="switch-button" onClick={selectScanned}>
-          SWITCH — select highlighted
+          SWITCH: select highlighted
         </button>
       )}
     </div>

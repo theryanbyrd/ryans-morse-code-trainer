@@ -2,7 +2,7 @@ import { ALPHABET, MORSE } from '../data/morse';
 import { Pattern } from './Pattern';
 import { CloseIcon } from './Icons';
 
-// A–Z reference board so learners can see the whole code map.
+// A-Z reference board so learners can see the whole code map.
 export function MorseBoard({ onClose }: { onClose: () => void }) {
   return (
     <div className="modal-backdrop" onClick={onClose}>

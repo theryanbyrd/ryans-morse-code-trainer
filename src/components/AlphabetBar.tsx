@@ -2,7 +2,7 @@ import { ALPHABET } from '../data/morse';
 import { LEARNED_THRESHOLD } from '../lib/session';
 import type { Progress } from '../lib/storage';
 
-// Persistent A–Z strip; learned letters are highlighted.
+// Persistent A-Z strip; learned letters are highlighted.
 export function AlphabetBar({ progress, current }: { progress: Progress; current: string | null }) {
   return (
     <div className="alphabet-bar" role="img" aria-label="Alphabet progress">

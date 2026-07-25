@@ -6,7 +6,7 @@ export function AccountButton() {
   const { enabled, googleEnabled, user, signInWithEmail, signInWithGoogle, signOut } = useAuth();
   const [open, setOpen] = useState(false);
 
-  // Dormant until Supabase is configured — keeps the guest UI unchanged.
+  // Dormant until Supabase is configured, keeps the guest UI unchanged.
   if (!enabled) return null;
 
   const initial = (user?.email?.[0] ?? '?').toUpperCase();
@@ -83,7 +83,7 @@ function AccountModal({ onClose, user, googleEnabled, signInWithEmail, signInWit
           </>
         ) : (
           <>
-            <p>Sign in to save your history and sync it across your devices. Optional — you can keep playing as a guest.</p>
+            <p>Sign in to save your history and sync it across your devices. Optional, you can keep playing as a guest.</p>
             {status === 'sent' ? (
               <p className="note">Check your email for a sign-in link.</p>
             ) : (

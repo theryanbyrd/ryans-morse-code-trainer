@@ -4,7 +4,7 @@ import { playCorrect, playDash, playDot, playWrong } from '../lib/audio';
 import { useApp } from '../state/AppContext';
 import { DotIcon, DashIcon, FlameIcon } from './Icons';
 
-// Signal Squadron — a Morse "ZType": invaders drift down wearing a character.
+// Signal Squadron, a Morse "ZType": invaders drift down wearing a character.
 // Key that character's code and FIRE to shoot it. Clear the wave, don't let one
 // reach the bottom. Reinforces sending under gentle time pressure.
 
@@ -343,7 +343,7 @@ export function SignalSquadron() {
       </div>
 
       <div className="sq-decode">
-        <span className="sq-input">{input || '—'}</span>
+        <span className="sq-input">{input || '-'}</span>
         <span className="sq-preview">{preview}</span>
       </div>
 

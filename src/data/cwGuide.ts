@@ -1,5 +1,5 @@
 // Ham-radio CW (Morse) shorthand: Q-codes, prosigns, abbreviations and the
-// number sign-offs you hear on the air — a lookup guide for the QSO simulator.
+// number sign-offs you hear on the air, a lookup guide for the QSO simulator.
 
 export type CwEntry = { term: string; meaning: string };
 export type CwGroup = { title: string; entries: CwEntry[] };
@@ -8,16 +8,16 @@ export const CW_GUIDE: CwGroup[] = [
   {
     title: 'Calling & procedure',
     entries: [
-      { term: 'CQ', meaning: 'Calling all stations — I want a contact' },
+      { term: 'CQ', meaning: 'Calling all stations, I want a contact' },
       { term: 'DE', meaning: '"from" / "this is" (goes before your callsign)' },
-      { term: 'K', meaning: 'Go ahead / over — any station may reply' },
-      { term: 'KN', meaning: 'Over — only the named station should reply' },
-      { term: 'R', meaning: 'Roger — received, all copied' },
+      { term: 'K', meaning: 'Go ahead / over, any station may reply' },
+      { term: 'KN', meaning: 'Over, only the named station should reply' },
+      { term: 'R', meaning: 'Roger, received, all copied' },
       { term: 'AR  (+)', meaning: 'End of this message' },
       { term: 'SK', meaning: 'End of contact (clear / silent key)' },
-      { term: 'BT  (=)', meaning: 'Break — separates thoughts, like a pause' },
+      { term: 'BT  (=)', meaning: 'Break, separates thoughts, like a pause' },
       { term: 'AS', meaning: 'Wait / stand by a moment' },
-      { term: 'BK', meaning: 'Break — quick back-and-forth' },
+      { term: 'BK', meaning: 'Break, quick back-and-forth' },
       { term: 'CL', meaning: 'Closing down the station' },
       { term: 'QRZ?', meaning: 'Who is calling me?' },
     ],
@@ -26,7 +26,7 @@ export const CW_GUIDE: CwGroup[] = [
     title: 'Q-codes',
     entries: [
       { term: 'QTH', meaning: 'My location is… / what is your location?' },
-      { term: 'QSL', meaning: 'I acknowledge receipt — message received' },
+      { term: 'QSL', meaning: 'I acknowledge receipt, message received' },
       { term: 'QSO', meaning: 'A contact / conversation' },
       { term: 'QRL?', meaning: 'Is this frequency in use?' },
       { term: 'QRM', meaning: 'Interference from other stations' },
@@ -39,8 +39,8 @@ export const CW_GUIDE: CwGroup[] = [
       { term: 'QRQ', meaning: 'Send faster' },
       { term: 'QRT', meaning: 'Stop sending / going off the air' },
       { term: 'QRV', meaning: 'I am ready' },
-      { term: 'QRX', meaning: 'Wait — I will call you again' },
-      { term: 'QSK', meaning: 'Full break-in — I hear you between my dits' },
+      { term: 'QRX', meaning: 'Wait, I will call you again' },
+      { term: 'QSK', meaning: 'Full break-in, I hear you between my dits' },
       { term: 'QRG', meaning: 'Your exact frequency is…' },
     ],
   },
@@ -48,19 +48,19 @@ export const CW_GUIDE: CwGroup[] = [
     title: 'Reports & sign-offs',
     entries: [
       { term: 'RST', meaning: 'Signal report: Readability · Strength · Tone' },
-      { term: '599', meaning: 'A perfect report — R5 S9 T9 ("five nine")' },
+      { term: '599', meaning: 'A perfect report, R5 S9 T9 ("five nine")' },
       { term: '5NN', meaning: '599 with cut numbers (N = 9)' },
       { term: '73', meaning: 'Best regards (the standard sign-off)' },
-      { term: '72', meaning: 'Best regards — QRP (low-power) style' },
+      { term: '72', meaning: 'Best regards, QRP (low-power) style' },
       { term: '88', meaning: 'Love and kisses (to a sweetheart)' },
-      { term: 'EE', meaning: 'A friendly "dit dit" — cheerio at the end' },
+      { term: 'EE', meaning: 'A friendly "dit dit", cheerio at the end' },
     ],
   },
   {
     title: 'Common abbreviations',
     entries: [
       { term: 'TU / TNX', meaning: 'Thank you / thanks' },
-      { term: 'FB', meaning: 'Fine business — great, excellent' },
+      { term: 'FB', meaning: 'Fine business, great, excellent' },
       { term: 'HW?', meaning: 'How do you copy?' },
       { term: 'CPY', meaning: 'Copy (as in, do you copy)' },
       { term: 'PSE', meaning: 'Please' },
@@ -71,8 +71,8 @@ export const CW_GUIDE: CwGroup[] = [
       { term: 'HR', meaning: 'Here' },
       { term: 'NR', meaning: 'Number' },
       { term: 'OP', meaning: 'Operator (their name)' },
-      { term: 'OM', meaning: 'Old man — any male operator' },
-      { term: 'YL', meaning: 'Young lady — a female operator' },
+      { term: 'OM', meaning: 'Old man, any male operator' },
+      { term: 'YL', meaning: 'Young lady, a female operator' },
       { term: 'XYL', meaning: 'Wife' },
       { term: 'RIG', meaning: 'Radio / transceiver' },
       { term: 'ANT', meaning: 'Antenna' },
@@ -86,10 +86,10 @@ export const CW_GUIDE: CwGroup[] = [
       { term: 'VY', meaning: 'Very' },
       { term: 'ABT', meaning: 'About' },
       { term: 'WKD', meaning: 'Worked (made contact with)' },
-      { term: '/P', meaning: 'Portable — operating away from home' },
-      { term: '/M', meaning: 'Mobile — operating from a vehicle' },
+      { term: '/P', meaning: 'Portable, operating away from home' },
+      { term: '/M', meaning: 'Mobile, operating from a vehicle' },
       { term: 'POTA / SOTA', meaning: 'Parks / Summits On The Air activities' },
-      { term: 'LOTW', meaning: 'Logbook of the World — online QSL confirming' },
+      { term: 'LOTW', meaning: 'Logbook of the World, online QSL confirming' },
     ],
   },
 ];

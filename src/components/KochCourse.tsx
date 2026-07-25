@@ -55,7 +55,7 @@ export function KochCourse() {
         <h1 className="mode-title">Koch course</h1>
         <p className="koch-intro">
           The proven method: real speed from day one, one new character per lesson. Copy the groups,
-          type what you hear — {KOCH_PASS}% unlocks the next.
+          type what you hear, {KOCH_PASS}% unlocks the next.
         </p>
         <div className="koch-grid">
           {Array.from({ length: KOCH_LESSONS }, (_, i) => i + 1).map((n) => {
@@ -140,7 +140,7 @@ export function KochCourse() {
       {phase === 'result' && result && (
         <div className="koch-result">
           <div className={`koch-score${passed ? ' pass' : ''}`}>{result.pct}%</div>
-          <p>{passed ? '✓ Passed — next lesson unlocked!' : `Need ${KOCH_PASS}% to advance. Keep at it!`}</p>
+          <p>{passed ? '✓ Passed! Next lesson unlocked.' : `Need ${KOCH_PASS}% to advance. Keep at it!`}</p>
           <div className="koch-sent">Sent: <code>{sent}</code></div>
           <div className="koch-per">
             {Object.entries(result.per)

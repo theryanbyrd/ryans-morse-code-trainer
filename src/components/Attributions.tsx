@@ -21,7 +21,7 @@ export function Attributions({ onClose }: { onClose: () => void }) {
           </a>
         </p>
         <p>
-          Open source under the <b>Apache License 2.0</b> — you're welcome to fork it, learn from it,
+          Open source under the <b>Apache License 2.0</b>, you're welcome to fork it, learn from it,
           and build on it. The app code, the hand-drawn SVG mnemonics, and the receive /
           gamification features are original to this project.
         </p>

@@ -1,5 +1,5 @@
 // Morse code data + decoding helpers for Ryan's Morse Code Trainer.
-// Dot = "." Dash = "-". We only teach the 26 letters (A–Z).
+// Dot = "." Dash = "-". We only teach the 26 letters (A-Z).
 
 export const MORSE: Record<string, string> = {
   a: '.-',
@@ -51,8 +51,8 @@ export const MORSE_EXTRA: Record<string, string> = {
   '?': '..--..',
   '.': '.-.-.-',
   ',': '--..--',
-  '=': '-...-', // BT — the "break" separator ham ops send between thoughts
-  '+': '.-.-.', // AR — end of message
+  '=': '-...-', // BT, the "break" separator ham ops send between thoughts
+  '+': '.-.-.', // AR, end of message
 };
 
 /** Full character set: letters + digits + punctuation/prosigns. */

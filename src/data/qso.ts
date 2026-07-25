@@ -1,5 +1,5 @@
 // 20 realistic HF CW (Morse) QSO scenarios. Each is a scripted back-and-forth:
-// turns you SEND ('s' — you key it) alternate with turns you RECEIVE ('r' — you
+// turns you SEND ('s', you key it) alternate with turns you RECEIVE ('r', you
 // copy it by ear). Text is authentic ham shorthand:
 //   CQ = calling · DE = "this is" · K = over (any) · KN = over (named only)
 //   R = roger · RST/599 = signal report · = (BT) = break/separator

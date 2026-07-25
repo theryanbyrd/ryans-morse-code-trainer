@@ -50,7 +50,7 @@ export function ModeSelect() {
         >
           <span className="mode-icon" aria-hidden="true"><PencilIcon /></span>
           <span className="mode-name">Learn</span>
-          <span className="mode-desc">Learn the code — tap each letter</span>
+          <span className="mode-desc">Learn the code, tap each letter</span>
           <span className="mode-meta">{learned}/26 letters learned</span>
         </button>
 
@@ -60,7 +60,7 @@ export function ModeSelect() {
         >
           <span className="mode-icon" aria-hidden="true"><HashIcon /></span>
           <span className="mode-name">Numbers &amp; symbols</span>
-          <span className="mode-desc">Learn to send 0–9 and punctuation</span>
+          <span className="mode-desc">Learn to send 0-9 and punctuation</span>
           <span className="mode-meta">{numsMastered}/{NUM_SYM_ORDER.length} mastered</span>
         </button>
 
@@ -71,7 +71,7 @@ export function ModeSelect() {
           <span className="mode-badge tool">Method</span>
           <span className="mode-icon" aria-hidden="true"><HeadphonesIcon /></span>
           <span className="mode-name">Koch course</span>
-          <span className="mode-desc">The classic method — copy at real speed</span>
+          <span className="mode-desc">The classic method, copy at real speed</span>
           <span className="mode-meta">Lesson {koch.lesson} / {KOCH_LESSONS}</span>
         </button>
 
@@ -113,7 +113,7 @@ export function ModeSelect() {
           <span className="mode-badge">Advanced</span>
           <span className="mode-icon" aria-hidden="true"><AntennaIcon /></span>
           <span className="mode-name">On the air</span>
-          <span className="mode-desc">Work a real CW contact — send &amp; copy a QSO</span>
+          <span className="mode-desc">Work a real CW contact, send &amp; copy a QSO</span>
           {canReceive ? (
             <span className="mode-meta">20 ham radio scenarios</span>
           ) : (
@@ -139,7 +139,7 @@ export function ModeSelect() {
           <span className="mode-badge game">Game</span>
           <span className="mode-icon" aria-hidden="true"><MapIcon /></span>
           <span className="mode-name">Cave of Echoes</span>
-          <span className="mode-desc">Crawl a cave — fight monsters in Morse</span>
+          <span className="mode-desc">Crawl a cave, fight monsters in Morse</span>
           <span className="mode-meta">{caveBeaten ? '✓ Cave cleared' : 'Send & copy adventure'}</span>
         </button>
 
@@ -150,7 +150,7 @@ export function ModeSelect() {
           <span className="mode-badge tool">Tool</span>
           <span className="mode-icon" aria-hidden="true"><TranslateIcon /></span>
           <span className="mode-name">Translator</span>
-          <span className="mode-desc">Text ↔ Morse — play it or flash it</span>
+          <span className="mode-desc">Text ↔ Morse, play it or flash it</span>
           <span className="mode-meta">Encode &amp; decode any message</span>
         </button>
 
@@ -162,7 +162,7 @@ export function ModeSelect() {
             <span className="mode-badge a11y">Beta</span>
             <span className="mode-icon" aria-hidden="true"><EyeIcon /></span>
             <span className="mode-name">Gaze input</span>
-            <span className="mode-desc">Key with your eyes — look left = dit, right = dah</span>
+            <span className="mode-desc">Key with your eyes, look left = dit, right = dah</span>
             <span className="mode-meta">Webcam · on-device</span>
           </button>
         )}

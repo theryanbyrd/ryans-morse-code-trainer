@@ -131,7 +131,7 @@ export function CaveQuest() {
       <div className="cave-end">
         <div className="cave-end-art">🏆</div>
         <h2>The cave falls silent</h2>
-        <p>You silenced The Static. The mountain’s signals are free — and your fist is sharp.</p>
+        <p>You silenced The Static. The mountain’s signals are free, and your fist is sharp.</p>
         <div className="completion-actions">
           <button className="btn primary" onClick={() => { setSave((s) => ({ ...s, completed: true })); restart(); }}>New expedition</button>
           <button className="btn" onClick={() => setMode(null)}>Menu</button>

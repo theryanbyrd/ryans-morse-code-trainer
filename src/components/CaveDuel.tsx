@@ -86,7 +86,7 @@ export function CaveDuel({
       if (settings.sound) playWrong();
       const left = playerHp - 1;
       setPlayerHp(left);
-      push(`The blow lands — it was “${attack}”. (−1)`);
+      push(`The blow lands! It was “${attack}”. (−1)`);
       if (left <= 0) {
         setTimeout(() => onResult(false, 0), 800);
         return;
@@ -123,7 +123,7 @@ export function CaveDuel({
 
       {phase === 'strike' && (
         <div className="duel-phase">
-          <div className="duel-cue strike-cue">⚔️ Strike its weak rune — key <b>{monster.weakness}</b></div>
+          <div className="duel-cue strike-cue">⚔️ Strike its weak rune: key <b>{monster.weakness}</b></div>
           <QsoSend key={`strike-${round}`} text={monster.weakness} onDone={onStrike} />
         </div>
       )}
@@ -169,7 +169,7 @@ export function CaveDuel({
 
       {phase === 'banish' && monster.incantation && (
         <div className="duel-phase">
-          <div className="duel-cue banish-cue">✨ Banish it — copy the final incantation!</div>
+          <div className="duel-cue banish-cue">✨ Banish it: copy the final incantation!</div>
           <QsoReceive
             key={`banish-${round}`}
             text={monster.incantation}

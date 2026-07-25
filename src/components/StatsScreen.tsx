@@ -56,11 +56,11 @@ export function StatsScreen({ onClose }: { onClose: () => void }) {
             <div className="stat-cards">
               <div className="stat-card">
                 <span className="big">{sendLearned}/26</span>
-                <span>Send — learned</span>
+                <span>Send, learned</span>
               </div>
               <div className="stat-card">
                 <span className="big">{heardMastered}/{pool.length || 0}</span>
-                <span>Receive — by ear</span>
+                <span>Receive, by ear</span>
               </div>
               <div className="stat-card">
                 <span className="big">{acc(sTot.c, sTot.a)}%</span>

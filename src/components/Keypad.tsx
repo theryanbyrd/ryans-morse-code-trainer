@@ -2,7 +2,7 @@ import { DotIcon, DashIcon } from './Icons';
 
 export type KeyAction = 'dot' | 'dash' | 'delete';
 
-// Scanning order for one-switch mode. There's no "enter" — answers are judged
+// Scanning order for one-switch mode. There's no "enter", answers are judged
 // automatically once the pattern is the right length.
 export const SCAN_ORDER: KeyAction[] = ['dot', 'dash', 'delete'];
 
@@ -46,12 +46,12 @@ export function Keypad({
       </div>
       {oneSwitch ? (
         <p className="key-hint one-switch-hint">
-          <b>One-switch:</b> the highlight moves on its own — press your switch, the{' '}
+          <b>One-switch:</b> the highlight moves on its own, press your switch, the{' '}
           <b>SWITCH</b> button below, or <b>Space</b> when it lands on the option you want.
         </p>
       ) : (
         <p className="key-hint">
-          Keyboard: <b>J</b> or <b>.</b> = dot · <b>K</b> or <b>-</b> = dash · <b>⌫</b> = delete.
+          Keyboard: <b>J</b> or <b>.</b> = dot, <b>K</b> or <b>-</b> = dash, <b>⌫</b> = delete.
           Answers check themselves once the code is complete.
         </p>
       )}

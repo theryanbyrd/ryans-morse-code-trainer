@@ -237,7 +237,7 @@ export function Game({ onOpenStats }: { onOpenStats: () => void }) {
           <Keypad onAction={handleAction} scanIndex={scanIndex} oneSwitch={settings.oneSwitch} />
           {settings.oneSwitch && (
             <button type="button" className="switch-button" onClick={selectScanned}>
-              SWITCH — select highlighted
+              SWITCH: select highlighted
             </button>
           )}
         </>

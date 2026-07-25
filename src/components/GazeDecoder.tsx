@@ -5,10 +5,10 @@ import { useApp } from '../state/AppContext';
 import { playDot, playDash } from '../lib/audio';
 import { Pattern } from './Pattern';
 
-// Gaze decoder — key Morse with your eyes. Look LEFT for a dit, RIGHT for a dah;
+// Gaze decoder, key Morse with your eyes. Look LEFT for a dit, RIGHT for a dah;
 // rest in the middle to let a character land, rest longer for a space.
 //
-// Eye tracking is WebGazer.js (lazy-loaded, webcam, all on-device — no video ever
+// Eye tracking is WebGazer.js (lazy-loaded, webcam, all on-device, no video ever
 // leaves the browser). Because it needs a real camera + calibration, the tuning
 // (dwell time, zone width) is exposed live and will want adjusting per person.
 
@@ -78,7 +78,7 @@ export function GazeDecoder() {
     setText((t) => (t + ch).slice(-80));
   }, []);
 
-  // the decode loop — reads gazeX (from WebGazer or the dev simulator) and runs
+  // the decode loop, reads gazeX (from WebGazer or the dev simulator) and runs
   // the dwell→emit→commit state machine.
   const startLoop = useCallback(() => {
     cancelAnimationFrame(rafRef.current);
@@ -223,7 +223,7 @@ export function GazeDecoder() {
         <h2>Gaze input</h2>
         <p className="gaze-lead">Key Morse with your eyes. Look <b className="dit-word">left for a dit</b>, <b className="dah-word">right for a dah</b>, and rest in the middle to finish a letter.</p>
         <div className="gaze-privacy">
-          🔒 Uses your webcam for eye tracking. Everything runs <b>on your device</b> — no video is recorded or ever leaves this browser. The camera is released when you leave.
+          🔒 Uses your webcam for eye tracking. Everything runs <b>on your device</b>, no video is recorded or ever leaves this browser. The camera is released when you leave.
         </div>
         {phase === 'error' && (
           <div className="gaze-error">Couldn’t start the camera: {error}. Check camera permissions and lighting, then try again.</div>

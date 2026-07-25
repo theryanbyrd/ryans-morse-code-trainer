@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { keyDown, keyUp } from '../lib/morsePlayer';
 
 // A real straight-key feel: hold ONE key. A short press is a dit, a longer hold
-// is a dah — the threshold sits between them, scaled to your send speed. A live
+// is a dah, the threshold sits between them, scaled to your send speed. A live
 // sidetone sounds the whole time the key is down.
 export function StraightKey({
   onSymbol,
@@ -79,7 +79,7 @@ export function StraightKey({
         onPointerUp={release}
         onPointerLeave={release}
         onPointerCancel={release}
-        aria-label="Straight key — tap for dit, hold for dah"
+        aria-label="Straight key: tap for dit, hold for dah"
       >
         <span className="sk-glyph">⌇</span>
         <span className="sk-hint">tap = dit · hold = dah</span>

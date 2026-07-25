@@ -72,7 +72,7 @@ export function Translator() {
           className="tr-area"
           value={text}
           onChange={(e) => onText(e.target.value)}
-          placeholder="Type text — letters, numbers, ? ! . , /"
+          placeholder="Type text, letters, numbers, ? ! . , /"
           autoCapitalize="characters"
           spellCheck={false}
         />
