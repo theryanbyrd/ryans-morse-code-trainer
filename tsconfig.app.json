@@ -21,5 +21,8 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  /* Tests are typechecked by tsconfig.test.json — keeping them out of the app
+     project means `tsc -b` (the build) never compiles or ships them. */
+  "exclude": ["src/**/*.test.ts"]
 }

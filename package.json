@@ -2,7 +2,7 @@
   "name": "ryans-morse-code-trainer",
   "private": true,
   "version": "0.1.0",
-  "description": "Ditdah — learn to send and receive Morse code with picture/sound mnemonics, a QSO simulator, and a translator. A React remake inspired by Ace Centre's Morse Learn.",
+  "description": "Ditdah \u2014 learn to send and receive Morse code with picture/sound mnemonics, a QSO simulator, and a translator. A React remake inspired by Ace Centre's Morse Learn.",
   "license": "Apache-2.0",
   "author": "Ryan Byrd",
   "homepage": "https://ryans-morse-code-trainer.vercel.app",
@@ -15,7 +15,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
@@ -31,6 +33,7 @@
     "@vitejs/plugin-react": "^6.0.2",
     "oxlint": "^1.69.0",
     "typescript": "~6.0.2",
-    "vite": "^8.1.0"
+    "vite": "^8.1.0",
+    "vitest": "^4.1.10"
   }
 }
