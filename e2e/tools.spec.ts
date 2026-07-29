@@ -105,3 +105,46 @@ test.describe('progress code', () => {
     expect(code.trim().length).toBeGreaterThan(10);
   });
 });
+
+test.describe('account sign-in', () => {
+  /** Pretend Supabase reports a given set of enabled providers. */
+  const withProviders = (page: import('@playwright/test').Page, external: Record<string, boolean>) =>
+    page.route('**/auth/v1/settings*', (r) =>
+      r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ external }) }));
+
+  test('offers Google sign-in when the provider is enabled', async ({ page }) => {
+    await withProviders(page, { google: true, email: true });
+    await seed(page);
+    await boot(page);
+    await page.locator('.account-chip').click();
+
+    const btn = page.locator('.google-btn');
+    await expect(btn).toBeVisible();
+    // Google's guidelines: their exact wording and their unmodified 4-colour mark.
+    await expect(btn).toContainText('Sign in with Google');
+    await expect(btn.locator('svg path')).toHaveCount(4);
+    // Comfortably tappable.
+    expect((await btn.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    // Email remains available as an alternative.
+    await expect(page.locator('input[type="email"]')).toBeVisible();
+  });
+
+  test('hides Google sign-in when the provider is off', async ({ page }) => {
+    await withProviders(page, { google: false, email: true });
+    await seed(page);
+    await boot(page);
+    await page.locator('.account-chip').click();
+
+    await expect(page.locator('.google-btn')).toHaveCount(0);
+    await expect(page.locator('.or-rule')).toHaveCount(0);
+    await expect(page.locator('input[type="email"]')).toBeVisible();
+  });
+
+  test('explains that signing in is optional', async ({ page }) => {
+    await withProviders(page, { google: true, email: true });
+    await seed(page);
+    await boot(page);
+    await page.locator('.account-chip').click();
+    await expect(page.locator('.modal.account')).toContainText('keep playing as a guest');
+  });
+});

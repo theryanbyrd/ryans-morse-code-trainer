@@ -1195,3 +1195,25 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 
 /* The 'game' badge modifier must not inherit the .game screen-container rule */
 .mode-badge.game { width: auto; display: inline-block; }
+
+/* Sign in with Google (Google brand guidelines: white surface, Roboto-ish
+   label, unmodified mark, 40px min height) */
+.google-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; min-height: 44px; padding: 10px 16px;
+  background: #fff; color: #1f1f1f; font-size: 15px; font-weight: 600;
+  border: 1px solid #dadce0; border-radius: 12px;
+  transition: background var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast);
+}
+.google-btn:hover { background: #f7f8f8; box-shadow: 0 1px 3px rgba(60,64,67,0.25); }
+.google-btn:active { transform: scale(0.98); }
+.google-btn svg { flex: none; }
+
+.or-rule {
+  display: flex; align-items: center; gap: 12px;
+  color: var(--ink-soft); font-size: 12px; text-transform: uppercase; letter-spacing: 1px;
+  margin: 2px 0;
+}
+.or-rule::before, .or-rule::after {
+  content: ''; flex: 1; height: 1px; background: rgba(0,0,0,0.12);
+}
