@@ -33,3 +33,9 @@ dist-ssr
 
 # uipro-installed skills (third-party, regenerate with `uipro init --ai claude`)
 .claude/skills/
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
