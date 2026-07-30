@@ -16,9 +16,9 @@ Project: **`mdqxlftzqsuerdvxfxjz`** (Supabase) · Live at **https://ditdah.me**
 2. **APIs & Services → OAuth consent screen**
    - User type: **External**, then **Publish** it (while it is in Testing, only
      accounts you list by hand can sign in).
-   - App name: `Ditdah`, support email: yours.
    - Authorised domain: `supabase.co` (that is where the callback lands).
    - Scopes: the defaults (`email`, `profile`, `openid`) are all that is needed.
+   - Set the branding as below, or the consent screen looks broken.
 3. **APIs & Services → Credentials → Create credentials → OAuth client ID**
    - Application type: **Web application**
    - **Authorised JavaScript origins**
@@ -31,6 +31,29 @@ Project: **`mdqxlftzqsuerdvxfxjz`** (Supabase) · Live at **https://ditdah.me**
      https://mdqxlftzqsuerdvxfxjz.supabase.co/auth/v1/callback
      ```
 4. Copy the **Client ID** and **Client secret**.
+
+### Branding: do not skip, or the consent screen shows a raw hostname
+
+Google names the app on its consent screen from **Google Auth Platform →
+Branding**. With it unset, Google falls back to the redirect domain, so users see
+"Sign in to **mdqxlftzqsuerdvxfxjz.supabase.co**", which looks like a phishing
+page.
+
+- **App name**: `Ditdah`
+- **User support email**: yours
+- **App home page**: `https://ditdah.me`
+- **Authorised domain**: `ditdah.me`
+
+The heading then reads "Sign in to Ditdah".
+
+Two caveats:
+- Uploading an **app logo triggers Google's verification review** (days, sometimes
+  longer). The app *name* does not, because `email`/`profile` are non-sensitive
+  scopes. Set the name now; treat the logo as optional.
+- The `supabase.co` host can still appear in the small print, because it really is
+  the redirect target. Removing it entirely needs a **Supabase custom auth domain**
+  (`auth.ditdah.me`), which is a paid add-on (Pro plan + custom domain). If you
+  ever do that, the redirect URI in the Google client has to change to match.
 
 ---
 
@@ -102,6 +125,78 @@ progress slice is added without being merged.
 Cave of Echoes crawls merge generously: rooms cleared, doors opened and loot are
 kept from both sides, beating the boss on any device counts, and you are stood
 where the further-along crawl had reached.
+
+---
+
+## Email abuse, rate limits and unsubscribe
+
+The magic-link endpoint takes an arbitrary address and emails it, so it is worth
+being deliberate about abuse. Anyone can POST to `/auth/v1/otp`; without limits a
+script could use the project to mail someone repeatedly.
+
+**What already protects it**
+
+- **A per-address cooldown.** Supabase refuses a second link to the same address
+  inside a minimum interval (60s by default) and answers `429` with
+  "For security purposes, you can only request this after N seconds".
+- **An hourly cap on emails sent**, project-wide. On the built-in email service
+  this is deliberately tiny (a couple of messages an hour) and Supabase documents
+  that service as **for testing, not production**.
+- **Row-level security** means a flood costs email quota but cannot touch anyone's
+  saved progress.
+
+Check and tune both under **Authentication → Rate Limits** and
+**Authentication → Emails**.
+
+**The real fix is a CAPTCHA, not an unsubscribe link**
+
+Supabase supports hCaptcha and Cloudflare Turnstile on auth endpoints
+(**Authentication → Attack Protection**). Turning it on and passing the token
+through `signInWithOtp({ options: { captchaToken } })` is what actually stops a
+bot enumerating addresses. Rate limits only bound the blast radius.
+
+**On unsubscribe links:** a sign-in link is a *transactional* message that the
+recipient just asked for, not marketing, so it is outside what unsubscribe rules
+target and mail providers do not expect one. Adding one would also be a griefing
+vector, since an attacker could unsubscribe a victim from their own sign-in
+emails. The right answers to unwanted auth email are the CAPTCHA and the rate
+limits above.
+
+**The default email is unbranded, and its opt-out is not yours**
+
+What the built-in service actually sends today:
+
+- from `noreply@mail.app.supabase.io`, signed as "Supabase Auth"
+- a generic "Confirm your email address" body with no Ditdah branding
+- a footer reading "You're receiving this email because you signed up for an
+  application **powered by Supabase**"
+- an **"Opt out of these emails"** link that belongs to Supabase, not to us
+
+That opt-out is worth understanding before relying on it as the answer to the
+spam question above. It unsubscribes the recipient from the shared Supabase
+mailer, so a user who clicks it may stop receiving *our* sign-in links as well.
+It is a liability, not a safeguard, and a proper transactional setup does not
+carry one.
+
+**Fixing both problems at once**
+
+Configure **custom SMTP** (Resend, Postmark, SendGrid) under
+**Authentication → Emails → SMTP Settings**, sending from an address on
+`ditdah.me`. That:
+
+- drops the Supabase from-address, footer and opt-out link
+- raises the tiny test-only cap so email sign-in works for real users
+- adds bounce and complaint handling
+
+Then paste the branded templates from `docs/email-templates/` into
+**Authentication → Emails → Templates**. Both are needed, because
+`signInWithOtp` sends **Confirm signup** to a new address and **Magic Link** to a
+returning one, and it was the new-user path that looked unbranded.
+
+Raising the sending cap raises the abuse ceiling too, so turn the CAPTCHA on at
+the same time.
+
+Google sign-in sidesteps all of this: it sends no email at all.
 
 ---
 
