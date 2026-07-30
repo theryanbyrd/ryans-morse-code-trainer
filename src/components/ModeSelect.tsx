@@ -16,6 +16,7 @@ import {
   RocketIcon, MapIcon, EyeIcon, TranslateIcon,
 } from './Icons';
 import { unlockMorse } from '../lib/morsePlayer';
+import { Share } from './Share';
 
 export function ModeSelect() {
   const { progress, receive, numbers, koch, cave, lastMode, settings, setMode } = useApp();
@@ -165,6 +166,8 @@ export function ModeSelect() {
           </button>
         )}
       </div>
+
+      <Share />
     </div>
   );
 }

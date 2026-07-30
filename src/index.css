@@ -1217,3 +1217,40 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 .or-rule::before, .or-rule::after {
   content: ''; flex: 1; height: 1px; background: rgba(0,0,0,0.12);
 }
+
+/* Share with a friend */
+.share {
+  width: 100%; max-width: 480px; margin: 8px auto 0;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 18px; padding: 18px 16px;
+}
+.share-title {
+  display: flex; align-items: center; gap: 8px; margin: 0;
+  font-size: 16px; font-weight: 800; color: var(--on-dark);
+}
+.share-sub { margin: 0 0 6px; font-size: 13px; color: var(--on-dark-soft); text-align: center; }
+.share-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.share-btn {
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  min-width: 68px; min-height: 62px; padding: 8px 10px; border-radius: 14px;
+  background: var(--card); color: var(--tint, var(--ink)); text-decoration: none;
+  border: 1px solid rgba(255,255,255,0.5); box-shadow: var(--shadow-card);
+  font-size: 11.5px; font-weight: 700;
+  transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast);
+}
+.share-btn span { color: var(--ink); }
+.share-btn:hover { transform: translateY(-2px); }
+.share-btn:active { transform: translateY(1px) scale(0.98); }
+.share-btn.copy { color: var(--green); }
+.share-native { width: 100%; max-width: 260px; margin-top: 8px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+
+/* Inside the cream About modal the dark-surface treatment has to flip. */
+.modal .share {
+  background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.08);
+}
+.modal .share-title { color: var(--ink); }
+.modal .share-sub { color: var(--ink-soft); }
+.modal .share-btn { border-color: rgba(0,0,0,0.08); }
+.share.compact { padding: 14px 12px; }
+.share.compact .share-btn { min-width: 60px; min-height: 56px; font-size: 11px; }

@@ -155,6 +155,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       await saveRemote(uid, merged);
       syncReadyForUser.current = uid;
       pendingUser.current = null;
+      track({ type: 'signin' }, settingsRef.current.trackingConsent);
     })();
   }, [user]);
 

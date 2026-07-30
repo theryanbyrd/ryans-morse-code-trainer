@@ -45,6 +45,37 @@ export async function scard(key: string): Promise<number> {
   return Number.isFinite(n) ? n : 0;
 }
 
+export async function expire(key: string, seconds: number): Promise<void> {
+  await cmd(['EXPIRE', key, seconds]);
+}
+
+/**
+ * The reporting day, in Ryan's timezone, so "yesterday" in the digest means the
+ * day he actually lived rather than a UTC slice of it.
+ */
+export const REPORT_TZ = 'America/Denver';
+
+export function dayKey(d = new Date(), offsetDays = 0): string {
+  const shifted = new Date(d.getTime() + offsetDays * 86_400_000);
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: REPORT_TZ, year: 'numeric', month: '2-digit', day: '2-digit',
+  }).format(shifted);
+}
+
+/** Daily aggregate counters. Plain totals, no per-person records. */
+export const D = {
+  views: (day: string) => `rmct:d:${day}:views`,
+  visitors: (day: string) => `rmct:d:${day}:visitors`, // a set of salted hashes
+  signins: (day: string) => `rmct:d:${day}:signins`,
+  shares: (day: string) => `rmct:d:${day}:shares`,
+  share: (day: string, target: string) => `rmct:d:${day}:share:${target}`,
+  answers: (day: string) => `rmct:d:${day}:answers`,
+  learned: (day: string) => `rmct:d:${day}:learned`,
+};
+
+/** Keep daily keys for a few weeks, then let them fall away on their own. */
+export const DAY_TTL = 60 * 60 * 24 * 45;
+
 export const ALPHABET = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
 export const K = {

@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import './index.css';
+import './index.css'
+import { pulse } from './lib/analytics';
 import App from './App.tsx';
 import { AppProvider } from './state/AppContext';
 import { AuthProvider } from './state/AuthContext';
@@ -14,3 +15,5 @@ createRoot(document.getElementById('root')!).render(
     </AuthProvider>
   </StrictMode>,
 );
+
+pulse();

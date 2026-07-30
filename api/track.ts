@@ -1,6 +1,6 @@
 // POST /api/track — ingest a single anonymous, consent-gated learning event.
 // Only aggregate counters are stored; no per-user data is retained.
-import { incr, sadd, readJson, ALPHABET, K, storeEnabled } from './_lib.js';
+import { incr, sadd, expire, dayKey, readJson, ALPHABET, K, D, DAY_TTL, storeEnabled } from './_lib.js';
 
 type Req = { method?: string; body?: unknown };
 type Res = {
@@ -14,7 +14,14 @@ type Event = {
   letter?: string;
   correct?: boolean;
   anonId?: string;
+  target?: string;
 };
+
+/** Bump a daily counter and keep it from living forever. */
+async function bumpDay(key: string) {
+  await incr(key);
+  await expire(key, DAY_TTL);
+}
 
 export default async function handler(req: Req, res: Res) {
   res.setHeader('Cache-Control', 'no-store');
@@ -30,14 +37,25 @@ export default async function handler(req: Req, res: Res) {
   }
 
   // Best-effort; storage may be disabled (no DB configured).
+  const day = dayKey();
   try {
     switch (e.type) {
       case 'session_start':
         await incr(K.sessions);
         if (e.anonId) await sadd('rmct:anon', String(e.anonId).slice(0, 64));
         break;
+      case 'share': {
+        await bumpDay(D.shares(day));
+        const t = typeof e.target === 'string' ? e.target.replace(/[^a-z]/gi, '').slice(0, 16).toLowerCase() : '';
+        if (t) await bumpDay(D.share(day, t));
+        break;
+      }
+      case 'signin':
+        await bumpDay(D.signins(day));
+        break;
       case 'answer': {
         await incr(K.answers);
+        await bumpDay(D.answers(day));
         if (e.correct) await incr(K.correct);
         const l = typeof e.letter === 'string' ? e.letter.toLowerCase() : '';
         if (ALPHABET.includes(l)) {
@@ -48,6 +66,7 @@ export default async function handler(req: Req, res: Res) {
       }
       case 'letter_learned':
         await incr(K.learned);
+        await bumpDay(D.learned(day));
         break;
       case 'course_complete':
         await incr(K.completes);

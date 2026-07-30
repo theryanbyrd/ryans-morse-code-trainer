@@ -1,5 +1,6 @@
 import { CloseIcon } from './Icons';
 import { LicenseBlurb } from './LicenseBlurb';
+import { Share } from './Share';
 
 export function AboutScreen({
   onClose,
@@ -36,6 +37,8 @@ export function AboutScreen({
         </p>
 
         <LicenseBlurb />
+
+        <Share compact />
 
         <p className="credits">
           A personal remake inspired by <b>Morse Learn</b> from Ace Centre, itself built on the

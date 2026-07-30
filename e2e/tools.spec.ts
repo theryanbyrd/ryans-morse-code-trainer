@@ -148,3 +148,46 @@ test.describe('account sign-in', () => {
     await expect(page.locator('.modal.account')).toContainText('keep playing as a guest');
   });
 });
+
+test.describe('share with a friend', () => {
+  test.beforeEach(async ({ page }) => {
+    await seed(page, { settings: { sound: false } });
+    await boot(page);
+  });
+
+  test('offers share targets on the mode menu', async ({ page }) => {
+    const share = page.locator('.share').first();
+    await expect(share).toBeVisible();
+    await expect(share.locator('.share-btn')).toHaveCount(6);
+  });
+
+  test('points every target at ditdah.me with a real share URL', async ({ page }) => {
+    const links = page.locator('.share').first().locator('a.share-btn');
+    const hosts = ['twitter.com', 'facebook.com', 'whatsapp.com', 'reddit.com', 'mailto:'];
+    for (let i = 0; i < hosts.length; i++) {
+      const href = await links.nth(i).getAttribute('href');
+      expect(href, `target ${i}`).toContain(hosts[i]);
+      expect(decodeURIComponent(href!)).toContain('ditdah.me');
+    }
+  });
+
+  test('opens share targets in a new tab, safely', async ({ page }) => {
+    const link = page.locator('.share').first().locator('a.share-btn').first();
+    await expect(link).toHaveAttribute('target', '_blank');
+    await expect(link).toHaveAttribute('rel', /noreferrer/);
+  });
+
+  test('copies the link and confirms it', async ({ page, context, browserName }) => {
+    test.skip(browserName !== 'chromium', 'clipboard permission is chromium-only here');
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+
+    await page.locator('.share-btn.copy').first().click();
+    await expect(page.locator('.share-btn.copy').first()).toContainText('Copied');
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('https://ditdah.me');
+  });
+
+  test('also appears in the About dialog', async ({ page }) => {
+    await page.locator('.icon-btn[aria-label="About"]').click();
+    await expect(page.locator('.modal.about .share')).toBeVisible();
+  });
+});
