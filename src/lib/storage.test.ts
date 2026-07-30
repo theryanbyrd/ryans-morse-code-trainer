@@ -166,3 +166,51 @@ describe('load / save', () => {
     expect(s.koch.lesson).toBeGreaterThanOrEqual(1);
   });
 });
+
+describe('cave slice', () => {
+  it('starts a fresh crawl at the cave mouth with full health', () => {
+    const c = load().cave;
+    expect(c.room).toBe('entrance');
+    expect(c.hp).toBeGreaterThan(0);
+    expect(c.cleared).toEqual([]);
+    expect(c.completed).toBe(false);
+  });
+
+  it('adopts a crawl left in the retired standalone key', () => {
+    // Players mid-crawl when the cave moved into the synced state must not be
+    // sent back to the entrance.
+    localStorage.setItem('rmct.cave', JSON.stringify({
+      room: 'gate', hp: 3, cleared: ['hall', 'gorge'], unlocked: ['gate>N'],
+      inventory: ['Signal Charm'], completed: false,
+    }));
+    const c = load().cave;
+    expect(c.room).toBe('gate');
+    expect(c.cleared).toEqual(['hall', 'gorge']);
+    expect(c.inventory).toEqual(['Signal Charm']);
+  });
+
+  it('prefers the synced slice over the retired key', () => {
+    localStorage.setItem('rmct.cave', JSON.stringify({ room: 'gate', hp: 1, cleared: ['hall'], unlocked: [], inventory: [], completed: false }));
+    localStorage.setItem(KEY, JSON.stringify({ settings: {}, cave: { room: 'junction', hp: 5, cleared: [], unlocked: [], inventory: [], completed: false } }));
+    expect(load().cave.room).toBe('junction');
+  });
+
+  it('ignores a corrupt legacy save instead of crashing', () => {
+    localStorage.setItem('rmct.cave', '{ not json');
+    expect(load().cave.room).toBe('entrance');
+  });
+
+  it('repairs junk fields rather than trusting them', () => {
+    localStorage.setItem(KEY, JSON.stringify({
+      settings: {},
+      cave: { room: 42, hp: 'lots', cleared: 'nope', unlocked: [1, 'gate>N'], inventory: null, completed: 'yes' },
+    }));
+    const c = load().cave;
+    expect(c.room).toBe('entrance');
+    expect(typeof c.hp).toBe('number');
+    expect(c.cleared).toEqual([]);
+    expect(c.unlocked).toEqual(['gate>N']);
+    expect(c.inventory).toEqual([]);
+    expect(c.completed).toBe(true);
+  });
+});

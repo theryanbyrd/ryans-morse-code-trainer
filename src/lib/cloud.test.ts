@@ -6,6 +6,7 @@ import {
   freshReceiveProgress,
   freshNumbersProgress,
   freshKochProgress,
+  freshCaveProgress,
 } from './storage';
 import type { SaveState } from './storage';
 
@@ -16,6 +17,7 @@ function fresh(): SaveState {
     receive: freshReceiveProgress(),
     numbers: freshNumbersProgress(),
     koch: freshKochProgress(),
+    cave: freshCaveProgress(),
   };
 }
 
@@ -173,5 +175,93 @@ describe('mergeSaveState', () => {
     const merged = mergeSaveState(local, legacyRemote);
     expect(merged.koch.lesson).toBe(4);
     expect(merged.numbers.chars['3'].score).toBe(2);
+  });
+});
+
+describe('mergeSaveState: cave crawl', () => {
+  it('keeps every room cleared on either device', () => {
+    const local = fresh();
+    const remote = fresh();
+    local.cave.cleared = ['hall'];
+    remote.cave.cleared = ['gorge'];
+
+    const merged = mergeSaveState(local, remote);
+    expect(merged.cave.cleared.sort()).toEqual(['gorge', 'hall']);
+  });
+
+  it('keeps doors opened on either device unlocked', () => {
+    const local = fresh();
+    const remote = fresh();
+    local.cave.unlocked = ['gate>N'];
+
+    expect(mergeSaveState(local, remote).cave.unlocked).toEqual(['gate>N']);
+  });
+
+  it('unions inventory without duplicating loot', () => {
+    const local = fresh();
+    const remote = fresh();
+    local.cave.inventory = ['Signal Charm'];
+    remote.cave.inventory = ['Signal Charm'];
+
+    expect(mergeSaveState(local, remote).cave.inventory).toEqual(['Signal Charm']);
+  });
+
+  it('remembers the cave was beaten even if only one side did it', () => {
+    const local = fresh();
+    const remote = fresh();
+    remote.cave.completed = true;
+
+    expect(mergeSaveState(local, remote).cave.completed).toBe(true);
+    expect(mergeSaveState(remote, local).cave.completed).toBe(true);
+  });
+
+  it('takes the healthier HP rather than punishing the learner', () => {
+    const local = fresh();
+    const remote = fresh();
+    local.cave.hp = 1;
+    remote.cave.hp = 4;
+
+    expect(mergeSaveState(local, remote).cave.hp).toBe(4);
+  });
+
+  it('stands you where the further-along crawl had got to', () => {
+    const local = fresh();
+    const remote = fresh();
+    local.cave.room = 'hall';
+    local.cave.cleared = ['hall'];
+    remote.cave.room = 'gate';
+    remote.cave.cleared = ['hall', 'gorge'];
+
+    expect(mergeSaveState(local, remote).cave.room).toBe('gate');
+  });
+
+  it('breaks a tie in favour of the device in hand', () => {
+    const local = fresh();
+    const remote = fresh();
+    local.cave.room = 'junction';
+    remote.cave.room = 'cache';
+
+    expect(mergeSaveState(local, remote).cave.room).toBe('junction');
+  });
+
+  it('survives a cloud row saved before the cave was synced', () => {
+    const local = fresh();
+    local.cave = { room: 'gate', hp: 3, cleared: ['hall', 'gorge'], unlocked: ['gate>N'], inventory: ['Signal Charm'], completed: false };
+    const legacyRemote = { ...fresh() } as SaveState;
+    delete (legacyRemote as Partial<SaveState>).cave;
+
+    const merged = mergeSaveState(local, legacyRemote);
+    expect(merged.cave.room).toBe('gate');
+    expect(merged.cave.cleared.sort()).toEqual(['gorge', 'hall']);
+  });
+
+  it('does not mutate either input', () => {
+    const local = fresh();
+    const remote = fresh();
+    local.cave.cleared = ['hall'];
+    const a = JSON.stringify(local); const b = JSON.stringify(remote);
+    mergeSaveState(local, remote);
+    expect(JSON.stringify(local)).toBe(a);
+    expect(JSON.stringify(remote)).toBe(b);
   });
 });

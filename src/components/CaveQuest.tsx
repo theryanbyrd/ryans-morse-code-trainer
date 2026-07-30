@@ -4,6 +4,7 @@ import {
 } from '../data/cave';
 import type { Dir, Exit } from '../data/cave';
 import { useApp } from '../state/AppContext';
+import type { CaveProgress } from '../lib/storage';
 import { decode, patternForChar } from '../data/morse';
 import { playWrong } from '../lib/audio';
 import { Keypad } from './Keypad';
@@ -13,30 +14,13 @@ import { Pattern } from './Pattern';
 import { QsoSend } from './QsoSend';
 import { CaveDuel } from './CaveDuel';
 
-const SAVE_KEY = 'rmct.cave';
-
-type Save = {
-  room: string;
-  hp: number;
-  cleared: string[]; // room ids whose monster is defeated
-  unlocked: string[]; // exit keys opened (roomId>dir)
-  inventory: string[];
-  completed: boolean;
-};
-
-function load(): Save {
-  try {
-    const raw = localStorage.getItem(SAVE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch { /* ignore */ }
-  return { room: START_ROOM, hp: MAX_HP, cleared: [], unlocked: [], inventory: [], completed: false };
-}
-
 type Phase = 'explore' | 'fight' | 'door' | 'lose' | 'win';
 
 export function CaveQuest() {
-  const { setMode, settings } = useApp();
-  const [save, setSave] = useState<Save>(load);
+  // The crawl lives in the shared save state so it syncs to an account.
+  const { setMode, settings, cave: save, saveCave } = useApp();
+  const setSave = (next: CaveProgress | ((prev: CaveProgress) => CaveProgress)) =>
+    saveCave(typeof next === 'function' ? next(save) : next);
   const [phase, setPhase] = useState<Phase>('explore');
   const [navInput, setNavInput] = useState('');
   const [navShake, setNavShake] = useState(false);
@@ -45,11 +29,6 @@ export function CaveQuest() {
 
   const room = ROOMS[save.room];
   const hasMonster = !!room.monster && !save.cleared.includes(room.id);
-
-  // persist
-  useEffect(() => {
-    localStorage.setItem(SAVE_KEY, JSON.stringify(save));
-  }, [save]);
 
   // entering a room with a live monster → fight; grab loot once
   useEffect(() => {

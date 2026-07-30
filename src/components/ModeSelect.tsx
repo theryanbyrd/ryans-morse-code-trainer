@@ -18,7 +18,7 @@ import {
 import { unlockMorse } from '../lib/morsePlayer';
 
 export function ModeSelect() {
-  const { progress, receive, numbers, koch, lastMode, settings, setMode } = useApp();
+  const { progress, receive, numbers, koch, cave, lastMode, settings, setMode } = useApp();
 
   const learned = learnedCount(progress);
   const numsMastered = masteredCount(numbers);
@@ -36,9 +36,7 @@ export function ModeSelect() {
   };
 
   const lockNote = `Learn ${MIN_LETTERS_TO_RECEIVE} letters first`;
-  const caveBeaten = (() => {
-    try { return !!JSON.parse(localStorage.getItem('rmct.cave') || '{}').completed; } catch { return false; }
-  })();
+  const caveBeaten = cave.completed;
 
   return (
     <div className="mode-select">

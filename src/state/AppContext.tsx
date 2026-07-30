@@ -4,13 +4,14 @@ import {
   DEFAULT_SETTINGS,
   decodeProgress,
   freshProgress,
+  freshCaveProgress,
   freshKochProgress,
   freshNumbersProgress,
   freshReceiveProgress,
   load,
   save,
 } from '../lib/storage';
-import type { KochProgress, NumbersProgress, Progress, ReceiveProgress, Settings } from '../lib/storage';
+import type { CaveProgress, KochProgress, NumbersProgress, Progress, ReceiveProgress, Settings } from '../lib/storage';
 import { applyNumberAnswer } from '../lib/numbers';
 import { KOCH_LESSONS, KOCH_PASS } from '../data/koch';
 import {
@@ -63,6 +64,8 @@ type Ctx = {
   addNumbersPlayTime: (ms: number) => void;
   koch: KochProgress;
   recordKoch: (lesson: number, pct: number) => void;
+  cave: CaveProgress;
+  saveCave: (next: CaveProgress) => void;
   completeReceiveWord: () => void;
   completeReceiveSentence: () => void;
   receiveToasts: ReceiveToast[];
@@ -82,6 +85,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [receive, setReceive] = useState<ReceiveProgress>(initial.receive);
   const [numbers, setNumbers] = useState<NumbersProgress>(initial.numbers);
   const [koch, setKoch] = useState<KochProgress>(initial.koch);
+  const [cave, setCave] = useState<CaveProgress>(initial.cave);
   const [started, setStarted] = useState(false);
   const [onboarded, setOnboarded] = useState(() => localStorage.getItem(ONBOARDED_KEY) === '1');
   const [progressVersion, setProgressVersion] = useState(0);
@@ -104,15 +108,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const receiveRef = useRef(receive);
   const numbersRef = useRef(numbers);
   const kochRef = useRef(koch);
+  const caveRef = useRef(cave);
   settingsRef.current = settings;
   progressRef.current = progress;
   receiveRef.current = receive;
   numbersRef.current = numbers;
   kochRef.current = koch;
+  caveRef.current = cave;
 
   useEffect(() => {
-    save({ settings, progress, receive, numbers, koch });
-  }, [settings, progress, receive, numbers, koch]);
+    save({ settings, progress, receive, numbers, koch, cave });
+  }, [settings, progress, receive, numbers, koch, cave]);
 
   // ----- Cloud sync (only active when Supabase is configured + signed in) -----
   const { user } = useAuth();
@@ -135,6 +141,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         receive: receiveRef.current,
         numbers: numbersRef.current,
         koch: kochRef.current,
+        cave: caveRef.current,
       };
       const remote = await loadRemote(uid);
       const merged = remote ? mergeSaveState(local, remote) : local;
@@ -143,6 +150,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setReceive(merged.receive);
       setNumbers(merged.numbers);
       setKoch(merged.koch);
+      setCave(merged.cave);
       setProgressVersion((v) => v + 1);
       await saveRemote(uid, merged);
       syncReadyForUser.current = uid;
@@ -154,9 +162,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const uid = user?.id;
     if (!uid || syncReadyForUser.current !== uid) return;
-    const t = setTimeout(() => void saveRemote(uid, { settings, progress, receive, numbers, koch }), 800);
+    const t = setTimeout(() => void saveRemote(uid, { settings, progress, receive, numbers, koch, cave }), 800);
     return () => clearTimeout(t);
-  }, [settings, progress, receive, numbers, koch, user]);
+  }, [settings, progress, receive, numbers, koch, cave, user]);
 
   const setSetting = useCallback<Ctx['setSetting']>((key, value) => {
     setSettings((s) => ({ ...s, [key]: value }));
@@ -261,6 +269,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setNumbers((n) => ({ ...n, playMs: n.playMs + ms }));
   }, []);
 
+  const saveCave = useCallback<Ctx['saveCave']>((next) => setCave(next), []);
+
   const recordKoch = useCallback<Ctx['recordKoch']>((lesson, pct) => {
     setKoch((k) => {
       const key = String(lesson);
@@ -276,6 +286,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setReceive(freshReceiveProgress());
     setNumbers(freshNumbersProgress());
     setKoch(freshKochProgress());
+    setCave(freshCaveProgress());
+    // Drop the retired standalone cave save too, or hydrate would adopt it back.
+    localStorage.removeItem('rmct.cave');
     setProgressVersion((v) => v + 1);
   }, []);
 
@@ -308,6 +321,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       addNumbersPlayTime,
       koch,
       recordKoch,
+      cave,
+      saveCave,
       completeReceiveWord,
       completeReceiveSentence,
       receiveToasts,
@@ -317,7 +332,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       resetProgress,
       loadFromCode,
     }),
-    [settings, progress, receive, numbers, koch, started, onboarded, progressVersion, mode, lastMode, receiveToasts, setSetting, start, finishOnboarding, setMode, answerLetter, answerReceive, answerNumber, addNumbersPlayTime, recordKoch, completeReceiveWord, completeReceiveSentence, dismissToast, addPlayTime, addReceivePlayTime, resetProgress, loadFromCode],
+    [settings, progress, receive, numbers, koch, cave, saveCave, started, onboarded, progressVersion, mode, lastMode, receiveToasts, setSetting, start, finishOnboarding, setMode, answerLetter, answerReceive, answerNumber, addNumbersPlayTime, recordKoch, completeReceiveWord, completeReceiveSentence, dismissToast, addPlayTime, addReceivePlayTime, resetProgress, loadFromCode],
   );
 
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>;

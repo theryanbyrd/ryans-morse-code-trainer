@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { seed, boot, openMode, keyPattern, MORSE } from './helpers';
+import { seed, boot, openMode, keyPattern, readSave, MORSE } from './helpers';
 
 test.describe('Signal Squadron', () => {
   test.beforeEach(async ({ page }) => {
@@ -129,5 +129,63 @@ test.describe('Cave of Echoes', () => {
     await boot(page);
     await openMode(page, 'Cave of Echoes');
     await expect(page.locator('.cave-title')).toHaveText('Whispering Hall');
+  });
+});
+
+test.describe('Cave of Echoes: synced save', () => {
+  test.beforeEach(async ({ page }) => {
+    await seed(page, { settings: { sound: false }, clear: ['rmct.cave'] });
+    await boot(page);
+    await openMode(page, 'Cave of Echoes');
+  });
+
+  test('stores the crawl in the shared save state, not its own key', async ({ page }) => {
+    // The crawl has to live in the synced slice or it never reaches an account.
+    await keyPattern(page, MORSE.n, '.cave-nav');
+    await page.locator('.cave-go').click();
+    await expect(page.locator('.cave-duel')).toBeVisible();
+
+    await expect.poll(async () => (await readSave(page)).cave?.room).toBe('hall');
+    const strayKey = await page.evaluate(() => localStorage.getItem('rmct.cave'));
+    expect(strayKey, 'the retired standalone cave key should no longer be written').toBeNull();
+  });
+
+  test('adopts a crawl left behind by the previous version', async ({ page }) => {
+    // Someone mid-crawl when this shipped must not be sent back to the entrance.
+    await page.evaluate(() => {
+      localStorage.removeItem('rmct.v1');
+      localStorage.setItem('rmct.cave', JSON.stringify({
+        room: 'gate', hp: 4, cleared: ['hall', 'gorge'], unlocked: [],
+        inventory: ['Signal Charm'], completed: false,
+      }));
+    });
+    await boot(page);
+    await openMode(page, 'Cave of Echoes');
+    await expect(page.locator('.cave-title')).toHaveText('The Runed Gate');
+    await expect(page.locator('.cave-inv')).toContainText('Signal Charm');
+  });
+
+  test('resetting all progress also resets the crawl', async ({ page }) => {
+    // Put a stale legacy save in place too, so the reset has something to tidy.
+    await page.evaluate(() => localStorage.setItem('rmct.cave', JSON.stringify({
+      room: 'gate', hp: 2, cleared: ['hall', 'gorge'], unlocked: [], inventory: [], completed: false,
+    })));
+    await keyPattern(page, MORSE.n, '.cave-nav');
+    await page.locator('.cave-go').click();
+    await expect(page.locator('.cave-duel')).toBeVisible();
+
+    page.once('dialog', (d) => void d.accept());
+    await page.locator('.board-btn').first().click();
+    await page.locator('.icon-btn[aria-label="Settings"]').click();
+    await page.locator('.btn.danger').click();
+
+    // Reset must clear the retired key as well, or stale crawl data lingers and
+    // could be adopted again by a later hydrate.
+    await expect.poll(async () => page.evaluate(() => localStorage.getItem('rmct.cave'))).toBeNull();
+    await expect.poll(async () => (await readSave(page)).cave?.cleared).toEqual([]);
+
+    await boot(page);
+    await openMode(page, 'Cave of Echoes');
+    await expect(page.locator('.cave-title')).toHaveText('Mouth of the Cave');
   });
 });

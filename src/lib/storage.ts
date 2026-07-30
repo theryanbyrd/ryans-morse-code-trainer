@@ -3,6 +3,7 @@
 
 import { TEACHING_ORDER } from '../data/morse';
 import { NUM_SYM_ORDER } from '../data/numsym';
+import { MAX_HP as CAVE_MAX_HP, START_ROOM as CAVE_START_ROOM } from '../data/cave';
 
 const KEY = 'rmct.v1';
 
@@ -89,6 +90,17 @@ export type KochProgress = {
   best: Record<string, number>; // lesson number -> best % copy
 };
 
+// Cave of Echoes crawl state. Kept with the other slices so it syncs to an
+// account rather than living only on one device.
+export type CaveProgress = {
+  room: string;
+  hp: number;
+  cleared: string[]; // room ids whose monster is defeated
+  unlocked: string[]; // exit keys opened ("roomId>dir")
+  inventory: string[];
+  completed: boolean; // has the boss ever been beaten
+};
+
 export const START_LETTERS = 3;
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -126,6 +138,10 @@ export function freshProgress(): Progress {
     letters[l] = { attempts: 0, correct: 0, wrong: 0, score: 0, hideHint: false };
   }
   return { letters, lettersInPlay: START_LETTERS, consecutiveCorrect: 0, totalAnswered: 0, playMs: 0 };
+}
+
+export function freshCaveProgress(): CaveProgress {
+  return { room: CAVE_START_ROOM, hp: CAVE_MAX_HP, cleared: [], unlocked: [], inventory: [], completed: false };
 }
 
 export function freshKochProgress(): KochProgress {
@@ -168,6 +184,7 @@ export function load(): SaveState {
         receive: hydrateReceive(parsed.receive),
         numbers: hydrateNumbers(parsed.numbers),
         koch: hydrateKoch(parsed.koch),
+        cave: hydrateCave(parsed.cave),
       };
     }
   } catch {
@@ -179,6 +196,7 @@ export function load(): SaveState {
     receive: freshReceiveProgress(),
     numbers: freshNumbersProgress(),
     koch: freshKochProgress(),
+    cave: hydrateCave(undefined),
   };
 }
 
@@ -188,7 +206,36 @@ export type SaveState = {
   receive: ReceiveProgress;
   numbers: NumbersProgress;
   koch: KochProgress;
+  cave: CaveProgress;
 };
+
+/**
+ * The cave used to persist to its own `rmct.cave` key. Adopt that save the first
+ * time we hydrate without one, so existing crawls are not reset by the move.
+ */
+const LEGACY_CAVE_KEY = 'rmct.cave';
+
+function hydrateCave(c?: Partial<CaveProgress>): CaveProgress {
+  let raw: Partial<CaveProgress> | undefined = c;
+  if (!raw) {
+    try {
+      const legacy = localStorage.getItem(LEGACY_CAVE_KEY);
+      if (legacy) raw = JSON.parse(legacy) as Partial<CaveProgress>;
+    } catch {
+      /* ignore a corrupt legacy save */
+    }
+  }
+  const base = freshCaveProgress();
+  if (!raw) return base;
+  return {
+    room: typeof raw.room === 'string' && raw.room ? raw.room : base.room,
+    hp: typeof raw.hp === 'number' ? Math.max(0, Math.min(CAVE_MAX_HP, raw.hp)) : base.hp,
+    cleared: Array.isArray(raw.cleared) ? raw.cleared.filter((x) => typeof x === 'string') : [],
+    unlocked: Array.isArray(raw.unlocked) ? raw.unlocked.filter((x) => typeof x === 'string') : [],
+    inventory: Array.isArray(raw.inventory) ? raw.inventory.filter((x) => typeof x === 'string') : [],
+    completed: Boolean(raw.completed),
+  };
+}
 
 function hydrateKoch(k?: Partial<KochProgress>): KochProgress {
   return { lesson: Math.max(1, k?.lesson ?? 1), best: k?.best ?? {} };

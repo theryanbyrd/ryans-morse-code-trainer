@@ -90,6 +90,7 @@ One JSON row per user in the `user_state` table, protected by row-level security
 | `receive`  | listening scores, XP, level, streaks, badges                      |
 | `numbers`  | numbers and symbols drill                                         |
 | `koch`     | furthest lesson reached and best score per lesson                 |
+| `cave`     | Cave of Echoes crawl: room, HP, cleared rooms, doors, loot         |
 
 Signing in **merges** guest progress with whatever is already on the account
 rather than overwriting either side: the higher score per character wins, badges
@@ -98,8 +99,9 @@ signing in later never loses work. That merge is covered by unit tests in
 `src/lib/cloud.test.ts`, including a guard that fails the build if a future
 progress slice is added without being merged.
 
-Cave of Echoes progress (`rmct.cave`) is currently **device-local only** and is
-not part of the synced state.
+Cave of Echoes crawls merge generously: rooms cleared, doors opened and loot are
+kept from both sides, beating the boss on any device counts, and you are stood
+where the further-along crawl had reached.
 
 ---
 
