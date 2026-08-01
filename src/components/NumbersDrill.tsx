@@ -164,6 +164,14 @@ export function NumbersDrill() {
 
       <LiveDecode input={input} />
 
+      <p className="sr-only" role="status" aria-live="polite">
+        {feedback === 'correct'
+          ? `Correct. ${current}.`
+          : feedback === 'wrong'
+            ? `Not quite. ${current} is ${target.split('').map((c) => (c === '.' ? 'dot' : 'dash')).join(' ')}.`
+            : ''}
+      </p>
+
       {settings.morseTree && <MorseTree input={input} />}
 
       {settings.singleKey ? (

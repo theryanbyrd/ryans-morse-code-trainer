@@ -1,6 +1,11 @@
 :root {
   /* Coral accent (a friendlier evolution of the original red) */
   --red: #ff5b6a;
+  /* The coral only reaches 2.82:1 on cream, so text on light surfaces uses this
+     deeper tone instead. The brand coral stays for fills and dark backgrounds. */
+  --red-text: #c92e42;
+  /* Same tone for coral fills that carry white text: white on #ff5b6a is 3.02:1. */
+  --red-solid: #c92e42;
   --red-dark: #f2485a;
   --red-deep: #d83f52;
   --accent-grad: linear-gradient(135deg, #ff7a59 0%, #ff4f6d 100%);
@@ -13,9 +18,14 @@
   --blue: #8ea2ff;
   --blue-deep: #5b6cff;
   --green: #16c79a;
-  --green-dark: #0fa982;
+  /* #0fa982 as text on white was 2.95:1. Darkened to clear AA at any size. */
+  --green-dark: #0a7358;
+  /* Filled surfaces that carry white text need a much darker green than the
+     bright accent, which is only legible against the twilight background. */
+  --green-solid: #0b7f62;
   --ink: #2c2b3a;
-  --ink-soft: #78778a;
+  /* Darkened for WCAG AA: #78778a only reached 4.09:1 on the cream card. */
+  --ink-soft: #666578;
   --card: #fbf7ef;
   /* Twilight background */
   --bg-1: #14152a;
@@ -237,7 +247,7 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 .ob-dots span { width: 9px; height: 9px; border-radius: 50%; background: #d8cdb8; }
 .ob-dots span.on { background: var(--red); }
 .ob-next {
-  background: var(--red); color: #fff; border: none; border-radius: 999px;
+  background: var(--red-solid); color: #fff; border: none; border-radius: 999px;
   padding: 13px 32px; font-size: 16px; font-weight: 700; width: 100%;
 }
 
@@ -330,7 +340,7 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 
 /* Completed-word reveal in the letter phase */
 .word-complete {
-  margin-top: 14px; background: var(--green); color: #fff;
+  margin-top: 14px; background: var(--green-solid); color: #fff;
   font-weight: 800; font-size: clamp(24px, 7vw, 34px); letter-spacing: 2px;
   padding: 14px 28px; border-radius: 18px; box-shadow: var(--shadow);
   animation: toast-in 0.3s cubic-bezier(0.22, 1, 0.36, 1);
@@ -418,7 +428,7 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
   text-align: center; box-shadow: var(--shadow-card); border: 1px solid rgba(255,255,255,0.5);
 }
 .completion .confetti { font-size: 64px; }
-.completion h2 { font-size: 30px; margin: 8px 0; color: var(--red); }
+.completion h2 { font-size: 30px; margin: 8px 0; color: var(--red-text); }
 .completion p { color: var(--ink-soft); line-height: 1.5; }
 .completion-actions { display: flex; gap: 10px; margin-top: 18px; }
 .completion-actions .btn { flex: 1; }
@@ -446,7 +456,7 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
   box-shadow: 0 6px 16px rgba(255, 90, 106, 0.35), inset 0 1px 0 rgba(255,255,255,0.35);
 }
 .mode-icon svg { width: 28px; height: 28px; }
-.mode-name { font-size: 23px; font-weight: 800; color: var(--red); }
+.mode-name { font-size: 23px; font-weight: 800; color: var(--red-text); }
 .mode-desc { font-size: 15px; color: var(--ink-soft); }
 .mode-meta { font-size: 13px; color: var(--ink-soft); margin-top: 4px; font-weight: 600; }
 .mode-meta.lock { color: var(--red-deep); }
@@ -553,7 +563,7 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 /* Badges modal */
 .badge-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
 .bs-item { background: #f7f7f8; border-radius: 12px; padding: 10px 6px; text-align: center; display: flex; flex-direction: column; }
-.bs-item .big { font-size: 20px; font-weight: 800; color: var(--red); }
+.bs-item .big { font-size: 20px; font-weight: 800; color: var(--red-text); }
 .bs-item span:last-child { font-size: 11px; color: var(--ink-soft); }
 .badge-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .badge { background: #f7f7f8; border-radius: 14px; padding: 14px 12px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 3px; opacity: 0.55; filter: grayscale(1); }
@@ -629,7 +639,7 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 }
 .btn:hover { background: #e3e6e9; }
 .btn:active { transform: scale(0.98); }
-.btn.primary { background: var(--green); color: #fff; }
+.btn.primary { background: var(--green-solid); color: #fff; }
 .btn.primary:hover { background: var(--green-dark); }
 .btn.primary:disabled { background: #bdbdbd; cursor: default; }
 .btn.danger { background: #fde7e5; color: var(--red-deep); }
@@ -751,7 +761,7 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
   transition: transform 0.12s;
 }
 .qso-card:hover { transform: translateY(-2px); }
-.qso-card-tag { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--red); }
+.qso-card-tag { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--red-text); }
 .qso-card-title { font-size: 16px; font-weight: 800; color: var(--ink); line-height: 1.15; }
 .qso-card-meta { font-size: 12px; color: var(--ink-soft); }
 
@@ -804,8 +814,8 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 }
 .qso-target { color: var(--amber); }
 .qso-keyed { min-height: 22px; color: #fff; display: grid; place-items: center; }
-.qso-keyed.ok { color: var(--green); }
-.qso-keyed.bad { color: var(--red); }
+.qso-keyed.ok { color: var(--green-dark); }
+.qso-keyed.bad { color: var(--red-text); }
 .qso-keyed-ph { color: var(--on-dark-soft); font-size: 13px; }
 
 /* Receiving a reply */
@@ -818,7 +828,7 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
   border-radius: 22px; padding: 28px 24px; text-align: center; box-shadow: var(--shadow-card);
 }
 .qso-complete .confetti { font-size: 48px; }
-.qso-complete h2 { color: var(--red); margin: 6px 0; font-size: 26px; }
+.qso-complete h2 { color: var(--red-text); margin: 6px 0; font-size: 26px; }
 .qso-complete p { color: var(--ink-soft); }
 
 @media (max-width: 380px) {
@@ -881,11 +891,11 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
   display: grid; grid-template-columns: 100px 1fr; gap: 10px; align-items: baseline;
   padding: 6px 0; border-bottom: 1px solid #f1f1f3;
 }
-.cw-term { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-weight: 800; color: var(--red); font-size: 14px; }
+.cw-term { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-weight: 800; color: var(--red-text); font-size: 14px; }
 .cw-mean { margin: 0; color: var(--ink-soft); font-size: 14px; line-height: 1.4; }
 
 /* Translator tool */
-.mode-badge.tool { background: var(--green); box-shadow: 0 6px 14px rgba(22,199,154,0.4); }
+.mode-badge.tool { background: var(--green-solid); box-shadow: 0 6px 14px rgba(22,199,154,0.4); }
 .translator { width: 100%; max-width: 520px; display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
 .translator .mode-title { text-align: center; }
 .flash-lamp {
@@ -949,7 +959,7 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 .koch-cell.locked { opacity: 0.4; filter: grayscale(1); box-shadow: none; }
 .koch-cell.active { outline: 2px solid var(--amber); outline-offset: 2px; }
 .kc-n { font-weight: 800; color: var(--ink); font-size: 15px; }
-.kc-ch { font-family: ui-monospace, monospace; font-weight: 800; color: var(--red); font-size: 13px; }
+.kc-ch { font-family: ui-monospace, monospace; font-weight: 800; color: var(--red-text); font-size: 13px; }
 .kc-best { font-size: 11px; color: var(--green-dark); font-weight: 700; }
 
 .koch-chars { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; }
@@ -1242,7 +1252,7 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 .share-btn span { color: var(--ink); }
 .share-btn:hover { transform: translateY(-2px); }
 .share-btn:active { transform: translateY(1px) scale(0.98); }
-.share-btn.copy { color: var(--green); }
+.share-btn.copy { color: var(--green-dark); }
 .share-native { width: 100%; max-width: 260px; margin-top: 8px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
 
 /* Inside the cream About modal the dark-surface treatment has to flip. */
@@ -1254,3 +1264,16 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 .modal .share-btn { border-color: rgba(0,0,0,0.08); }
 .share.compact { padding: 14px 12px; }
 .share.compact .share-btn { min-width: 60px; min-height: 56px; font-size: 11px; }
+
+/* Visible to assistive tech only: used for announcements that are otherwise
+   conveyed by colour, motion or sound alone. */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

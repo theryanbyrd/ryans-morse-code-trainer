@@ -96,7 +96,12 @@ test.describe('app shell', () => {
       const aboutNetwork = /Failed to load resource|ERR_NAME_NOT_RESOLVED|ERR_INTERNET_DISCONNECTED|hostname could not be found|Load failed|network connection was lost/i.test(m.text());
       if (!fromExternal && !aboutNetwork) errors.push(m.text());
     });
-    page.on('requestfailed', (r) => { if (!external.test(r.url())) failed.push(r.url()); });
+    // `vite preview` serves the built assets only, with no serverless runtime, so
+    // /api/* legitimately fails here while working in production.
+    const noRuntimeLocally = /\/api\//;
+    page.on('requestfailed', (r) => {
+      if (!external.test(r.url()) && !noRuntimeLocally.test(r.url())) failed.push(r.url());
+    });
 
     await seed(page, { learned: ['e', 't', 'a'] });
     await boot(page);

@@ -10,7 +10,7 @@ export function Pattern({
   className?: string;
 }) {
   return (
-    <div className={`pattern ${className ?? ''}`} aria-label={patternAria(pattern)}>
+    <div className={`pattern ${className ?? ''}`} role="img" aria-label={patternAria(pattern)}>
       {pattern.split('').map((ch, i) =>
         ch === '-' ? (
           <span key={i} className="sym dash" style={{ height: size, width: size * 2.2 }} />

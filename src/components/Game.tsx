@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { SpeakerIcon } from './Icons';
 import { MORSE } from '../data/morse';
+
 import { useApp } from '../state/AppContext';
 import { hintActive, isCourseComplete, pickWord } from '../lib/session';
 import {
@@ -18,6 +19,11 @@ import type { KeyAction } from './Keypad';
 import { StraightKey } from './StraightKey';
 import { Completion } from './Completion';
 import { MorseTree } from './MorseTree';
+
+/** Spell a pattern for a screen reader: '.-' becomes 'dot dash'. */
+function patternWords(p: string): string {
+  return p.split('').map((c) => (c === '.' ? 'dot' : 'dash')).join(' ');
+}
 
 const WORD_DELAY = 850; // pause after finishing a word
 const LETTER_DELAY = 480; // pause between letters (lets "Correct!" be heard)
@@ -216,6 +222,15 @@ export function Game({ onOpenStats }: { onOpenStats: () => void }) {
       </button>
 
       <LiveDecode input={input} />
+
+      {/* Outcome is otherwise conveyed only by colour and sound. */}
+      <p className="sr-only" role="status" aria-live="polite">
+        {feedback === 'correct'
+          ? `Correct. ${letter.toUpperCase()}.`
+          : feedback === 'wrong'
+            ? `Not quite. ${letter.toUpperCase()} is ${patternWords(MORSE[letter])}.`
+            : ''}
+      </p>
 
       {settings.morseTree && <MorseTree input={input} />}
 

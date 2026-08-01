@@ -322,7 +322,18 @@ export function SignalSquadron() {
       </div>
 
       <div className="sq-stage">
-        <canvas ref={canvasRef} width={W} height={H} className="sq-canvas" />
+        <canvas
+          ref={canvasRef}
+          width={W}
+          height={H}
+          className="sq-canvas"
+          role="img"
+          aria-label={
+            status === 'playing'
+              ? `Play area. Wave ${wave}, score ${score}, ${lives} lives left.`
+              : 'Signal Squadron play area'
+          }
+        />
         {status === 'ready' && (
           <div className="sq-overlay">
             <h2>Signal Squadron</h2>

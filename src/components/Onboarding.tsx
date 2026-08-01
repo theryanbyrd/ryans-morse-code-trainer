@@ -18,7 +18,7 @@ const SLIDES = [
     body: 'A is an archer, the dot is the nock, the dash is the long arrow. Picture it and the code sticks.',
     art: (
       <div className="ob-letter">
-        <img className="ob-mnemonic-img" src="/assets/images/final/A.png" alt="" />
+        <img className="ob-mnemonic-img" src="/assets/images/final/A.png" alt="" aria-hidden="true" />
         <Pattern pattern=".-" size={20} />
       </div>
     ),

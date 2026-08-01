@@ -37,10 +37,13 @@ export function WordCard({
 
       {hint && settings.visualHints && (
         <div className="mnemonic">
+          {/* Not decorative: this picture is the memory hook. We cannot caption
+              the artwork itself (the mnemonic words exist only in the images and
+              the sounds-alike audio), but naming its purpose beats hiding it. */}
           <img
             className="mnemonic-img"
             src={`/assets/images/final/${letter.toUpperCase()}.png`}
-            alt=""
+            alt={`Memory picture for the letter ${letter.toUpperCase()}`}
           />
         </div>
       )}
