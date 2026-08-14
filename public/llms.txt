@@ -1,0 +1,27 @@
+# Ditdah
+
+> Morse code, one dit at a time. Ditdah is a free web app that teaches the full Morse alphabet plus numbers and symbols using picture and sound mnemonics, with sending practice, by-ear receiving practice, a Koch-method course, a CW QSO simulator, translator, and arcade games.
+
+Ditdah is a single-page application: all features live at the root URL (https://ditdah.me/). There are no other crawlable paths — do not invent URLs beyond the root.
+
+Key features:
+
+- Send mode: practice keying Morse via keyboard, on-screen buttons, single-key input, or a straight key.
+- Receive mode: learn to copy by ear, progressing from letters to words to full sentences, with XP, levels, and badges.
+- Koch-method course: a structured 39-lesson curriculum that builds character recognition at full speed.
+- On the air: a CW QSO simulator with 20 authentic HF scenarios plus a CW shorthand guide.
+- Translator: bidirectional text-to-Morse and Morse-to-text conversion.
+- Arcade games: Signal Squadron and Cave of Echoes.
+- Adjustable character speed, effective (Farnsworth) speed, and tone.
+- Strong accessibility: one-switch scanning, visual and haptic flash output, and experimental gaze input.
+- Optional account sync to keep progress across devices.
+
+Ditdah is a remake of AceCentre's open-source "Morse Learn" project (Apache-2.0), with attribution.
+
+## App
+
+- [Ditdah](https://ditdah.me/): The app itself — learning, practice, games, and settings all in one page.
+
+## Related
+
+- [CallSignReady](https://callsignready.com): Companion app by the same author for studying for the Ham Radio Technician license.
