@@ -74,8 +74,6 @@ dev simulator, but live eye tracking has never run. Needs a webcam session to
 tune dwell time, centre-band width and mirror, then set those as defaults and
 decide whether it leaves beta.
 
----
-
 ### D. No URL routing
 Every mode is React state (`mode` in `AppContext`, mirrored to `rmct.mode` in
 localStorage). Only `#about` touches the URL. So the Translator, Koch, the cave
