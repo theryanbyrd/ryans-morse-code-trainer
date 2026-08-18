@@ -21,9 +21,12 @@ GET  /api/digest?dry=1 -> {"reason":"analytics store not configured"}
 - **A store.** Vercel → Storage → Marketplace → Upstash Redis, connect to the
   project. Sets `KV_REST_API_URL` / `KV_REST_API_TOKEN` automatically. Redeploy,
   then `curl -X POST https://ditdah.me/api/pulse` should report `"stored":true`.
-- **A mailer.** A Resend API key, plus `CRON_SECRET` (any long random string;
-  it stops anyone who finds the URL from making the app send mail). `DIGEST_TO`
-  already defaults to `ryanbyrd@gmail.com`.
+- **A mailer.** A Resend API key. `DIGEST_TO` already defaults to
+  `ryanbyrd@gmail.com`. `CRON_SECRET` is **already set** (2026-08-16), so
+  `/api/digest` and `/api/keepalive` now 401 without Vercel Cron's bearer
+  header. Note `vercel env pull` writes it back as `CRON_SECRET=""`, so the
+  value is not recoverable that way; read it in the dashboard, or just set a
+  new one.
 
 Counters only start accruing once the store exists, so the first useful digest is
 the day after.

@@ -132,6 +132,17 @@ Check contrast before introducing a colour.
   project pause while the check still reported success.
 - Unpausing is a dashboard action and takes a couple of minutes.
 
+**Endpoint auth**
+- `CRON_SECRET` is set in Vercel production. `/api/digest` and `/api/keepalive`
+  reject anything without `Authorization: Bearer $CRON_SECRET`; Vercel Cron
+  sends it automatically.
+- `/api/error` deliberately has **no** such guard and must not get one: browsers
+  call it, so the secret would ship in the client bundle. It is bounded instead
+  (413 over 8KB, 60 reports per address per hour) and the hourly key hashes the
+  address rather than storing it.
+- Rate-limit enforcement needs the Upstash store, so it is currently inert and
+  the response reports `"limited": false` rather than implying otherwise.
+
 **Error logging**
 - `src/lib/errorLog.ts` catches uncaught errors and rejections, plus explicit
   `reportError()` calls in the auth and cloud-sync paths, and POSTs to
