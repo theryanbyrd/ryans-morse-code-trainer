@@ -118,6 +118,35 @@ cream, so it is for fills and dark backgrounds only. Text on light surfaces uses
 `--red-text`; fills carrying white text use `--red-solid` / `--green-solid`.
 Check contrast before introducing a colour.
 
+**Supabase pausing (this bit us for ten days)**
+- Free-tier projects auto-pause after **7 days of inactivity**, and Ditdah only
+  talks to Supabase when somebody signs in, so a quiet week is enough. It paused
+  on 2026-08-06 and every sign-in failed until 2026-08-16.
+- A paused project **stops resolving entirely**. `nslookup` returns NXDOMAIN, so
+  the failure happens at DNS and the browser reports its own generic wording:
+  Chrome "Failed to fetch", Safari "Load failed". NXDOMAIN does *not* mean the
+  project was deleted, which is the obvious wrong conclusion to draw.
+- `GET /api/keepalive` now runs daily (`vercel.json`) to prevent it. It issues a
+  real PostgREST query, **not** `/auth/v1/health`: the health endpoint is served
+  by the auth gateway and never touches Postgres, so pinging it would let the
+  project pause while the check still reported success.
+- Unpausing is a dashboard action and takes a couple of minutes.
+
+**Error logging**
+- `src/lib/errorLog.ts` catches uncaught errors and rejections, plus explicit
+  `reportError()` calls in the auth and cloud-sync paths, and POSTs to
+  `/api/error`.
+- `/api/error` **always `console.error`s**, so reports land in the Vercel runtime
+  log with no store configured (`vercel logs <deployment>`, grep `client-error`).
+  It also counts them in Upstash when that exists, and the digest has an
+  errors row.
+- Reports are **not** consent-gated. Consent governs studying the learner, not
+  noticing the app is broken. They carry no identifiers: emails, JWTs, Supabase
+  keys and long hex strings are scrubbed, and the URL's query and hash are
+  dropped because a magic-link callback carries a token. The server re-scrubs
+  rather than trusting its caller.
+- Deduped, capped at 8 per session, so a render loop cannot become a firehose.
+
 **Other**
 - Installing a React dependency while the dev server runs leaves a stale Vite
   optimizer and produces "Invalid hook call" errors that persist in the tool's

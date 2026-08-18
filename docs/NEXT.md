@@ -76,10 +76,24 @@ decide whether it leaves beta.
 
 ---
 
+### D. No URL routing
+Every mode is React state (`mode` in `AppContext`, mirrored to `rmct.mode` in
+localStorage). Only `#about` touches the URL. So the Translator, Koch, the cave
+and the rest are all `https://ditdah.me/`, which means no deep links, no
+shareable link to a mode, the browser Back button leaves the site instead of
+going back a screen, and analytics cannot tell the modes apart.
+
+Fix is a hash router (`#/translator`), which is the cheap option and matches the
+existing `#about` handling, or real paths via `history.pushState` plus a Vercel
+rewrite. Worth doing before any SEO push, since right now there is exactly one
+indexable URL.
+
+---
+
 ## Smaller follow-ups
 
-- **Canonical domain.** `ditdah.me` and `www.ditdah.me` both serve the site.
-  Pick one and set the other to redirect in Vercel → Settings → Domains.
+- **Canonical domain.** Done: `vercel.json` now redirects `www.ditdah.me` to the
+  apex (came in with the growth-engine M0 commit).
 - **CallSignReady** (`~/signal-up`) still needs its Google client wired up. Its
   setup doc now carries the branding warning. One Google Cloud project can hold
   both clients; Ditdah's lives in "PTL Creative".
