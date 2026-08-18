@@ -920,6 +920,11 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
 }
 .tr-area.morse { font-family: ui-monospace, 'SF Mono', Menlo, monospace; letter-spacing: 1px; }
 .tr-area:focus { outline: none; }
+/* Sits on the cream card, so it uses --red-text (AA on light) rather than --red. */
+.tr-skipped {
+  margin: 0; padding: 8px 14px 10px; font-size: 12.5px; line-height: 1.4;
+  color: var(--red-text); background: rgba(201,46,66,0.06); border-top: 1px solid #eee;
+}
 .tr-actions { display: flex; gap: 10px; }
 .tr-actions .btn { flex: 1; }
 .tr-hint { color: var(--on-dark-soft); font-size: 12.5px; text-align: center; margin: 0; }

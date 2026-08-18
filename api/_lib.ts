@@ -71,6 +71,8 @@ export const D = {
   share: (day: string, target: string) => `rmct:d:${day}:share:${target}`,
   answers: (day: string) => `rmct:d:${day}:answers`,
   learned: (day: string) => `rmct:d:${day}:learned`,
+  errors: (day: string) => `rmct:d:${day}:errors`,
+  errorKinds: (day: string) => `rmct:d:${day}:errorkinds`, // a set of fingerprints
 };
 
 /** Keep daily keys for a few weeks, then let them fall away on their own. */

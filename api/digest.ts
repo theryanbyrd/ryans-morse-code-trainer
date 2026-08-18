@@ -29,6 +29,8 @@ export type DayStats = {
   shareBreakdown: Record<string, number>;
   answers: number;
   learned: number;
+  errors: number;
+  errorKinds: number;
 };
 
 const SHARE_TARGETS = ['x', 'facebook', 'whatsapp', 'reddit', 'email', 'copy', 'native'];
@@ -48,6 +50,8 @@ export async function collect(day: string): Promise<DayStats> {
     shareBreakdown,
     answers: await getNum(D.answers(day)),
     learned: await getNum(D.learned(day)),
+    errors: await getNum(D.errors(day)),
+    errorKinds: await scard(D.errorKinds(day)),
   };
 }
 
@@ -66,6 +70,23 @@ export function renderDigest(s: DayStats, prev: DayStats): string {
       <td align="right" style="padding:10px 0;border-bottom:1px solid #e8e2d8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:20px;font-weight:bold;color:#1b1b2b;">${value.toLocaleString()}</td>
       <td align="right" style="padding:10px 0 10px 12px;border-bottom:1px solid #e8e2d8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;color:#8a8a99;">${delta(value, prevValue)}</td>
     </tr>`;
+
+  // Errors get their own row rather than reusing row(), because a rise here is
+  // bad news and should not be styled like a rise in page views. On a clean day
+  // it reads as reassurance; on a bad day it turns red and names the spread.
+  const errorRow = (t: DayStats, p: DayStats) => {
+    const bad = t.errors > 0;
+    const colour = bad ? '#c92e42' : '#4a4a5a';
+    const note = bad
+      ? `${t.errorKinds} distinct${p.errors > 0 ? `, ${delta(t.errors, p.errors)} vs prior day` : ''}`
+      : 'all clear';
+    return `
+    <tr>
+      <td style="padding:10px 0;border-bottom:1px solid #e8e2d8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;color:${colour};">Client errors</td>
+      <td align="right" style="padding:10px 0;border-bottom:1px solid #e8e2d8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:20px;font-weight:bold;color:${bad ? '#c92e42' : '#1b1b2b'};">${t.errors.toLocaleString()}</td>
+      <td align="right" style="padding:10px 0 10px 12px;border-bottom:1px solid #e8e2d8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;color:#8a8a99;">${note}</td>
+    </tr>`;
+  };
 
   const shares = Object.entries(s.shareBreakdown)
     .sort((a, b) => b[1] - a[1])
@@ -96,6 +117,7 @@ export function renderDigest(s: DayStats, prev: DayStats): string {
           ${row('Shares', s.shares, prev.shares)}
           ${row('Answers keyed', s.answers, prev.answers)}
           ${row('Letters learned', s.learned, prev.learned)}
+          ${errorRow(s, prev)}
         </table>
       </td></tr>
       ${shares ? `<tr><td style="padding:4px 30px 0 30px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12.5px;color:#8a8a99;">Shared via ${shares}</td></tr>` : ''}
