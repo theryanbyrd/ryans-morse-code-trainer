@@ -23,7 +23,7 @@ no framework beyond that, plain CSS with custom properties.
 
 ```bash
 npm run dev          # vite dev server (or the "morse" entry in ~/.claude/launch.json)
-npm test             # 197 Vitest unit tests
+npm test             # 245 Vitest unit tests (src/ and api/)
 npm run test:e2e     # 176 Playwright tests, desktop Chromium + mobile WebKit
 npm run build        # tsc -b && vite build
 ```
@@ -66,9 +66,12 @@ Sign-in: **Google is live and verified end to end**, plus email magic link.
 
 ## Testing
 
-- **197 unit tests** (Vitest) over pure logic: morse codec, the cloud merge,
-  storage codec and migrations, session, receive, numbers, koch, plus content
-  integrity for QSO scenarios and the cave graph.
+- **245 unit tests** (Vitest) over pure logic: morse codec, the cloud merge,
+  storage codec and migrations, session, receive, numbers, koch, the error-log
+  scrubbing and the keepalive/error handlers, plus content integrity for QSO
+  scenarios and the cave graph. `vitest.config.ts` covers both `src/**` and
+  `api/**`; note `api/*` is in no tsconfig, so `tsc -b` does **not** typecheck
+  it and only Vercel does at deploy time.
 - **176 E2E tests** (Playwright) against the **production bundle** via
   `vite preview`, not the dev server.
 - **42 accessibility tests** including an axe-core sweep of 15 screens.
@@ -78,9 +81,10 @@ are excluded from `tsconfig.app.json` so `tsc -b` never ships them, and
 `tsconfig.test.json` typechecks them.
 
 **Both suites are mutation-verified.** When adding tests, break the thing on
-purpose and confirm the suite fails. Twice in this project a mutation "passed"
-and both times it was a bad mutation rather than a test gap, so check which it is
-before trusting a green result.
+purpose and confirm the suite fails. Three times now a mutation has "passed":
+twice it was a bad mutation, once (the error rate-limit key) it was a real test
+gap, where the assertion happened to hold on the key prefix while the property
+under test had broken. Always check which it is before trusting a green result.
 
 ---
 
