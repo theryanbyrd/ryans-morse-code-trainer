@@ -11,14 +11,40 @@
 // The client scrubs emails, JWTs and keys before sending (see src/lib/errorLog)
 // and we re-scrub here, because an endpoint on the public internet should not
 // trust that its caller did the redaction.
-import { incr, sadd, expire, dayKey, readJson, D, DAY_TTL, storeEnabled } from './_lib.js';
+import { createHash } from 'node:crypto';
+import { incr, getNum, sadd, expire, dayKey, readJson, D, DAY_TTL, storeEnabled } from './_lib.js';
 
-type Req = { method?: string; body?: unknown };
+type Req = { method?: string; body?: unknown; headers?: Record<string, string | string[] | undefined> };
 type Res = {
   status: (code: number) => Res;
   json: (data: unknown) => void;
   setHeader: (k: string, v: string) => void;
 };
+
+// This endpoint CANNOT take a CRON_SECRET the way /api/keepalive and
+// /api/digest do: browsers call it, so the secret would have to ship in the
+// client bundle where anyone can read it, which protects nothing. It has to
+// stay open, so it is bounded instead — an oversized body is refused outright
+// and each address gets an hourly ceiling. The client already caps itself at 8
+// reports per session; this is the floor under a caller that ignores that.
+const MAX_BODY = 8_000; // characters of JSON
+const MAX_PER_IP_PER_HOUR = 60;
+
+const header = (req: Req, name: string): string => {
+  const v = req.headers?.[name];
+  return Array.isArray(v) ? (v[0] ?? '') : (v ?? '');
+};
+
+/** Hourly bucket key for one caller, hashed the same way pulse() hashes visitors. */
+export function rateKey(hour: string, salt: string, ip: string): string {
+  const who = createHash('sha256').update(`${hour}:${salt}:${ip}`).digest('hex').slice(0, 24);
+  return `rmct:erate:${hour}:${who}`;
+}
+
+/** The reporting hour, used only to bucket the rate limit. */
+export function hourKey(d = new Date()): string {
+  return `${dayKey(d)}:${d.getUTCHours()}`;
+}
 
 type Report = {
   kind?: unknown;
@@ -78,10 +104,36 @@ export default async function handler(req: Req, res: Res) {
     return;
   }
 
+  // Refuse an oversized body before doing any work on it.
+  const raw = typeof req.body === 'string' ? req.body : JSON.stringify(req.body ?? '');
+  if (raw.length > MAX_BODY) {
+    res.status(413).json({ ok: false, error: 'report too large' });
+    return;
+  }
+
   const report = normalize(readJson<Report>(req));
   if (!report) {
     res.status(400).json({ ok: false, error: 'bad report' });
     return;
+  }
+
+  // Hourly ceiling per address. Only enforceable with a store; without one this
+  // is a no-op and the response says so rather than implying a limit exists.
+  const ip = header(req, 'x-forwarded-for').split(',')[0].trim();
+  if (storeEnabled && ip) {
+    try {
+      const hour = hourKey();
+      const key = rateKey(hour, process.env.PULSE_SALT || 'ditdah', ip);
+      const seen = await getNum(key);
+      if (seen >= MAX_PER_IP_PER_HOUR) {
+        res.status(429).json({ ok: false, error: 'rate limited' });
+        return;
+      }
+      await incr(key);
+      await expire(key, 3600);
+    } catch {
+      /* a broken store must not stop a real report from being logged */
+    }
   }
 
   // Sink 1: the runtime log. One line, structured, greppable.
@@ -107,5 +159,5 @@ export default async function handler(req: Req, res: Res) {
     /* the log line already happened; the counter is a bonus */
   }
 
-  res.status(200).json({ ok: true, logged: true, counted: storeEnabled });
+  res.status(200).json({ ok: true, logged: true, counted: storeEnabled, limited: storeEnabled });
 }
