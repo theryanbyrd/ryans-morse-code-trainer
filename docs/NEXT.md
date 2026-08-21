@@ -91,6 +91,20 @@ indexable URL.
 
 ---
 
+## iOS app
+
+An iPhone build for the App Store is specced in **[IOS-PRD.md](IOS-PRD.md)**,
+following the Capacitor shell that shipped Hymn Dictionary. Decisions already
+made: guest-only (no sign-in, which sidesteps Sign in with Apple and the
+account-deletion rule), gaze input cut from v1, free with no purchases.
+
+The two real risks are that iOS silences WKWebView audio with the ring switch
+(fatal for a Morse trainer, needs an AVAudioSession category set natively and a
+physical device to verify) and that going full-screen tends to expose safe-area
+bugs Safari's chrome was hiding — that happened twice on Hymn Dictionary.
+
+---
+
 ## Smaller follow-ups
 
 - **Canonical domain.** Done: `vercel.json` now redirects `www.ditdah.me` to the
