@@ -14,6 +14,8 @@
 // (visible via `vercel logs`, no store required) and additionally counts them in
 // Upstash when that is configured.
 
+import { apiUrl } from './native';
+
 export type ErrorKind =
   | 'uncaught' // window.onerror
   | 'rejection' // unhandled promise rejection
@@ -106,9 +108,9 @@ export function reportError(kind: ErrorKind, err: unknown, where?: string): void
     if (!shouldSend(report)) return;
     const body = JSON.stringify(report);
     if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
-      navigator.sendBeacon('/api/error', new Blob([body], { type: 'application/json' }));
+      navigator.sendBeacon(apiUrl('/api/error'), new Blob([body], { type: 'application/json' }));
     } else {
-      void fetch('/api/error', {
+      void fetch(apiUrl('/api/error'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body,

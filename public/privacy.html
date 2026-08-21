@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Privacy Policy · Ditdah</title>
+  <meta name="description" content="How Ditdah handles your data: no account needed, progress stays on your device, no ads, no selling data." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-1: #14152a; --bg-2: #1c1d3c; --bg-3: #2a1c3f;
+      --card: #fbf7ef; --ink: #2c2b3a; --ink-soft: #666578;
+      --on-dark: rgba(255,255,255,0.94); --on-dark-soft: rgba(255,255,255,0.62);
+      --amber: #ffb020; --red-text: #c92e42;
+      --font: 'Poppins', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 55%, var(--bg-3) 100%);
+      background-attachment: fixed;
+      color: var(--on-dark);
+      font: 16px/1.65 var(--font);
+      padding: 32px 20px calc(56px + env(safe-area-inset-bottom));
+    }
+    main { max-width: 680px; margin: 0 auto; }
+    .top { font-size: 14px; display: inline-block; margin-bottom: 22px; color: var(--amber); text-decoration: none; font-weight: 600; }
+    .top:hover { text-decoration: underline; }
+    h1 { font-size: clamp(28px, 7vw, 36px); font-weight: 800; letter-spacing: -0.5px; line-height: 1.15; margin-bottom: 6px; }
+    .sub { color: var(--on-dark-soft); font-size: 14px; margin-bottom: 26px; }
+    h2 { font-size: 20px; font-weight: 700; margin: 30px 0 8px; }
+    p, li { margin-bottom: 10px; }
+    ul { padding-left: 22px; margin-bottom: 10px; }
+    a { color: var(--amber); }
+    .card {
+      background: var(--card); color: var(--ink);
+      border-radius: 16px; padding: 18px 20px; margin: 16px 0;
+      box-shadow: 0 18px 40px rgba(8,10,30,0.45), inset 0 1px 0 rgba(255,255,255,0.7);
+    }
+    .card p:last-child { margin-bottom: 0; }
+    .card a { color: var(--red-text); }
+    table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 15px; }
+    th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid rgba(255,255,255,0.14); vertical-align: top; }
+    th { font-weight: 700; color: var(--on-dark); }
+    td { color: var(--on-dark-soft); }
+    .foot { margin-top: 34px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.14); font-size: 14px; color: var(--on-dark-soft); }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="top" href="/">&larr; Ditdah</a>
+    <h1>Privacy Policy</h1>
+    <p class="sub">Ditdah (ditdah.me and the Ditdah iPhone app) · Effective August 16, 2026</p>
+
+    <div class="card">
+      <p><strong>The short version.</strong> Ditdah works without an account.
+      Everything you learn is stored on your own device. There are no ads, no
+      trackers following you to other sites, and nothing is ever sold. We count
+      anonymous usage so we can tell whether the app is helping anyone, and we
+      log errors so we find out when it breaks.</p>
+    </div>
+
+    <h2>What stays on your device</h2>
+    <p>Your progress, settings, scores, badges, streaks, and course position are
+    stored on the device you are using, and by default they never leave it. That
+    covers every mode: Learn, Numbers &amp; symbols, the Koch course, the
+    listening drills, the games, and the cave.</p>
+    <p>You can erase all of it at any time with <strong>Reset progress</strong>
+    in Settings. In the iPhone app, deleting the app removes it too.</p>
+
+    <h2>The iPhone app has no account at all</h2>
+    <p>The app does not offer sign-in, does not ask for your name or email, and
+    has no user profile. To move progress to another device, Settings can show
+    you a <strong>progress code</strong> that you type in elsewhere. The code
+    encodes your own progress and is not stored on our servers.</p>
+    <p>The app works fully offline. Every lesson, sound, and image is bundled
+    inside it, so no network connection is required to use any part of Ditdah.</p>
+
+    <h2>Optional sign-in (website only)</h2>
+    <p>On ditdah.me you may optionally create an account to sync progress
+    between devices, either with Google or with an emailed sign-in link. If you
+    do, we store your email address, an account identifier, and your Ditdah
+    progress with our hosting provider, Supabase. We use it only to sync your
+    progress. Signing in <em>merges</em> your local progress rather than
+    replacing it.</p>
+    <p>To delete your account and its stored progress, email
+    <a href="mailto:ryanbyrd@gmail.com">ryanbyrd@gmail.com</a> and we will remove
+    it.</p>
+
+    <h2>What we count</h2>
+    <table>
+      <tr><th>What</th><th>Why</th></tr>
+      <tr>
+        <td>Anonymous visit and page counts</td>
+        <td>To know whether anyone is using Ditdah. Unique visitors are counted
+        from a hash that rotates daily and is never stored as a raw address.</td>
+      </tr>
+      <tr>
+        <td>Error reports</td>
+        <td>So we learn when something is broken instead of waiting to be told.
+        Reports carry the error message and where it happened. Email addresses,
+        sign-in tokens and keys are stripped out before the report is sent, and
+        again when it is received.</td>
+      </tr>
+      <tr>
+        <td>Learning events, only if you opt in</td>
+        <td>Counts of answers keyed and letters learned, to see which letters
+        are hardest. This is off unless you turn on <strong>Tracking
+        consent</strong> in Settings.</td>
+      </tr>
+    </table>
+    <p>None of it is used to identify you, to advertise to you, or to follow you
+    across other apps and websites.</p>
+
+    <h2>Google Analytics (website only)</h2>
+    <p>The ditdah.me website uses Google Analytics for aggregate visit
+    statistics. <strong>The iPhone app does not.</strong> If you would rather not
+    be counted at all, any content blocker will stop it, and Ditdah keeps working
+    normally.</p>
+
+    <h2>Camera, for gaze input (website only)</h2>
+    <p>The website has an experimental, off-by-default gaze mode that lets you
+    key Morse by looking left and right. If you switch it on, your browser asks
+    permission and the video is processed <strong>entirely on your own device</strong>.
+    No image, video, or frame is ever uploaded, recorded, or seen by us. Turning
+    the setting off ends the camera session. The iPhone app does not include this
+    feature and never asks for camera access.</p>
+
+    <h2>Children</h2>
+    <p>Ditdah is suitable for all ages and does not knowingly collect personal
+    information from anyone, including children. There is no account in the app,
+    no chat, no user content, and no advertising.</p>
+
+    <h2>Who else touches the data</h2>
+    <ul>
+      <li><strong>Vercel</strong> hosts the site and the counters.</li>
+      <li><strong>Supabase</strong> stores synced progress for website accounts only.</li>
+      <li><strong>Google Analytics</strong> receives website visit statistics only.</li>
+    </ul>
+    <p>We do not sell data, share it with advertisers, or use it for advertising.</p>
+
+    <h2>Changes</h2>
+    <p>If this policy changes in a way that affects what we collect, the
+    effective date above changes with it.</p>
+
+    <div class="foot">
+      <p>Questions: <a href="mailto:ryanbyrd@gmail.com">ryanbyrd@gmail.com</a></p>
+      <p>Ditdah is a remake of Ace Centre's Morse Learn, used under Apache 2.0.</p>
+    </div>
+  </main>
+</body>
+</html>

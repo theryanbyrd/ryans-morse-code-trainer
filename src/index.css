@@ -104,6 +104,27 @@ input, textarea { user-select: text; -webkit-user-select: text; font-size: 16px;
   padding: 14px 16px;
   padding-top: calc(14px + env(safe-area-inset-top));
   gap: 12px;
+  /* Pinned, not just padded.
+     The safe-area padding alone is not enough in the iOS shell: raising the
+     keyboard scrolls the whole document to reveal the focused field, which
+     carried this bar up underneath the translucent status bar and left the
+     gear sitting behind the Dynamic Island. Sticky keeps it below the safe
+     area no matter how far the page scrolls. The gradient is what stops
+     content showing through it on the way past. */
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: linear-gradient(
+    to bottom,
+    rgba(20, 21, 42, 0.92) 0%,
+    rgba(20, 21, 42, 0.86) 72%,
+    rgba(20, 21, 42, 0) 100%
+  );
+  /* Blur as well as tint, matching the glass treatment already used on
+     .hud-trophy. Without it, scrolled text reads through the fade at the
+     bottom edge and the bar looks unfinished. */
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
 }
 .chrome-left { display: flex; align-items: center; gap: 10px; }
 .icon-btn {

@@ -11,11 +11,26 @@ test.describe('app shell', () => {
     await expect(page.locator('.start-screen')).toBeHidden();
   });
 
-  test('starts on a key press as the prompt claims', async ({ page }) => {
+  test('starts the way the prompt claims it does', async ({ page }, testInfo) => {
+    // The prompt is platform-specific, and so is this test: a phone has no
+    // keyboard, so promising "press any button" there was a lie (fixed for the
+    // iOS build). Each platform asserts the instruction it actually shows.
+    const touch = testInfo.project.name === 'mobile';
     await seed(page);
     await page.goto('/');
     await expect(page.locator('.start-screen')).toBeVisible();
-    await page.keyboard.press('Enter');
+    await expect(page.locator('.start-prompt')).toHaveText(
+      touch ? 'Tap anywhere to start.' : 'Press any button to Start.',
+    );
+
+    if (touch) {
+      await page.locator('.start-screen').click();
+    } else {
+      // The keydown listener attaches in an effect, so it can lag the first
+      // paint. Waiting for the handler to exist beats sleeping and hoping.
+      await page.waitForFunction(() => document.readyState === 'complete');
+      await page.keyboard.press('Enter');
+    }
     await expect(page.locator('.mode-select')).toBeVisible();
   });
 
