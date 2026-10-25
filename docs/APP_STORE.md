@@ -28,7 +28,16 @@
   camera privacy label.
 - `PrivacyInfo.xcprivacy` in the app target, verified present in the built
   bundle.
-- Privacy policy at **https://ditdah.me/privacy.html**.
+- Privacy policy at **https://ditdah.me/privacy.html**, and reachable **from
+  inside the app** on the About screen, not only from the store listing. The
+  policy names "Dit Dah Me" outright so the required URL visibly covers the app
+  under review.
+- **External links escape to Safari, verified on device.** Tapping a share
+  channel or the privacy link opens the real Safari with a "Ditdah" back
+  affordance. These are `<a target="_blank">`, which Capacitor hands to the
+  system browser. (Gibberish Gym needed a native-share fix because it used
+  `window.open(url, '_self')`, which navigates in place inside the webview;
+  Ditdah never had that bug. Checked, not assumed.)
 - Store screenshots (6.9", 1320x2868, iPhone 17 Pro Max simulator) in
   `appstore/screenshots/`.
 
