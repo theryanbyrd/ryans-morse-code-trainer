@@ -179,7 +179,7 @@ Draft review note in §3.8.
 |---|---|
 | Bundle id | `com.ryanbyrd.ditdah` |
 | Team | `W82VG376HK` |
-| Display name | `Dit Dah Me` (home screen and store listing) |
+| Display name | `Dit Dah Me` (home screen, store listing, and the in-app wordmark) |
 | Version | `1.0 (1)` |
 | Devices | iPhone only (`TARGETED_DEVICE_FAMILY = 1`) |
 | Orientation | Portrait only |

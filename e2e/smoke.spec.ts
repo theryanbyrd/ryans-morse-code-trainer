@@ -4,7 +4,7 @@ import { seed, boot, openMode } from './helpers';
 test.describe('app shell', () => {
   test('shows the brand on the start screen and enters on a click', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('.start-title')).toHaveText('Ditdah');
+    await expect(page.locator('.start-title')).toHaveText('Dit Dah Me');
     await expect(page.locator('.start-tagline')).toContainText('one dit at a time');
 
     await page.locator('.start-screen').click();

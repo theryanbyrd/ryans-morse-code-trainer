@@ -62,6 +62,10 @@ export function AboutScreen({
           <a href="https://ditdah.me/privacy.html" target="_blank" rel="noreferrer">
             Privacy policy
           </a>{' '}
+          ·{' '}
+          <a href="https://ditdah.me/support.html" target="_blank" rel="noreferrer">
+            Support
+          </a>{' '}
           · no account needed, progress stays on your device
         </p>
         <button className="btn" onClick={onShowAttributions} style={{ width: '100%', marginTop: 8 }}>

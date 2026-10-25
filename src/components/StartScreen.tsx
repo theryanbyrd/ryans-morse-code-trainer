@@ -32,7 +32,7 @@ export function StartScreen({ onStart }: { onStart: () => void }) {
         <span />
         <span />
       </div>
-      <h1 className="start-title brand">Ditdah</h1>
+      <h1 className="start-title brand">Dit Dah Me</h1>
       <p className="start-tagline">Morse code, one dit at a time</p>
       <p className="start-prompt">
         {isTouchPrimary() ? 'Tap anywhere to start.' : 'Press any button to Start.'}

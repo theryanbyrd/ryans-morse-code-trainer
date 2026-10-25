@@ -39,8 +39,30 @@
   system browser. (Gibberish Gym needed a native-share fix because it used
   `window.open(url, '_self')`, which navigates in place inside the webview;
   Ditdah never had that bug. Checked, not assumed.)
-- Store screenshots (6.9", 1320x2868, iPhone 17 Pro Max simulator) in
-  `appstore/screenshots/`.
+- **Six** store screenshots (6.9", 1320x2868, iPhone 17 Pro Max simulator) in
+  `appstore/screenshots/`, recaptured 2026-10-25 from the current build:
+  start (leads with the Dit Dah Me wordmark), mode menu, Learn, Koch course,
+  Signal Squadron mid-play, Translator.
+- **Support page at https://ditdah.me/support.html** with a real contact email,
+  because Guideline 1.5 wants the Support URL to carry up-to-date contact
+  information and the site root had none. Linked from About beside the privacy
+  policy.
+
+## Pre-submission reviewer pass (2026-10-25)
+
+Checked rather than assumed, so the first submission is the only one:
+
+| Guideline | Check | Result |
+|---|---|---|
+| 2.1 completeness | Every outbound URL in the app resolved | 12/12 return 200 |
+| 1.5 support URL | Contact info reachable from the Support URL | **Was missing** — site root had none; added `/support.html` |
+| 2.3.8 metadata | Store name, home screen, wordmark, share text | All now say Dit Dah Me |
+| 2.3.3 screenshots | Real captures of the app in use | 6/6, recaptured from the current build |
+| 5.1.1 privacy | Policy reachable in-app and from the listing | About screen + listing URL, names the app |
+| 5.1.1 camera | Gaze mode reachable in the shell? | No — gated twice; no `NSCameraUsageDescription` needed |
+| 2.1 placeholders | Placeholder text or emails shipped? | No — only in tests and the unreachable Account form |
+| 4.8 / 5.1.1(v) | Sign-in present? | No account layer in the bundle; verified by the build guard |
+| 2.5.1 private API | External links trap the user in the webview? | No — verified on device, they open real Safari |
 
 ## Guideline 4.2 defense (put in App Review notes)
 
@@ -98,7 +120,7 @@ without having to infer it.
 | Name (30) | `Dit Dah Me` — **chosen and accepted 2026-10-25** |
 | Subtitle (30) | `Learn Morse by ear and by hand` |
 | Category | Primary: Education · Secondary: Games |
-| Support URL | `https://ditdah.me` |
+| Support URL | `https://ditdah.me/support.html` |
 | Privacy Policy URL | `https://ditdah.me/privacy.html` |
 | Copyright | `© 2026 M. Ryan Byrd` |
 | SKU | `ditdah-ios` · App ID `6826897455` |
