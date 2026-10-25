@@ -20,16 +20,47 @@ Product-shaping decisions, settled before the spec was written.
 | Gaze input (WebGazer)? | **Cut from v1** | No camera permission, no camera privacy label, no reviewer asking why a Morse trainer watches your face, ~1.2MB smaller. It is still untested on real hardware (NEXT.md item C). |
 | Price? | **Free, no ads, no IAP** | Smallest review surface. No StoreKit, no restore-purchases flow. Matches the Hymn Dictionary precedent. |
 
-### Still open
+### Resolved (2026-10-25)
 
-1. **Is "Ditdah" available as an App Store name?** Cannot be checked outside App
-   Store Connect. Fallback: `Ditdah: Morse Code Trainer`.
-2. **Age rating.** Signal Squadron shoots invaders and Cave of Echoes duels
-   monsters. Hymn Dictionary answered 4+ to everything trivially; Ditdah cannot.
-   See §3.7 — this needs an honest answer, not a reflexive one.
-3. **Should GA run inside the app?** Recommendation in §3.6 is no.
-4. **Playback haptics fidelity.** See §3.4; v1 recommendation is deliberately
-   modest and the reasoning is spelled out.
+All four are now settled. Nothing in this PRD is open.
+
+**1. The App Store name — RESOLVED: `Dit Dah Me`.**
+
+Accepted by App Store Connect on 2026-10-25; app record created, App ID
+`6826897455`, version 1.0 at "Prepare for Submission".
+
+Connect rejected both `Ditdah` and `Ditdah: Morse Code Trainer` first, because
+**four** apps already use the mark (Ditdah CW: Morse Code Trainer; DitDah Daily;
+Ditdah - Learn & Chat Morse; DitDah Decoder - Morse Code CW). Apple blocks
+confusingly-similar names, not only exact duplicates.
+
+This changes the store listing only. The domain stays ditdah.me, the in-app
+wordmark stays Ditdah, and the bundle id stays `com.ryanbyrd.ditdah`. See
+`APP_STORE.md` for how the listing ties the two names together for a 2.3.8
+metadata check.
+
+**2. Age rating — RESOLVED: 9+, and answer the questionnaire honestly.**
+
+The content was audited rather than guessed at. Signal Squadron's invaders are
+blocky shapes you "blast"; Cave of Echoes' monsters are "Dit Sprite", "Signal
+Wraith" and "The Static". A grep for blood, gore, gun, weapon, corpse and murder
+across all game content and data returns **nothing**.
+
+So: answer **Infrequent/Mild** to *Cartoon or Fantasy Violence*, and **No** to
+everything else. That lands at **9+**. Do not answer 4+ reflexively, as Hymn
+Dictionary could; under-rating invites a forced re-rating after launch, while
+over-rating costs nothing.
+
+**3. Google Analytics in the shell — RESOLVED: no.** The gtag snippet in
+`index.html` is gated on `capacitor:`/`ionic:` protocol, so it never loads in
+the app. This keeps the privacy labels to two rows and keeps a third-party
+tracker out of an app aimed partly at children. Verified in the shipped bundle.
+
+**4. Playback haptics — RESOLVED: deferred, and the UI tells the truth.**
+iOS has no Vibration API, and `@capacitor/haptics` fires discrete impacts that
+cannot hold a 60ms dit. Haptics drive the learner's own key presses, where they
+work; the "Flash & vibrate" toggle renames itself to "Flash" on iOS rather than
+promising a buzz that never arrives. Core Haptics patterning stays out of v1.
 
 ---
 
@@ -148,7 +179,7 @@ Draft review note in §3.8.
 |---|---|
 | Bundle id | `com.ryanbyrd.ditdah` |
 | Team | `W82VG376HK` |
-| Display name | `Ditdah` |
+| Display name | `Ditdah` (home screen) · store listing `Dit Dah Me` |
 | Version | `1.0 (1)` |
 | Devices | iPhone only (`TARGETED_DEVICE_FAMILY = 1`) |
 | Orientation | Portrait only |

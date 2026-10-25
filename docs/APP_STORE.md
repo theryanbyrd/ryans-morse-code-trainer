@@ -53,17 +53,44 @@ that Google Identity Services **blocks embedded webviews**
 (`disallowed_useragent`) so the web flow will not work in WKWebView regardless —
 it needs `ASWebAuthenticationSession`.
 
+## The name — settled: **Dit Dah Me**
+
+App Store Connect accepted `Dit Dah Me` on 2026-10-25. The app record exists
+(App ID `6826897455`), version 1.0 is at "Prepare for Submission".
+
+Kept here because it explains the listing and will matter at renewal time:
+Connect rejected both `Ditdah` and `Ditdah: Morse Code Trainer`, because **four**
+apps already use the mark.
+
+| Existing app | Developer |
+|---|---|
+| Ditdah CW: Morse Code Trainer | Mustafa Sucu |
+| DitDah Daily | Marc Walsh |
+| Ditdah - Learn & Chat Morse | DongEun Shin |
+| DitDah Decoder - Morse Code CW | Made by Tim LLC |
+
+Apple blocks confusingly-similar names, not only exact duplicates, so any
+"Ditdah + generic Morse descriptor" would have kept bouncing. `Dit Dah Me`
+clears it: three words, ending in "Me", and it is the domain spoken aloud.
+
+**Store name vs in-app name.** The listing says `Dit Dah Me`; the icon, splash
+and wordmark say **Ditdah**, and the domain is **ditdah.me**. That is a
+deliberate, defensible pairing rather than a mismatch, because "ditdah.me" reads
+aloud as "dit dah me" — but the description below opens by tying the two
+together explicitly, so a reviewer checking Guideline 2.3.8 (metadata accuracy)
+sees the connection without having to infer it.
+
 ## Listing copy (paste into App Store Connect)
 
 | Field | Value |
 |---|---|
-| Name (30) | `Ditdah: Learn Morse Code` |
-| Subtitle (30) | `Morse code, one dit at a time` |
+| Name (30) | `Dit Dah Me` — **chosen and accepted 2026-10-25** |
+| Subtitle (30) | `Learn Morse by ear and by hand` |
 | Category | Primary: Education · Secondary: Games |
 | Support URL | `https://ditdah.me` |
 | Privacy Policy URL | `https://ditdah.me/privacy.html` |
 | Copyright | `© 2026 M. Ryan Byrd` |
-| SKU | `ditdah-ios` |
+| SKU | `ditdah-ios` · App ID `6826897455` |
 
 **Promotional text (170):**
 
@@ -76,9 +103,9 @@ it needs `ASWebAuthenticationSession`.
 
 **Description:**
 
-> Ditdah teaches Morse code one dit at a time. Start with a single letter, hear
-> it, key it back, and build from there until you are holding a conversation in
-> code.
+> Dit Dah Me is Ditdah, the Morse trainer at ditdah.me, on your phone. It
+> teaches Morse code one dit at a time: start with a single letter, hear it, key
+> it back, and build from there until you are holding a conversation in code.
 >
 > LEARN BY SENDING
 > Every letter comes with a picture and a sound-alike hook, then you key it
@@ -123,24 +150,30 @@ tracking"**:
 Everything else: **not collected.** There is no sign-in in the app, so no name,
 email, or user id exists. Google Analytics runs on the website only.
 
-## Age rating
+## Age rating — 9+, confirmed
 
-**Do not reflexively answer 4+.** Signal Squadron is an arcade shooter and Cave
-of Echoes has combat, so the **Cartoon or Fantasy Violence** question is
-arguably in scope; the honest answer is likely "Infrequent/Mild", landing at 9+.
-Over-rating costs nothing. Under-rating invites a rejection or a forced
-re-rating after launch.
+Answer **Infrequent/Mild** to *Cartoon or Fantasy Violence*, **No** to
+everything else. That lands at 9+.
+
+This is an audit, not a guess. Signal Squadron's invaders are blocky shapes you
+"blast"; Cave of Echoes' monsters are "Dit Sprite", "Signal Wraith" and "The
+Static". Grepping all game content and data for blood, gore, gun, weapon, corpse
+and murder returns nothing.
+
+Ryan's call (2026-10-25): take 9+ rather than risk a resubmit. That is the right
+trade. Under-rating risks App Review flagging the rating as inaccurate, and each
+rejection costs a full 1-3 day review cycle; 9+ costs essentially nothing in
+discoverability for a learning app.
 
 ## Ryan's checklist (in order)
 
-1. **Confirm the name is free.** If `Ditdah` is taken, use
-   `Ditdah: Morse Code Trainer`.
+1. ~~Pick the name.~~ **Done** — `Dit Dah Me`, App ID `6826897455`, record
+   created and version 1.0 is at "Prepare for Submission".
 2. **Test on a real iPhone, with the silent switch ON.** This is the one thing
    the Simulator cannot check, and it is the highest-likelihood defect: if the
    `AVAudioSession` category did not take, the app is silent for anyone whose
    phone is on silent, which reads as "the app is broken."
-3. **Create the app record**: appstoreconnect.apple.com → My Apps → **+** →
-   New App → iOS, name + SKU from the table, bundle `com.ryanbyrd.ditdah`.
+3. ~~Create the app record.~~ **Done** — bundle `com.ryanbyrd.ditdah`.
 4. **Upload the build**: Xcode → scheme **App** → destination **Any iOS Device
    (arm64)** → Product → **Archive** → Distribute App → App Store Connect →
    Upload. Processing takes ~15 min.

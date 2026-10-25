@@ -53,6 +53,17 @@ export function AboutScreen({
           </a>{' '}
           · Apache 2.0
         </p>
+        <p className="credits small">
+          {/* App Store Connect requires a privacy policy URL, but a learner
+              should be able to find it from inside the app too. target=_blank
+              matters in the iOS shell: Capacitor hands an off-origin http(s)
+              URL to the system browser, so this escapes to Safari instead of
+              stranding the reader inside the webview with no way back. */}
+          <a href="https://ditdah.me/privacy.html" target="_blank" rel="noreferrer">
+            Privacy policy
+          </a>{' '}
+          · no account needed, progress stays on your device
+        </p>
         <button className="btn" onClick={onShowAttributions} style={{ width: '100%', marginTop: 8 }}>
           Attributions &amp; license →
         </button>
