@@ -8,6 +8,7 @@
 ## Technical state (done)
 
 - Bundle `com.ryanbyrd.ditdah`, team `W82VG376HK`, version **1.0 (1)**,
+  home-screen name **Dit Dah Me** (matches the listing exactly),
   iPhone-only (`TARGETED_DEVICE_FAMILY = 1`), portrait-only, iOS 15+.
 - `ITSAppUsesNonExemptEncryption = NO` in Info.plist (standard HTTPS only), so
   uploads skip the export-compliance question.
@@ -82,12 +83,13 @@ Apple blocks confusingly-similar names, not only exact duplicates, so any
 "Ditdah + generic Morse descriptor" would have kept bouncing. `Dit Dah Me`
 clears it: three words, ending in "Me", and it is the domain spoken aloud.
 
-**Store name vs in-app name.** The listing says `Dit Dah Me`; the icon, splash
-and wordmark say **Ditdah**, and the domain is **ditdah.me**. That is a
-deliberate, defensible pairing rather than a mismatch, because "ditdah.me" reads
-aloud as "dit dah me" — but the description below opens by tying the two
-together explicitly, so a reviewer checking Guideline 2.3.8 (metadata accuracy)
-sees the connection without having to infer it.
+**Store name, home screen, and in-app wordmark.** The listing and the home
+screen both say `Dit Dah Me` (set 2026-10-25, verified on the springboard: it
+fits with no truncation). The splash and in-app wordmark still say **Ditdah**,
+and the domain is **ditdah.me** — a deliberate pairing, since "ditdah.me" reads
+aloud as "dit dah me". The description opens by tying the two together, so a
+reviewer checking Guideline 2.3.8 (metadata accuracy) sees the connection
+without having to infer it.
 
 ## Listing copy (paste into App Store Connect)
 

@@ -3,7 +3,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 // iOS shell config. See docs/IOS-PRD.md for the reasoning behind each choice.
 const config: CapacitorConfig = {
   appId: 'com.ryanbyrd.ditdah',
-  appName: 'Ditdah',
+  appName: 'Dit Dah Me',
   webDir: 'dist',
   // Matches the theme-color and the top of the twilight gradient, so there is
   // no white flash behind the webview before the app paints.
