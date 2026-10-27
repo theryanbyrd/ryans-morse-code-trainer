@@ -1,3 +1,5 @@
+import { apiUrl } from './native';
+
 // Anonymous, consent-gated analytics. Events are POSTed to /api/track only when
 // the learner has opted in via the Tracking Consent setting. Everything is
 // best-effort: failures are swallowed so they never affect gameplay.
@@ -27,9 +29,9 @@ export function track(event: TrackEvent, consent: boolean): void {
     const body = JSON.stringify({ ...event, anonId: anonId(), ts: Date.now() });
     // sendBeacon survives page unloads; fall back to fetch.
     if (navigator.sendBeacon) {
-      navigator.sendBeacon('/api/track', new Blob([body], { type: 'application/json' }));
+      navigator.sendBeacon(apiUrl('/api/track'), new Blob([body], { type: 'application/json' }));
     } else {
-      void fetch('/api/track', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: true });
+      void fetch(apiUrl('/api/track'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: true });
     }
   } catch {
     /* never let analytics break the app */
@@ -47,7 +49,7 @@ export function pulse(): void {
     const KEY = 'rmct.pulsed';
     if (sessionStorage.getItem(KEY)) return;
     sessionStorage.setItem(KEY, '1');
-    void fetch('/api/pulse', { method: 'POST', keepalive: true }).catch(() => {});
+    void fetch(apiUrl('/api/pulse'), { method: 'POST', keepalive: true }).catch(() => {});
   } catch {
     /* never let analytics break the app */
   }

@@ -1,6 +1,13 @@
 import { useEffect } from 'react';
 import { unlockAudio } from '../lib/audio';
 
+// "Press any button" is keyboard language, and the iPhone build has no
+// keyboard: the whole screen is the button. Coarse pointer means touch.
+function isTouchPrimary(): boolean {
+  if (typeof window === 'undefined' || !window.matchMedia) return false;
+  return window.matchMedia('(pointer: coarse)').matches;
+}
+
 export function StartScreen({ onStart }: { onStart: () => void }) {
   useEffect(() => {
     const begin = () => {
@@ -25,9 +32,11 @@ export function StartScreen({ onStart }: { onStart: () => void }) {
         <span />
         <span />
       </div>
-      <h1 className="start-title brand">Ditdah</h1>
+      <h1 className="start-title brand">Dit Dah Me</h1>
       <p className="start-tagline">Morse code, one dit at a time</p>
-      <p className="start-prompt">Press any button to Start.</p>
+      <p className="start-prompt">
+        {isTouchPrimary() ? 'Tap anywhere to start.' : 'Press any button to Start.'}
+      </p>
     </button>
   );
 }

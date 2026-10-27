@@ -1,6 +1,8 @@
 import { useApp } from '../state/AppContext';
 import type { Settings } from '../lib/storage';
 import { CloseIcon } from './Icons';
+import { playbackHapticsSupported } from '../lib/shell';
+import { isNative } from '../lib/native';
 
 type ToggleKey =
   | 'sound'
@@ -15,6 +17,21 @@ type ToggleKey =
   | 'gazeInput'
   | 'singleKey'
   | 'trackingConsent';
+
+// Two toggles have to describe themselves differently in the native shell.
+//
+// "Flash & vibrate": iOS has never supported navigator.vibrate, so on iPhone
+// the buzz half simply does not happen. Playback haptics need Core Haptics and
+// are out of v1 scope (docs/IOS-PRD.md), so rather than offer a switch that
+// half-works, the copy drops the promise it cannot keep.
+//
+// "Gaze input": cut from the iOS build entirely, so its card is not offered.
+function toggleCopy(key: ToggleKey, label: string, help: string) {
+  if (key === 'visual' && !playbackHapticsSupported()) {
+    return { label: 'Flash', help: 'Blink in time with the code (Receive)' };
+  }
+  return { label, help };
+}
 
 const TOGGLES: { key: ToggleKey; label: string; help: string }[] = [
   { key: 'sound', label: 'Sound', help: 'Dot/dash tones and correct/wrong cues' },
@@ -55,11 +72,13 @@ export function SettingsModal({
         </header>
 
         <div className="toggle-list">
-          {TOGGLES.map((t) => (
+          {TOGGLES.filter((t) => !(t.key === 'gazeInput' && isNative())).map((t) => {
+            const copy = toggleCopy(t.key, t.label, t.help);
+            return (
             <label key={t.key} className="toggle-row">
               <span className="toggle-text">
-                <span className="toggle-label">{t.label}</span>
-                <span className="toggle-help">{t.help}</span>
+                <span className="toggle-label">{copy.label}</span>
+                <span className="toggle-help">{copy.help}</span>
               </span>
               <input
                 type="checkbox"
@@ -68,7 +87,8 @@ export function SettingsModal({
                 onChange={(e) => setSetting(t.key, e.target.checked)}
               />
             </label>
-          ))}
+            );
+          })}
 
           {settings.oneSwitch && (
             <label className="toggle-row slider-row">

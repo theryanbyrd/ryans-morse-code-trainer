@@ -22,6 +22,11 @@ import { MorseBoard } from './components/MorseBoard';
 import { Attributions } from './components/Attributions';
 import { AccountButton } from './components/Account';
 import { GearIcon, HelpIcon, SwapIcon } from './components/Icons';
+import { acquireKeepAwake, releaseKeepAwake } from './lib/shell';
+
+// Modes where the learner listens without touching anything, so iOS would
+// otherwise dim and lock the screen partway through a lesson.
+const LISTENING_MODES = ['receive-letters', 'receive-words', 'koch', 'qso'];
 
 type Overlay = 'none' | 'settings' | 'stats' | 'about' | 'getcode' | 'loadcode' | 'board' | 'attributions';
 
@@ -39,6 +44,13 @@ export default function App() {
     window.addEventListener('hashchange', sync);
     return () => window.removeEventListener('hashchange', sync);
   }, []);
+
+  // Hold the screen awake for the duration of a listening mode (native only).
+  useEffect(() => {
+    if (!mode || !LISTENING_MODES.includes(mode)) return;
+    void acquireKeepAwake();
+    return () => void releaseKeepAwake();
+  }, [mode]);
 
   const closeOverlay = () => {
     setOverlay('none');

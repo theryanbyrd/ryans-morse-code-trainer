@@ -21,9 +21,12 @@ GET  /api/digest?dry=1 -> {"reason":"analytics store not configured"}
 - **A store.** Vercel → Storage → Marketplace → Upstash Redis, connect to the
   project. Sets `KV_REST_API_URL` / `KV_REST_API_TOKEN` automatically. Redeploy,
   then `curl -X POST https://ditdah.me/api/pulse` should report `"stored":true`.
-- **A mailer.** A Resend API key, plus `CRON_SECRET` (any long random string;
-  it stops anyone who finds the URL from making the app send mail). `DIGEST_TO`
-  already defaults to `ryanbyrd@gmail.com`.
+- **A mailer.** A Resend API key. `DIGEST_TO` already defaults to
+  `ryanbyrd@gmail.com`. `CRON_SECRET` is **already set** (2026-08-16), so
+  `/api/digest` and `/api/keepalive` now 401 without Vercel Cron's bearer
+  header. Note `vercel env pull` writes it back as `CRON_SECRET=""`, so the
+  value is not recoverable that way; read it in the dashboard, or just set a
+  new one.
 
 Counters only start accruing once the store exists, so the first useful digest is
 the day after.
@@ -74,12 +77,38 @@ dev simulator, but live eye tracking has never run. Needs a webcam session to
 tune dwell time, centre-band width and mirror, then set those as defaults and
 decide whether it leaves beta.
 
+### D. No URL routing
+Every mode is React state (`mode` in `AppContext`, mirrored to `rmct.mode` in
+localStorage). Only `#about` touches the URL. So the Translator, Koch, the cave
+and the rest are all `https://ditdah.me/`, which means no deep links, no
+shareable link to a mode, the browser Back button leaves the site instead of
+going back a screen, and analytics cannot tell the modes apart.
+
+Fix is a hash router (`#/translator`), which is the cheap option and matches the
+existing `#about` handling, or real paths via `history.pushState` plus a Vercel
+rewrite. Worth doing before any SEO push, since right now there is exactly one
+indexable URL.
+
+---
+
+## iOS app
+
+An iPhone build for the App Store is specced in **[IOS-PRD.md](IOS-PRD.md)**,
+following the Capacitor shell that shipped Hymn Dictionary. Decisions already
+made: guest-only (no sign-in, which sidesteps Sign in with Apple and the
+account-deletion rule), gaze input cut from v1, free with no purchases.
+
+The two real risks are that iOS silences WKWebView audio with the ring switch
+(fatal for a Morse trainer, needs an AVAudioSession category set natively and a
+physical device to verify) and that going full-screen tends to expose safe-area
+bugs Safari's chrome was hiding — that happened twice on Hymn Dictionary.
+
 ---
 
 ## Smaller follow-ups
 
-- **Canonical domain.** `ditdah.me` and `www.ditdah.me` both serve the site.
-  Pick one and set the other to redirect in Vercel → Settings → Domains.
+- **Canonical domain.** Done: `vercel.json` now redirects `www.ditdah.me` to the
+  apex (came in with the growth-engine M0 commit).
 - **CallSignReady** (`~/signal-up`) still needs its Google client wired up. Its
   setup doc now carries the branding warning. One Google Cloud project can hold
   both clients; Ditdah's lives in "PTL Creative".

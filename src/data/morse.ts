@@ -55,8 +55,27 @@ export const MORSE_EXTRA: Record<string, string> = {
   '+': '.-.-.', // AR, end of message
 };
 
-/** Full character set: letters + digits + punctuation/prosigns. */
-export const MORSE_FULL: Record<string, string> = { ...MORSE, ...MORSE_EXTRA };
+// The rest of the ITU punctuation set. These are not taught in any drill and
+// not used in the QSO scripts, but the Translator accepts arbitrary pasted
+// text, so it needs them: without an entry here a character is silently
+// dropped from the output rather than translated.
+export const MORSE_PUNCT: Record<string, string> = {
+  '!': '-.-.--', // KW
+  "'": '.----.',
+  '"': '.-..-.',
+  '(': '-.--.',
+  ')': '-.--.-',
+  '&': '.-...', // AS, "wait"
+  ':': '---...',
+  ';': '-.-.-.',
+  '-': '-....-', // hyphen the character, not the dash symbol
+  '_': '..--.-',
+  $: '...-..-',
+  '@': '.--.-.', // AC
+};
+
+/** Full character set: letters + digits + prosigns + punctuation. */
+export const MORSE_FULL: Record<string, string> = { ...MORSE, ...MORSE_EXTRA, ...MORSE_PUNCT };
 
 /** Morse pattern for any supported character ('' if unsupported). */
 export function patternForChar(ch: string): string {
@@ -68,9 +87,41 @@ export const PATTERN_TO_CHAR_FULL: Record<string, string> = Object.fromEntries(
   Object.entries(MORSE_FULL).map(([ch, pattern]) => [pattern, ch]),
 );
 
+// Pasted text carries typographic characters that phone and desktop keyboards
+// substitute automatically. Morse has no separate signal for them, so map them
+// onto the plain equivalent rather than dropping them.
+const SUBSTITUTIONS: Record<string, string> = {
+  '‘': "'", // ‘
+  '’': "'", // ’
+  '“': '"', // “
+  '”': '"', // ”
+  '–': '-', // en dash
+  '—': '-', // em dash
+  '…': '...', // …
+  ' ': ' ', // non-breaking space
+};
+
+/** Fold typographic punctuation onto the keyable ASCII equivalent. */
+export function normalizeText(text: string): string {
+  return text.replace(/[‘’“”–—… ]/g, (c) => SUBSTITUTIONS[c]);
+}
+
+/**
+ * The distinct characters that have no Morse pattern and would be dropped.
+ * The Translator shows these so a silent omission is never a surprise.
+ */
+export function unsupportedChars(text: string): string[] {
+  const seen = new Set<string>();
+  for (const ch of normalizeText(text)) {
+    if (/\s/.test(ch)) continue;
+    if (!MORSE_FULL[ch.toLowerCase()]) seen.add(ch);
+  }
+  return [...seen];
+}
+
 /** Convert alphanumeric text to Morse (chars space-separated, words " / "). */
 export function textToMorse(text: string): string {
-  return text
+  return normalizeText(text)
     .trim()
     .split(/\s+/)
     .map((word) =>

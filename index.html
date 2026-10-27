@@ -12,14 +12,25 @@
     <meta name="apple-mobile-web-app-title" content="Ditdah" />
     <meta name="format-detection" content="telephone=no" />
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1VFENLPCL1"></script>
+    <!-- Google tag (gtag.js) — web only.
+         The iOS app deliberately ships without Google Analytics: it would mean
+         declaring an Identifiers privacy label and carrying a third-party
+         tracker into an app aimed partly at children, for very little. The
+         first-party /api/pulse counters still run there. See docs/IOS-PRD.md. -->
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-1VFENLPCL1');
+      (function () {
+        var p = window.location.protocol;
+        if (p === 'capacitor:' || p === 'ionic:') return;
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=G-1VFENLPCL1';
+        document.head.appendChild(s);
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        window.gtag = gtag;
+        gtag('js', new Date());
+        gtag('config', 'G-1VFENLPCL1');
+      })();
     </script>
 
     <meta
