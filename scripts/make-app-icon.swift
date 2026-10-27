@@ -17,10 +17,18 @@ import Foundation
 import ImageIO
 import UniformTypeIdentifiers
 
-let size = 1024
-let out = CommandLine.arguments.count > 1
-    ? CommandLine.arguments[1]
-    : "AppIcon-512@2x.png"
+// Usage: make-app-icon.swift <out.png> [canvas=1024] [art=canvas]
+//   icon:   canvas 1024, art fills it
+//   splash: canvas 2732, art ~820 centred on the twilight field. This replaces
+//           Capacitor's stock blue-X-on-white Splash.imageset, which otherwise
+//           flashes a framework logo on a white field before the dark app
+//           paints -- on a real device that is several seconds of looking broken.
+let args = CommandLine.arguments
+let out  = args.count > 1 ? args[1] : "AppIcon-512@2x.png"
+let size = args.count > 2 ? Int(args[2])! : 1024
+let art  = CGFloat(args.count > 3 ? Int(args[3])! : size)
+let k     = art / 1024.0        // the mark's own geometry is authored at 1024
+let inset = (CGFloat(size) - art) / 2
 
 let space = CGColorSpaceCreateDeviceRGB()
 guard let ctx = CGContext(
@@ -39,7 +47,8 @@ func rgb(_ hex: UInt32) -> CGColor {
     ])!
 }
 
-// --- Background: the app's twilight gradient, corner to corner -------------
+// --- Background: the app's twilight gradient, corner to corner over the WHOLE
+// canvas, so a splash has no bare edges --------------------------------------
 let bg = CGGradient(colorsSpace: space,
                     colors: [rgb(0x14152a), rgb(0x1c1d3c), rgb(0x2a1c3f)] as CFArray,
                     locations: [0.0, 0.55, 1.0])!
@@ -47,6 +56,10 @@ ctx.drawLinearGradient(bg,
                        start: CGPoint(x: 0, y: size),
                        end: CGPoint(x: size, y: 0),
                        options: [])
+
+// Place the mark: scale its 1024-space geometry to `art` and centre it.
+ctx.translateBy(x: inset, y: inset)
+ctx.scaleBy(x: k, y: k)
 
 // --- The dit: amber circle -------------------------------------------------
 let ditR: CGFloat = 112

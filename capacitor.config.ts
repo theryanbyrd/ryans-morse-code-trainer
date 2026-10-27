@@ -16,10 +16,16 @@ const config: CapacitorConfig = {
     // are not blocked by WKWebView CORS. No server changes needed.
     CapacitorHttp: { enabled: true },
     // Hold the branded splash until main.tsx hides it after first paint,
-    // otherwise a blank webview shows while the JS bundle boots. The 5s
-    // launchShowDuration is only a fail-safe if JS never boots at all.
+    // otherwise a blank webview shows while the JS bundle boots.
+    //
+    // launchShowDuration is ONLY a fail-safe for a boot that never happens, so
+    // it must sit above a real cold start. 5s did not: on Ryan's physical
+    // iPhone (2026-10-27) WebContent took 2.37s and the GPU process 2.20s
+    // before the bundle even parsed, so the splash auto-hid first and Capacitor
+    // logged "SplashScreen was automatically hidden after default timeout".
+    // The simulator never showed this because it boots faster than a device.
     SplashScreen: {
-      launchShowDuration: 5000,
+      launchShowDuration: 12000,
       launchAutoHide: true,
       backgroundColor: '#14152a',
       showSpinner: true,
