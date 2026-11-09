@@ -7,7 +7,8 @@
 // stored, and yesterday's hashes cannot be recomputed once the salt rotates, so
 // the set counts people without identifying them.
 import { createHash } from 'node:crypto';
-import { incr, sadd, expire, dayKey, D, DAY_TTL, storeEnabled } from './_lib.js';
+import { incr, sadd, expire, dayKey, D, DAY_TTL, storeEnabled,
+         clientIp, rateLimit, isIpBlocked, logActivity, ipBucket, readSiteConfig } from './_lib.js';
 
 type Req = { method?: string; headers?: Record<string, string | string[] | undefined> };
 type Res = {
@@ -28,6 +29,19 @@ export default async function handler(req: Req, res: Res) {
     return;
   }
 
+  // Abuse controls before any store work, so a flood costs one Redis INCR
+  // rather than a full write path.
+  const ip = clientIp(req.headers);
+  if (await isIpBlocked(ip)) {
+    res.status(403).json({ ok: false, error: 'blocked' });
+    return;
+  }
+  const rl = await rateLimit('pulse', ip, 120, 3600);
+  if (!rl.allowed) {
+    res.status(429).json({ ok: false, error: 'rate limited' });
+    return;
+  }
+
   const day = dayKey();
   try {
     await incr(D.views(day));
@@ -42,10 +56,11 @@ export default async function handler(req: Req, res: Res) {
       const visitor = createHash('sha256').update(`${day}:${salt}:${ip}:${ua}`).digest('hex').slice(0, 24);
       await sadd(D.visitors(day), visitor);
       await expire(D.visitors(day), DAY_TTL);
+      await logActivity({ kind: 'pageview', name: '/', ip: visitor, ua: ua.slice(0, 120) });
     }
   } catch {
     /* analytics must never break a page load */
   }
 
-  res.status(200).json({ ok: true, stored: storeEnabled });
+  res.status(200).json({ ok: true, stored: storeEnabled, limited: rl.enforced });
 }

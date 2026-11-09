@@ -23,7 +23,7 @@ no framework beyond that, plain CSS with custom properties.
 
 ```bash
 npm run dev          # vite dev server (or the "morse" entry in ~/.claude/launch.json)
-npm test             # 197 Vitest unit tests
+npm test             # 245 Vitest unit tests (src/ and api/)
 npm run test:e2e     # 176 Playwright tests, desktop Chromium + mobile WebKit
 npm run build        # tsc -b && vite build
 ```
@@ -66,9 +66,12 @@ Sign-in: **Google is live and verified end to end**, plus email magic link.
 
 ## Testing
 
-- **197 unit tests** (Vitest) over pure logic: morse codec, the cloud merge,
-  storage codec and migrations, session, receive, numbers, koch, plus content
-  integrity for QSO scenarios and the cave graph.
+- **245 unit tests** (Vitest) over pure logic: morse codec, the cloud merge,
+  storage codec and migrations, session, receive, numbers, koch, the error-log
+  scrubbing and the keepalive/error handlers, plus content integrity for QSO
+  scenarios and the cave graph. `vitest.config.ts` covers both `src/**` and
+  `api/**`; note `api/*` is in no tsconfig, so `tsc -b` does **not** typecheck
+  it and only Vercel does at deploy time.
 - **176 E2E tests** (Playwright) against the **production bundle** via
   `vite preview`, not the dev server.
 - **42 accessibility tests** including an axe-core sweep of 15 screens.
@@ -78,9 +81,10 @@ are excluded from `tsconfig.app.json` so `tsc -b` never ships them, and
 `tsconfig.test.json` typechecks them.
 
 **Both suites are mutation-verified.** When adding tests, break the thing on
-purpose and confirm the suite fails. Twice in this project a mutation "passed"
-and both times it was a bad mutation rather than a test gap, so check which it is
-before trusting a green result.
+purpose and confirm the suite fails. Three times now a mutation has "passed":
+twice it was a bad mutation, once (the error rate-limit key) it was a real test
+gap, where the assertion happened to hold on the key prefix while the property
+under test had broken. Always check which it is before trusting a green result.
 
 ---
 
@@ -117,6 +121,46 @@ before trusting a green result.
 cream, so it is for fills and dark backgrounds only. Text on light surfaces uses
 `--red-text`; fills carrying white text use `--red-solid` / `--green-solid`.
 Check contrast before introducing a colour.
+
+**Supabase pausing (this bit us for ten days)**
+- Free-tier projects auto-pause after **7 days of inactivity**, and Ditdah only
+  talks to Supabase when somebody signs in, so a quiet week is enough. It paused
+  on 2026-08-06 and every sign-in failed until 2026-08-16.
+- A paused project **stops resolving entirely**. `nslookup` returns NXDOMAIN, so
+  the failure happens at DNS and the browser reports its own generic wording:
+  Chrome "Failed to fetch", Safari "Load failed". NXDOMAIN does *not* mean the
+  project was deleted, which is the obvious wrong conclusion to draw.
+- `GET /api/keepalive` now runs daily (`vercel.json`) to prevent it. It issues a
+  real PostgREST query, **not** `/auth/v1/health`: the health endpoint is served
+  by the auth gateway and never touches Postgres, so pinging it would let the
+  project pause while the check still reported success.
+- Unpausing is a dashboard action and takes a couple of minutes.
+
+**Endpoint auth**
+- `CRON_SECRET` is set in Vercel production. `/api/digest` and `/api/keepalive`
+  reject anything without `Authorization: Bearer $CRON_SECRET`; Vercel Cron
+  sends it automatically.
+- `/api/error` deliberately has **no** such guard and must not get one: browsers
+  call it, so the secret would ship in the client bundle. It is bounded instead
+  (413 over 8KB, 60 reports per address per hour) and the hourly key hashes the
+  address rather than storing it.
+- Rate-limit enforcement needs the Upstash store, so it is currently inert and
+  the response reports `"limited": false` rather than implying otherwise.
+
+**Error logging**
+- `src/lib/errorLog.ts` catches uncaught errors and rejections, plus explicit
+  `reportError()` calls in the auth and cloud-sync paths, and POSTs to
+  `/api/error`.
+- `/api/error` **always `console.error`s**, so reports land in the Vercel runtime
+  log with no store configured (`vercel logs <deployment>`, grep `client-error`).
+  It also counts them in Upstash when that exists, and the digest has an
+  errors row.
+- Reports are **not** consent-gated. Consent governs studying the learner, not
+  noticing the app is broken. They carry no identifiers: emails, JWTs, Supabase
+  keys and long hex strings are scrubbed, and the URL's query and hash are
+  dropped because a magic-link callback carries a token. The server re-scrubs
+  rather than trusting its caller.
+- Deduped, capped at 8 per session, so a render loop cannot become a firehose.
 
 **Other**
 - Installing a React dependency while the dev server runs leaves a stale Vite

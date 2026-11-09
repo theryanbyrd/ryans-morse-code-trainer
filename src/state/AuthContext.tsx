@@ -2,6 +2,19 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase, supabaseEnabled } from '../lib/supabase';
+import { isNetworkFailure, reportError } from '../lib/errorLog';
+
+// When the backend is unreachable the browser hands us its own wording, which
+// is meaningless to a learner: Chrome says "Failed to fetch", Safari says "Load
+// failed". Say what is actually true, and reassure them nothing is lost.
+const OFFLINE_MESSAGE =
+  'Cannot reach the sign-in service right now. Your progress is safe on this device, so you can keep playing as a guest and sign in later.';
+
+/** Log an auth failure and turn it into something worth reading. */
+function authFailure(message: string, where: string): { ok: false; error: string } {
+  reportError('auth', new Error(message), where);
+  return { ok: false, error: isNetworkFailure(message) ? OFFLINE_MESSAGE : message };
+}
 
 type AuthCtx = {
   enabled: boolean;
@@ -22,10 +35,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!supabase) return;
-    supabase.auth.getSession().then(({ data }) => {
-      setUser(data.session?.user ?? null);
-      setReady(true);
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        setUser(data.session?.user ?? null);
+        setReady(true);
+      })
+      .catch((err) => {
+        // This is the call that failed silently for ten days while the Supabase
+        // project was paused. Report it, and still mark auth ready so the app
+        // settles into guest mode instead of hanging.
+        reportError('auth', err, 'getSession');
+        setReady(true);
+      });
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
@@ -37,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       fetch(`${url}/auth/v1/settings`, { headers: { apikey: key } })
         .then((r) => (r.ok ? r.json() : null))
         .then((d) => setGoogleEnabled(Boolean(d?.external?.google)))
-        .catch(() => {});
+        .catch((err) => reportError('auth', err, 'authSettings'));
     }
     return () => sub.subscription.unsubscribe();
   }, []);
@@ -54,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           email,
           options: { emailRedirectTo: window.location.origin },
         });
-        return error ? { ok: false, error: error.message } : { ok: true };
+        return error ? authFailure(error.message, 'signInWithEmail') : { ok: true };
       },
       async signInWithGoogle() {
         if (!supabase) return { ok: false, error: 'Sign-in is not configured.' };
@@ -62,7 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           provider: 'google',
           options: { redirectTo: window.location.origin },
         });
-        return error ? { ok: false, error: error.message } : { ok: true };
+        return error ? authFailure(error.message, 'signInWithGoogle') : { ok: true };
       },
       async signOut() {
         await supabase?.auth.signOut();

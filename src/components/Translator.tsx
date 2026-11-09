@@ -1,5 +1,5 @@
-import { useCallback, useRef, useState } from 'react';
-import { morseToText, textToMorse } from '../data/morse';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { morseToText, textToMorse, unsupportedChars } from '../data/morse';
 import { unlockMorse, playMorse } from '../lib/morsePlayer';
 import { useApp } from '../state/AppContext';
 import type { Playback } from '../lib/morsePlayer';
@@ -51,6 +51,10 @@ export function Translator() {
     }
   };
 
+  // Anything with no Morse pattern is dropped from the output. Say so, because
+  // a character quietly going missing is indistinguishable from a bug.
+  const skipped = useMemo(() => unsupportedChars(text), [text]);
+
   const clear = () => {
     playback.current?.stop();
     setText('');
@@ -76,6 +80,12 @@ export function Translator() {
           autoCapitalize="characters"
           spellCheck={false}
         />
+        {skipped.length > 0 && (
+          <p className="tr-skipped" role="status">
+            No Morse for {skipped.map((c) => `“${c}”`).join(' ')}, so{' '}
+            {skipped.length === 1 ? 'it was' : 'they were'} left out.
+          </p>
+        )}
       </div>
 
       <div className="tr-panel">

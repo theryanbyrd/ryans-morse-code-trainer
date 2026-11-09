@@ -3,6 +3,7 @@
 // (guest) state with the cloud state so nothing is lost, then keep the cloud in
 // sync as the learner plays.
 import { supabase } from './supabase';
+import { reportError } from './errorLog';
 import { freshCaveProgress } from './storage';
 import type { CaveProgress, KochProgress, LetterStat, NumbersProgress, Progress, ReceiveLetterStat, ReceiveProgress, SaveState, Settings } from './storage';
 
@@ -11,16 +12,25 @@ const TABLE = 'user_state';
 export async function loadRemote(userId: string): Promise<SaveState | null> {
   if (!supabase) return null;
   const { data, error } = await supabase.from(TABLE).select('state').eq('user_id', userId).maybeSingle();
-  if (error || !data) return null;
+  // Falling back to local state is the right behaviour, but doing it silently
+  // is how a broken backend stays invisible. Report, then fall back.
+  if (error) {
+    reportError('sync', new Error(error.message), 'loadRemote');
+    return null;
+  }
+  if (!data) return null;
   return (data.state as SaveState) ?? null;
 }
 
 export async function saveRemote(userId: string, state: SaveState): Promise<void> {
   if (!supabase) return;
-  await supabase.from(TABLE).upsert(
+  const { error } = await supabase.from(TABLE).upsert(
     { user_id: userId, state, updated_at: new Date().toISOString() },
     { onConflict: 'user_id' },
   );
+  // A failed save means the learner's progress never left the device, which is
+  // exactly the kind of thing worth knowing about before they notice.
+  if (error) reportError('sync', new Error(error.message), 'saveRemote');
 }
 
 function mergeLetter(a?: LetterStat, b?: LetterStat): LetterStat {

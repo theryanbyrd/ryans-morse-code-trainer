@@ -39,3 +39,6 @@ dist-ssr
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# impeccable: share the ignore decisions, not the local hook cache
+.impeccable/hook.cache.json

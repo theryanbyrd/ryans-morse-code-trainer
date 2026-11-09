@@ -2,8 +2,9 @@
 //   /api/data-dump            → JSON
 //   /api/data-dump?format=csv → CSV (per-letter table)
 import { getNum, ALPHABET, K, storeEnabled } from './_lib.js';
+import { clientIp, rateLimit, isIpBlocked } from './_lib.js';
 
-type Req = { query?: Record<string, string | string[]> };
+type Req = { query?: Record<string, string | string[]>; headers?: Record<string, string | string[] | undefined> };
 type Res = {
   status: (code: number) => Res;
   json: (data: unknown) => void;
@@ -13,6 +14,20 @@ type Res = {
 
 export default async function handler(req: Req, res: Res) {
   res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
+
+  // These endpoints each fan out to ~54 Redis reads, so an unbounded request
+  // rate is a cost-amplification vector against a metered store, not just
+  // traffic. Bounded per address.
+  const ip = clientIp(req.headers);
+  if (await isIpBlocked(ip)) {
+    res.status(403).json({ enabled: false, error: 'blocked' });
+    return;
+  }
+  const rl = await rateLimit('datadump', ip, 30, 3600);
+  if (!rl.allowed) {
+    res.status(429).json({ enabled: false, error: 'rate limited' });
+    return;
+  }
   const format = String(req.query?.format ?? 'json').toLowerCase();
 
   if (!storeEnabled) {

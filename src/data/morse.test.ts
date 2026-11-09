@@ -2,11 +2,14 @@ import { describe, it, expect } from 'vitest';
 import {
   MORSE,
   MORSE_FULL,
+  MORSE_PUNCT,
   PATTERN_TO_LETTER,
   PATTERN_TO_CHAR_FULL,
   TEACHING_ORDER,
   ALPHABET,
   patternForChar,
+  normalizeText,
+  unsupportedChars,
   textToMorse,
   morseToText,
   decode,
@@ -96,6 +99,46 @@ describe('textToMorse / morseToText', () => {
 
   it('ignores unsupported characters when encoding', () => {
     expect(textToMorse('A~B')).toBe('.- -...');
+  });
+
+  it('encodes the punctuation the Translator placeholder advertises', () => {
+    // The regression: "!" was missing from the table, so it vanished from the
+    // output with no indication that anything had been dropped.
+    expect(textToMorse('!')).toBe('-.-.--');
+    expect(textToMorse('HI!')).toBe('.... .. -.-.--');
+    for (const ch of '?!.,/') expect(patternForChar(ch), `missing ${ch}`).toBeTruthy();
+  });
+
+  it('round-trips every punctuation mark it claims to support', () => {
+    for (const ch of Object.keys(MORSE_PUNCT)) {
+      expect(morseToText(textToMorse(ch)), `"${ch}" does not round-trip`).toBe(ch);
+    }
+  });
+
+  it('folds typographic punctuation from a paste onto keyable equivalents', () => {
+    expect(textToMorse('’')).toBe(patternForChar("'"));
+    expect(textToMorse('“')).toBe(patternForChar('"'));
+    expect(textToMorse('—')).toBe(patternForChar('-'));
+    expect(normalizeText('…')).toBe('...');
+    expect(textToMorse('A B')).toBe('.- / -...');
+  });
+});
+
+describe('unsupportedChars', () => {
+  it('is empty for text the translator fully supports', () => {
+    expect(unsupportedChars('HELLO, WORLD! 73 DE K7RB @ 14.250')).toEqual([]);
+  });
+
+  it('reports each dropped character once', () => {
+    expect(unsupportedChars('café café')).toEqual(['é']);
+  });
+
+  it('ignores whitespace and folds typographic characters first', () => {
+    expect(unsupportedChars('HI\nTHERE’S')).toEqual([]);
+  });
+
+  it('keeps a multi-code-unit character whole', () => {
+    expect(unsupportedChars('SOS \u{1f600}')).toEqual(['\u{1f600}']);
   });
 });
 

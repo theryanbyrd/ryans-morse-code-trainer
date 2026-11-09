@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Support · Dit Dah Me</title>
+  <meta name="description" content="Support and contact for Dit Dah Me, the Morse code trainer at ditdah.me." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-1: #14152a; --bg-2: #1c1d3c; --bg-3: #2a1c3f;
+      --card: #fbf7ef; --ink: #2c2b3a; --ink-soft: #666578;
+      --on-dark: rgba(255,255,255,0.94); --on-dark-soft: rgba(255,255,255,0.62);
+      --amber: #ffb020; --red-text: #c92e42;
+      --font: 'Poppins', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 55%, var(--bg-3) 100%);
+      background-attachment: fixed;
+      color: var(--on-dark);
+      font: 16px/1.65 var(--font);
+      padding: 32px 20px calc(56px + env(safe-area-inset-bottom));
+    }
+    main { max-width: 680px; margin: 0 auto; }
+    .top { font-size: 14px; display: inline-block; margin-bottom: 22px; color: var(--amber); text-decoration: none; font-weight: 600; }
+    .top:hover { text-decoration: underline; }
+    h1 { font-size: clamp(28px, 7vw, 36px); font-weight: 800; letter-spacing: -0.5px; line-height: 1.15; margin-bottom: 6px; }
+    .sub { color: var(--on-dark-soft); font-size: 14px; margin-bottom: 26px; }
+    h2 { font-size: 20px; font-weight: 700; margin: 30px 0 8px; }
+    p, li { margin-bottom: 10px; }
+    ul { padding-left: 22px; margin-bottom: 10px; }
+    a { color: var(--amber); }
+    .card {
+      background: var(--card); color: var(--ink);
+      border-radius: 16px; padding: 18px 20px; margin: 16px 0;
+      box-shadow: 0 18px 40px rgba(8,10,30,0.45), inset 0 1px 0 rgba(255,255,255,0.7);
+    }
+    .card p:last-child { margin-bottom: 0; }
+    .card a { color: var(--red-text); }
+    table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 15px; }
+    th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid rgba(255,255,255,0.14); vertical-align: top; }
+    th { font-weight: 700; color: var(--on-dark); }
+    td { color: var(--on-dark-soft); }
+    .foot { margin-top: 34px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.14); font-size: 14px; color: var(--on-dark-soft); }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="top" href="/">&larr; Dit Dah Me</a>
+    <h1>Support</h1>
+    <p class="sub">Dit Dah Me (ditdah.me and the iPhone app) · Updated October 25, 2026</p>
+
+    <div class="card">
+      <p><strong>Need help, found a bug, or have an idea?</strong> Email
+      <a href="mailto:ryanbyrd@gmail.com">ryanbyrd@gmail.com</a> and you will get
+      a reply from a person. There is no ticket system and no bot.</p>
+    </div>
+
+    <h2>Common questions</h2>
+
+    <h2>Do I need an account?</h2>
+    <p>No. The iPhone app has no sign-in at all, and everything you learn is
+    stored on your own device.</p>
+
+    <h2>How do I move my progress to another device?</h2>
+    <p>Settings shows a <strong>progress code</strong>. Read it on the old
+    device, type it into the new one. Nothing is stored on a server.</p>
+
+    <h2>The sound does not play</h2>
+    <p>Check the ring/silent switch and the volume. Dit Dah Me plays through the
+    normal media channel, so it should be audible even with the ringer off; if
+    it is not, please email and say which iPhone and iOS version you are on.</p>
+
+    <h2>How do I erase everything?</h2>
+    <p>Settings &rarr; <strong>Reset progress</strong>. Deleting the app removes
+    it all too.</p>
+
+    <h2>Accessibility</h2>
+    <p>Dit Dah Me supports VoiceOver throughout, one-switch scanning, and a
+    single-key mode where a short press is a dit and a long press is a dah. If
+    something is hard to use with your setup, please say so in an email; that
+    feedback shapes the app.</p>
+
+    <h2>Privacy</h2>
+    <p>See the <a href="/privacy.html">privacy policy</a>. The short version:
+    no account, no ads, nothing sold.</p>
+
+    <div class="foot">
+      <p>Email: <a href="mailto:ryanbyrd@gmail.com">ryanbyrd@gmail.com</a></p>
+      <p>Dit Dah Me is a remake of Ace Centre's Morse Learn, used under Apache 2.0.</p>
+    </div>
+  </main>
+</body>
+</html>

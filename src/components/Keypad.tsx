@@ -1,5 +1,11 @@
 import { DotIcon, DashIcon } from './Icons';
 
+/** Coarse pointer means touch, so keyboard instructions do not apply. */
+function isTouchPrimary(): boolean {
+  if (typeof window === 'undefined' || !window.matchMedia) return false;
+  return window.matchMedia('(pointer: coarse)').matches;
+}
+
 export type KeyAction = 'dot' | 'dash' | 'delete';
 
 // Scanning order for one-switch mode. There's no "enter", answers are judged
@@ -51,7 +57,14 @@ export function Keypad({
         </p>
       ) : (
         <p className="key-hint">
-          Keyboard: <b>J</b> or <b>.</b> = dot, <b>K</b> or <b>-</b> = dash, <b>⌫</b> = delete.
+          {/* The keyboard half is meaningless on a phone, and on the iPhone build
+              there is no keyboard at all. Touch users get only the part that is
+              true for them. */}
+          {!isTouchPrimary() && (
+            <>
+              Keyboard: <b>J</b> or <b>.</b> = dot, <b>K</b> or <b>-</b> = dash, <b>⌫</b> = delete.{' '}
+            </>
+          )}
           Answers check themselves once the code is complete.
         </p>
       )}

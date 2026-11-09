@@ -8,7 +8,7 @@
 //   DIGEST_TO       where to send it        (default ryanbyrd@gmail.com)
 //   DIGEST_FROM     verified sender         (default Resend's onboarding sender)
 // Without the store or the key it reports what is missing instead of sending.
-import { getNum, scard, dayKey, D, storeEnabled } from './_lib.js';
+import { getNum, scard, dayKey, D, storeEnabled, lrange, A, LOG_CAP } from './_lib.js';
 
 type Req = { method?: string; headers?: Record<string, string | string[] | undefined>; query?: Record<string, unknown> };
 type Res = {
@@ -29,9 +29,40 @@ export type DayStats = {
   shareBreakdown: Record<string, number>;
   answers: number;
   learned: number;
+  errors: number;
+  errorKinds: number;
+  actions: number;
+  topActions: Array<[string, number]>;
 };
 
 const SHARE_TARGETS = ['x', 'facebook', 'whatsapp', 'reddit', 'email', 'copy', 'native'];
+
+/**
+ * Per-action counts for the digest, read from the rolling activity log.
+ *
+ * The log is capped at LOG_CAP entries per day, so on a busy day this is a
+ * sample of the most recent activity rather than the full total. The email
+ * says so rather than implying a complete count.
+ */
+export async function collectActions(day: string): Promise<{ actions: number; topActions: Array<[string, number]> }> {
+  try {
+    const rows = await lrange(A.activity(day), 0, LOG_CAP - 1);
+    const tally = new Map<string, number>();
+    let actions = 0;
+    for (const r of rows) {
+      try {
+        const e = JSON.parse(r) as { kind?: string; name?: string };
+        if (e.kind !== 'action') continue;
+        actions++;
+        tally.set(String(e.name), (tally.get(String(e.name)) ?? 0) + 1);
+      } catch { /* a malformed row must not break the digest */ }
+    }
+    const topActions = [...tally.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6);
+    return { actions, topActions };
+  } catch {
+    return { actions: 0, topActions: [] };
+  }
+}
 
 export async function collect(day: string): Promise<DayStats> {
   const shareBreakdown: Record<string, number> = {};
@@ -48,6 +79,9 @@ export async function collect(day: string): Promise<DayStats> {
     shareBreakdown,
     answers: await getNum(D.answers(day)),
     learned: await getNum(D.learned(day)),
+    errors: await getNum(D.errors(day)),
+    errorKinds: await scard(D.errorKinds(day)),
+    ...(await collectActions(day)),
   };
 }
 
@@ -67,6 +101,24 @@ export function renderDigest(s: DayStats, prev: DayStats): string {
       <td align="right" style="padding:10px 0 10px 12px;border-bottom:1px solid #e8e2d8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;color:#8a8a99;">${delta(value, prevValue)}</td>
     </tr>`;
 
+  // Errors get their own row rather than reusing row(), because a rise here is
+  // bad news and should not be styled like a rise in page views. On a clean day
+  // it reads as reassurance; on a bad day it turns red and names the spread.
+  const errorRow = (t: DayStats, p: DayStats) => {
+    const bad = t.errors > 0;
+    const colour = bad ? '#c92e42' : '#4a4a5a';
+    const note = bad
+      ? `${t.errorKinds} distinct${p.errors > 0 ? `, ${delta(t.errors, p.errors)} vs prior day` : ''}`
+      : 'all clear';
+    return `
+    <tr>
+      <td style="padding:10px 0;border-bottom:1px solid #e8e2d8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;color:${colour};">Client errors</td>
+      <td align="right" style="padding:10px 0;border-bottom:1px solid #e8e2d8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:20px;font-weight:bold;color:${bad ? '#c92e42' : '#1b1b2b'};">${t.errors.toLocaleString()}</td>
+      <td align="right" style="padding:10px 0 10px 12px;border-bottom:1px solid #e8e2d8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;color:#8a8a99;">${note}</td>
+    </tr>`;
+  };
+
+  const actionList = s.topActions.map(([k, v]) => `${k} ${v}`).join(' &middot; ');
   const shares = Object.entries(s.shareBreakdown)
     .sort((a, b) => b[1] - a[1])
     .map(([k, v]) => `${k} ${v}`)
@@ -96,9 +148,13 @@ export function renderDigest(s: DayStats, prev: DayStats): string {
           ${row('Shares', s.shares, prev.shares)}
           ${row('Answers keyed', s.answers, prev.answers)}
           ${row('Letters learned', s.learned, prev.learned)}
+          ${row('User actions', s.actions, prev.actions)}
+          ${errorRow(s, prev)}
         </table>
       </td></tr>
       ${shares ? `<tr><td style="padding:4px 30px 0 30px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12.5px;color:#8a8a99;">Shared via ${shares}</td></tr>` : ''}
+      ${actionList ? `<tr><td style="padding:4px 30px 0 30px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12.5px;color:#8a8a99;">Top actions: ${actionList}</td></tr>` : ''}
+      ${s.actions ? `<tr><td style="padding:4px 30px 0 30px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11.5px;color:#a8a8b5;">Action counts come from the rolling activity log, which keeps the most recent ${LOG_CAP} entries a day, so on a busy day they are a sample rather than a total.</td></tr>` : ''}
       ${quiet ? `<tr><td style="padding:12px 30px 0 30px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;color:#8a8a99;">A quiet day. If this keeps reading zero, check that <code>/api/pulse</code> is reachable and the store is configured.</td></tr>` : ''}
       <tr><td style="padding:20px 30px 26px 30px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;color:#8a8a99;">
         Percentages compare with ${prev.day}. Counts are aggregate only; no personal data is stored.

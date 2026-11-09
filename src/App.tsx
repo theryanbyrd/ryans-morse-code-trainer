@@ -22,6 +22,13 @@ import { MorseBoard } from './components/MorseBoard';
 import { Attributions } from './components/Attributions';
 import { AccountButton } from './components/Account';
 import { GearIcon, HelpIcon, SwapIcon } from './components/Icons';
+import { acquireKeepAwake, releaseKeepAwake } from './lib/shell';
+import { fetchSiteConfig, SAFE_DEFAULT, type SiteConfig } from './lib/siteConfig';
+import { Maintenance } from './components/Maintenance';
+
+// Modes where the learner listens without touching anything, so iOS would
+// otherwise dim and lock the screen partway through a lesson.
+const LISTENING_MODES = ['receive-letters', 'receive-words', 'koch', 'qso'];
 
 type Overlay = 'none' | 'settings' | 'stats' | 'about' | 'getcode' | 'loadcode' | 'board' | 'attributions';
 
@@ -29,6 +36,14 @@ export default function App() {
   const { started, onboarded, mode, settings, progress, progressVersion, start, finishOnboarding, setMode } =
     useApp();
   const [overlay, setOverlay] = useState<Overlay>('none');
+  // Fails open: SAFE_DEFAULT until the fetch lands, and SAFE_DEFAULT forever
+  // if it never does. An offline launch must never be blocked on this.
+  const [site, setSite] = useState<SiteConfig>(SAFE_DEFAULT);
+  useEffect(() => {
+    let live = true;
+    void fetchSiteConfig().then((c) => { if (live) setSite(c); });
+    return () => { live = false; };
+  }, []);
 
   // #about route opens the About screen, per the original.
   useEffect(() => {
@@ -39,6 +54,13 @@ export default function App() {
     window.addEventListener('hashchange', sync);
     return () => window.removeEventListener('hashchange', sync);
   }, []);
+
+  // Hold the screen awake for the duration of a listening mode (native only).
+  useEffect(() => {
+    if (!mode || !LISTENING_MODES.includes(mode)) return;
+    void acquireKeepAwake();
+    return () => void releaseKeepAwake();
+  }, [mode]);
 
   const closeOverlay = () => {
     setOverlay('none');
@@ -64,6 +86,18 @@ export default function App() {
     translator: 'Translator',
   };
   const modeLabel = mode ? MODE_LABELS[mode] : '';
+
+  // Maintenance replaces the whole shell rather than just the stage, so the
+  // chrome buttons cannot launch a mode behind the notice.
+  if (site.maintenance.on) {
+    return (
+      <div className="app">
+        <main className="stage">
+          <Maintenance message={site.maintenance.message} />
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="app">

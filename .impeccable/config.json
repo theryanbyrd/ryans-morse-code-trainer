@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "layout-transition",
+        "value": "*",
+        "files": [
+          "src/index.css"
+        ],
+        "createdAt": "2026-10-25T17:58:03.971Z",
+        "reason": "Claude, verified: .hud-xp-fill and .pl-fill are progress-bar fills predating this session (git blame: original build + rebrand commits). scaleX would squash the 90deg gradient and distort the 999px pill caps; both animate once per discrete event, not continuously."
+      }
+    ]
+  }
+}

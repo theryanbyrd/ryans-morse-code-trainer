@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ditdah.me/sitemap.xml
+
+# Operator console and API are not content.
+Disallow: /admin.html
+Disallow: /api/

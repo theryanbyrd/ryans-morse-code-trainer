@@ -44,20 +44,20 @@ const TARGETS: Target[] = [
   {
     id: 'reddit',
     label: 'Reddit',
-    href: `https://www.reddit.com/submit?url=${enc(SITE)}&title=${enc('Ditdah: learn Morse code, one dit at a time')}`,
+    href: `https://www.reddit.com/submit?url=${enc(SITE)}&title=${enc('Dit Dah Me: learn Morse code, one dit at a time')}`,
     Icon: RedditLogo,
     tint: '#ff4500',
   },
   {
     id: 'email',
     label: 'Email',
-    href: `mailto:?subject=${enc('Ditdah: learn Morse code')}&body=${enc(`${BLURB}\n\n${SITE}`)}`,
+    href: `mailto:?subject=${enc('Dit Dah Me: learn Morse code')}&body=${enc(`${BLURB}\n\n${SITE}`)}`,
     Icon: EnvelopeSimple,
     tint: '#6b6b7b',
   },
 ];
 
-/** Share Ditdah with a friend. Uses the native sheet where the device has one. */
+/** Share Dit Dah Me with a friend. Uses the native sheet where the device has one. */
 export function Share({ compact = false }: { compact?: boolean }) {
   const { settings } = useApp();
   const [copied, setCopied] = useState(false);
@@ -66,7 +66,7 @@ export function Share({ compact = false }: { compact?: boolean }) {
 
   const nativeShare = async () => {
     try {
-      await navigator.share({ title: 'Ditdah', text: BLURB, url: SITE });
+      await navigator.share({ title: 'Dit Dah Me', text: BLURB, url: SITE });
       note('native');
     } catch {
       /* the user dismissed the sheet */
@@ -91,7 +91,7 @@ export function Share({ compact = false }: { compact?: boolean }) {
       <h2 className="share-title" id="share-title">
         <ShareNetwork size={18} weight="bold" aria-hidden="true" /> Know someone who would like this?
       </h2>
-      <p className="share-sub">Send them Ditdah. It is free and needs no account.</p>
+      <p className="share-sub">Send them Dit Dah Me. It is free and needs no account.</p>
 
       <div className="share-row">
         {TARGETS.map(({ id, label, href, Icon, tint }) => (
@@ -110,7 +110,7 @@ export function Share({ compact = false }: { compact?: boolean }) {
           </a>
         ))}
 
-        <button className="share-btn copy" onClick={copy} aria-label="Copy link to Ditdah">
+        <button className="share-btn copy" onClick={copy} aria-label="Copy link to Dit Dah Me">
           {copied ? <Check size={22} weight="bold" aria-hidden="true" /> : <LinkSimple size={22} weight="bold" aria-hidden="true" />}
           <span>{copied ? 'Copied' : 'Copy link'}</span>
         </button>

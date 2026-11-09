@@ -1,4 +1,5 @@
 import { useApp } from '../state/AppContext';
+import { isNative } from '../lib/native';
 import type { Mode } from '../state/AppContext';
 import { learnedCount } from '../lib/session';
 import {
@@ -153,7 +154,7 @@ export function ModeSelect() {
           <span className="mode-meta">Encode &amp; decode any message</span>
         </button>
 
-        {settings.gazeInput && (
+        {settings.gazeInput && !isNative() && (
           <button
             className={`mode-card${lastMode === 'gaze' ? ' recommended' : ''}`}
             onClick={() => choose('gaze')}
