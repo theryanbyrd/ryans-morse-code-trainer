@@ -12,7 +12,8 @@
 // and we re-scrub here, because an endpoint on the public internet should not
 // trust that its caller did the redaction.
 import { createHash } from 'node:crypto';
-import { incr, getNum, sadd, expire, dayKey, readJson, D, DAY_TTL, storeEnabled } from './_lib.js';
+import { incr, getNum, sadd, expire, dayKey, readJson, D, DAY_TTL, storeEnabled,
+         logError, isIpBlocked } from './_lib.js';
 
 type Req = { method?: string; body?: unknown; headers?: Record<string, string | string[] | undefined> };
 type Res = {
@@ -104,6 +105,11 @@ export default async function handler(req: Req, res: Res) {
     return;
   }
 
+  if (await isIpBlocked(header(req, 'x-forwarded-for').split(',')[0].trim())) {
+    res.status(403).json({ ok: false, error: 'blocked' });
+    return;
+  }
+
   // Refuse an oversized body before doing any work on it.
   const raw = typeof req.body === 'string' ? req.body : JSON.stringify(req.body ?? '');
   if (raw.length > MAX_BODY) {
@@ -147,6 +153,12 @@ export default async function handler(req: Req, res: Res) {
       ...(report.stack ? { stack: report.stack } : {}),
     })}`,
   );
+
+  // Sink 3: the rolling error log the admin console reads. Same scrubbed
+  // payload, so nothing identifying lands here either.
+  await logError(fingerprint(report.kind, report.message), {
+    kind: report.kind, message: report.message, where: report.where, url: report.url,
+  });
 
   // Sink 2: aggregate counters, when a store exists.
   try {

@@ -180,6 +180,15 @@ tracking"**:
 | Usage Data → Product Interaction | First-party `/api/pulse` visit counters |
 | Diagnostics → Crash Data | `/api/error` reports, scrubbed of identifiers |
 
+**Still two rows, and that is checked rather than assumed.** A website activity
+log and an operator console were added on 2026-11-09, but neither changes what
+the *app* sends: the log is written server-side from `/api/pulse` and
+`/api/track`, which the app already called, and every entry stores a
+daily-rotating **hash** of the address rather than the address. No new data type
+leaves the device, nothing became linked to an identity, and `admin.html` is
+stripped from `dist` before `cap sync` so the console is not inside the binary
+at all (`scripts/strip-ios-extras.mjs`).
+
 Everything else: **not collected.** There is no sign-in in the app, so no name,
 email, or user id exists. Google Analytics runs on the website only.
 

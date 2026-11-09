@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <title>Site management · Dit Dah Me</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <style>
+    :root {
+      --bg-1:#14152a; --bg-2:#1c1d3c; --bg-3:#2a1c3f; --card:#fbf7ef;
+      --ink:#2c2b3a; --ink-soft:#666578; --on-dark:rgba(255,255,255,.94);
+      --on-dark-soft:rgba(255,255,255,.62); --amber:#ffb020; --red:#c92e42; --green:#0b7f62;
+      --font:'Poppins',system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:linear-gradient(160deg,var(--bg-1),var(--bg-2) 55%,var(--bg-3));background-attachment:fixed;
+         color:var(--on-dark);font:15px/1.6 var(--font);padding:24px 16px 72px}
+    main{max-width:1000px;margin:0 auto}
+    h1{font-size:clamp(24px,5vw,32px);font-weight:800;letter-spacing:-.5px}
+    .sub{color:var(--on-dark-soft);font-size:13px;margin-bottom:20px}
+    .card{background:var(--card);color:var(--ink);border-radius:16px;padding:16px 18px;margin:14px 0;
+          box-shadow:0 18px 40px rgba(8,10,30,.45),inset 0 1px 0 rgba(255,255,255,.7)}
+    .card h2{font-size:17px;font-weight:800;margin-bottom:10px}
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    input,select,textarea{font:inherit;padding:9px 11px;border:1px solid #ddd6c8;border-radius:10px;
+          background:#fff;color:var(--ink);min-width:0}
+    input[type=text],input[type=password]{flex:1}
+    button{font:inherit;font-weight:700;padding:9px 14px;border:none;border-radius:10px;cursor:pointer;
+          background:var(--ink);color:#fff}
+    button.ghost{background:#eef0f2;color:var(--ink)}
+    button.danger{background:var(--red);color:#fff}
+    button.go{background:var(--green);color:#fff}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+    .stat{background:#fff;border-radius:12px;padding:12px}
+    .stat b{display:block;font-size:24px;line-height:1.1}
+    .stat span{font-size:12px;color:var(--ink-soft);font-weight:600}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th,td{text-align:left;padding:7px 8px;border-bottom:1px solid #e8e2d8;vertical-align:top}
+    th{font-weight:800}
+    code{font:12px ui-monospace,Menlo,monospace;background:#f1ece2;padding:1px 5px;border-radius:5px}
+    .pill{display:inline-block;font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px}
+    .pill.on{background:#ffe2e6;color:var(--red)} .pill.off{background:#d9f2e9;color:var(--green)}
+    .muted{color:var(--ink-soft);font-size:13px}
+    .err{color:var(--red);font-weight:700;font-size:13px;min-height:18px}
+    .hide{display:none}
+    .scroll{max-height:380px;overflow:auto}
+    .note{background:#fff8e6;border-left:3px solid var(--amber);padding:10px 12px;border-radius:8px;font-size:13px}
+  </style>
+</head>
+<body>
+<main>
+  <h1>Site management</h1>
+  <p class="sub">Dit Dah Me · ditdah.me — operator console</p>
+
+  <!-- LOGIN -->
+  <section id="login" class="card">
+    <h2>Sign in</h2>
+    <p class="muted" style="margin-bottom:10px">Enter the admin token. It is compared in constant time and never stored in JavaScript; the session lives in an httpOnly cookie.</p>
+    <div class="row">
+      <input id="token" type="password" placeholder="ADMIN_TOKEN" autocomplete="current-password" />
+      <button id="loginBtn" class="go">Sign in</button>
+    </div>
+    <p id="loginErr" class="err"></p>
+  </section>
+
+  <div id="panel" class="hide">
+    <!-- OVERVIEW -->
+    <section class="card">
+      <h2>Today <button id="refresh" class="ghost" style="float:right;padding:5px 10px;font-size:13px">Refresh</button></h2>
+      <div class="grid" id="stats"></div>
+      <p id="storeNote" class="note hide" style="margin-top:12px"></p>
+    </section>
+
+    <!-- MAINTENANCE + FLAGS -->
+    <section class="card">
+      <h2>Maintenance &amp; feature flags</h2>
+      <div class="row" style="margin-bottom:10px">
+        <span>Maintenance mode:</span> <span id="maintPill" class="pill off">off</span>
+        <input id="maintMsg" type="text" placeholder="Message shown to visitors" />
+        <button id="maintOn" class="danger">Turn on</button>
+        <button id="maintOff" class="go">Turn off</button>
+      </div>
+      <div class="row">
+        <input id="flagName" type="text" placeholder="flag_name" />
+        <select id="flagVal"><option value="true">on</option><option value="false">off</option></select>
+        <button id="flagSet">Set flag</button>
+      </div>
+      <table style="margin-top:10px"><tbody id="flagRows"></tbody></table>
+    </section>
+
+    <!-- BLOCKING -->
+    <section class="card">
+      <h2>Blocking</h2>
+      <div class="row">
+        <select id="blockKind"><option value="ip">IP</option><option value="email">Email</option></select>
+        <input id="blockVal" type="text" placeholder="203.0.113.7 or someone@example.com" />
+        <button id="blockBtn" class="danger">Block</button>
+      </div>
+      <div class="row" style="margin-top:12px;align-items:flex-start">
+        <div style="flex:1;min-width:220px"><strong>Blocked IPs</strong><table><tbody id="ipRows"></tbody></table></div>
+        <div style="flex:1;min-width:220px"><strong>Blocked emails</strong><table><tbody id="emailRows"></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- ACTIVITY -->
+    <section class="card">
+      <h2>Activity log <input id="actDay" type="date" style="float:right"/></h2>
+      <div class="scroll"><table>
+        <thead><tr><th>Time</th><th>Kind</th><th>Name</th><th>Visitor</th><th>Meta</th></tr></thead>
+        <tbody id="actRows"></tbody></table></div>
+    </section>
+
+    <!-- ERRORS -->
+    <section class="card">
+      <h2>Client errors</h2>
+      <div class="scroll"><table>
+        <thead><tr><th>Time</th><th>Kind</th><th>Message</th><th>Where</th></tr></thead>
+        <tbody id="errRows"></tbody></table></div>
+    </section>
+
+    <div class="row"><button id="logout" class="ghost">Sign out</button></div>
+  </div>
+</main>
+
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var esc = function(s){ return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;'); };
+  var time = function(t){ try { return new Date(t).toLocaleTimeString(); } catch(e){ return ''; } };
+
+  async function api(action, body, query){
+    var url = '/api/admin' + (query || '');
+    var res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify(Object.assign({ action: action }, body || {})),
+    });
+    var data = await res.json().catch(function(){ return {}; });
+    return { status: res.status, data: data };
+  }
+
+  async function login(){
+    $('loginErr').textContent = '';
+    var r = await api('login', { token: $('token').value });
+    if (r.status === 200 && r.data.ok) { $('token').value = ''; show(); return; }
+    $('loginErr').textContent = r.data.error || ('failed (' + r.status + ')');
+  }
+
+  async function show(){
+    $('login').classList.add('hide');
+    $('panel').classList.remove('hide');
+    await Promise.all([overview(), blocklist(), activity(), errors()]);
+  }
+
+  async function overview(){
+    var r = await api('overview');
+    if (r.status === 401) { location.reload(); return; }
+    var d = r.data;
+    $('stats').innerHTML =
+      stat(d.today && d.today.visitors, 'Unique visitors') +
+      stat(d.today && d.today.views, 'Page views') +
+      stat(d.today && d.today.errors, 'Errors today') +
+      stat(d.totals && d.totals.answers, 'Answers keyed') +
+      stat(d.totals && d.totals.learned, 'Letters learned') +
+      stat(d.totals && d.totals.sessions, 'Sessions');
+    if (!d.configured) {
+      $('storeNote').classList.remove('hide');
+      $('storeNote').textContent = 'Analytics store is not connected, so these read zero and nothing is being logged. Connect Upstash Redis in Vercel (KV_REST_API_URL / KV_REST_API_TOKEN) to turn this on.';
+    } else { $('storeNote').classList.add('hide'); }
+    var m = d.maintenance || { on:false, message:'' };
+    $('maintPill').textContent = m.on ? 'ON' : 'off';
+    $('maintPill').className = 'pill ' + (m.on ? 'on' : 'off');
+    $('maintMsg').value = m.message || '';
+    var flags = d.flags || {};
+    $('flagRows').innerHTML = Object.keys(flags).length
+      ? Object.keys(flags).map(function(k){
+          return '<tr><td><code>'+esc(k)+'</code></td><td>'+(flags[k]?'on':'off')+
+                 '</td><td style="text-align:right"><button class="ghost" data-flag="'+esc(k)+'">remove</button></td></tr>';
+        }).join('')
+      : '<tr><td class="muted">No flags set.</td></tr>';
+    Array.prototype.forEach.call($('flagRows').querySelectorAll('[data-flag]'), function(b){
+      b.onclick = async function(){
+        var next = Object.assign({}, flags); delete next[b.getAttribute('data-flag')];
+        await api('flags', { flags: next }); overview();
+      };
+    });
+  }
+  function stat(v, label){
+    return '<div class="stat"><b>'+esc(v == null ? 0 : v)+'</b><span>'+esc(label)+'</span></div>';
+  }
+
+  async function blocklist(){
+    var r = await api('blocklist');
+    render('ipRows', r.data.ips || [], 'ip');
+    render('emailRows', r.data.emails || [], 'email');
+  }
+  function render(id, list, kind){
+    $(id).innerHTML = list.length
+      ? list.map(function(v){
+          return '<tr><td><code>'+esc(v)+'</code></td><td style="text-align:right">'+
+                 '<button class="ghost" data-un="'+esc(v)+'" data-kind="'+kind+'">unblock</button></td></tr>';
+        }).join('')
+      : '<tr><td class="muted">None.</td></tr>';
+    Array.prototype.forEach.call($(id).querySelectorAll('[data-un]'), function(b){
+      b.onclick = async function(){
+        await api('unblock', { kind: b.getAttribute('data-kind'), value: b.getAttribute('data-un') });
+        blocklist();
+      };
+    });
+  }
+
+  async function activity(){
+    var day = $('actDay').value;
+    var r = await api('activity', null, day ? ('?day=' + encodeURIComponent(day)) : '');
+    var rows = r.data.rows || [];
+    $('actRows').innerHTML = rows.length ? rows.map(function(e){
+      return '<tr><td>'+esc(time(e.t))+'</td><td>'+esc(e.kind)+'</td><td>'+esc(e.name)+
+             '</td><td><code>'+esc((e.ip||'').slice(0,10))+'</code></td><td class="muted">'+
+             esc(e.meta ? JSON.stringify(e.meta) : '')+'</td></tr>';
+    }).join('') : '<tr><td class="muted" colspan="5">No activity recorded for this day.</td></tr>';
+  }
+
+  async function errors(){
+    var r = await api('errors');
+    var rows = r.data.rows || [];
+    $('errRows').innerHTML = rows.length ? rows.map(function(e){
+      return '<tr><td>'+esc(time(e.t))+'</td><td>'+esc(e.kind)+'</td><td>'+esc(e.message)+
+             '</td><td class="muted">'+esc(e.where||'')+'</td></tr>';
+    }).join('') : '<tr><td class="muted" colspan="4">No errors recorded. Good.</td></tr>';
+  }
+
+  $('loginBtn').onclick = login;
+  $('token').addEventListener('keydown', function(e){ if (e.key === 'Enter') login(); });
+  $('refresh').onclick = function(){ overview(); activity(); errors(); };
+  $('actDay').onchange = activity;
+  $('logout').onclick = async function(){ await api('logout'); location.reload(); };
+  $('maintOn').onclick = async function(){ await api('maintenance', { on:true, message:$('maintMsg').value }); overview(); };
+  $('maintOff').onclick = async function(){ await api('maintenance', { on:false, message:'' }); overview(); };
+  $('flagSet').onclick = async function(){
+    var name = $('flagName').value.trim(); if (!name) return;
+    var r = await api('overview'); var flags = Object.assign({}, (r.data && r.data.flags) || {});
+    flags[name] = $('flagVal').value === 'true';
+    await api('flags', { flags: flags }); $('flagName').value = ''; overview();
+  };
+  $('blockBtn').onclick = async function(){
+    var v = $('blockVal').value.trim(); if (!v) return;
+    await api('block', { kind: $('blockKind').value, value: v });
+    $('blockVal').value = ''; blocklist();
+  };
+
+  // Already signed in? overview() returns 401 if not, so this is the probe.
+  api('overview').then(function(r){ if (r.status === 200 && r.data.ok) show(); });
+})();
+</script>
+</body>
+</html>

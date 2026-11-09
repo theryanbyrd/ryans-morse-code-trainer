@@ -1,8 +1,9 @@
 // POST /api/track — ingest a single anonymous, consent-gated learning event.
 // Only aggregate counters are stored; no per-user data is retained.
-import { incr, sadd, expire, dayKey, readJson, ALPHABET, K, D, DAY_TTL, storeEnabled } from './_lib.js';
+import { incr, sadd, expire, dayKey, readJson, ALPHABET, K, D, DAY_TTL, storeEnabled,
+         clientIp, rateLimit, isIpBlocked, logActivity, ipBucket } from './_lib.js';
 
-type Req = { method?: string; body?: unknown };
+type Req = { method?: string; body?: unknown; headers?: Record<string, string | string[] | undefined> };
 type Res = {
   status: (code: number) => Res;
   json: (data: unknown) => void;
@@ -27,6 +28,17 @@ export default async function handler(req: Req, res: Res) {
   res.setHeader('Cache-Control', 'no-store');
   if (req.method !== 'POST') {
     res.status(405).json({ ok: false, error: 'method not allowed' });
+    return;
+  }
+
+  const ip = clientIp(req.headers);
+  if (await isIpBlocked(ip)) {
+    res.status(403).json({ ok: false, error: 'blocked' });
+    return;
+  }
+  const rl = await rateLimit('track', ip, 600, 3600);
+  if (!rl.allowed) {
+    res.status(429).json({ ok: false, error: 'rate limited' });
     return;
   }
 
@@ -78,5 +90,13 @@ export default async function handler(req: Req, res: Res) {
     /* swallow — analytics must never error the client */
   }
 
-  res.status(200).json({ ok: true, stored: storeEnabled });
+  await logActivity({
+    kind: 'action',
+    name: String(e.type).slice(0, 32),
+    ip: ip ? ipBucket(ip, process.env.PULSE_SALT || 'ditdah', day) : '',
+    ua: '',
+    ...(e.target ? { meta: { target: String(e.target).slice(0, 24) } } : {}),
+  });
+
+  res.status(200).json({ ok: true, stored: storeEnabled, limited: rl.enforced });
 }

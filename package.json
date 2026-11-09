@@ -20,7 +20,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "build:ios": "VITE_SUPABASE_URL= VITE_SUPABASE_ANON_KEY= VITE_SUPABASE_PUBLISHABLE_KEY= npm run build && node scripts/verify-ios-bundle.mjs && npx cap sync ios"
+    "build:ios": "VITE_SUPABASE_URL= VITE_SUPABASE_ANON_KEY= VITE_SUPABASE_PUBLISHABLE_KEY= npm run build && node scripts/verify-ios-bundle.mjs && node scripts/strip-ios-extras.mjs && npx cap sync ios"
   },
   "dependencies": {
     "@capacitor-community/keep-awake": "^8.0.1",

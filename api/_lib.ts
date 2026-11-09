@@ -1,4 +1,5 @@
 /// <reference types="node" />
+import { createHash } from 'node:crypto';
 // Shared server helpers. Files prefixed with "_" are not turned into routes by
 // Vercel, so this is just a module the handlers import.
 //
@@ -97,5 +98,198 @@ export function readJson<T = unknown>(req: { body?: unknown }): T | null {
     return req.body as T;
   } catch {
     return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Abuse controls, activity log, blocklists and flags.
+//
+// All of this rides the SAME optional Upstash store as the counters above. No
+// new infrastructure, and every helper degrades to a documented default when
+// the store is absent, so the site keeps working unconfigured.
+//
+// The honest caveat, stated once: without the store there is no shared state,
+// so rate limiting CANNOT be enforced. These helpers report that rather than
+// pretending. Vercel's own platform limits are the only backstop until
+// KV_REST_API_URL / KV_REST_API_TOKEN exist.
+// ---------------------------------------------------------------------------
+
+/** Delete a key. */
+export async function del(key: string): Promise<void> {
+  await cmd(['DEL', key]);
+}
+
+/** Push onto the head of a list and trim it, so logs cannot grow without bound. */
+export async function lpushCapped(key: string, value: string, cap: number): Promise<void> {
+  await cmd(['LPUSH', key, value]);
+  await cmd(['LTRIM', key, 0, cap - 1]);
+}
+
+/** Read a slice of a list, newest first. */
+export async function lrange(key: string, start = 0, stop = -1): Promise<string[]> {
+  const v = await cmd(['LRANGE', key, start, stop]);
+  return Array.isArray(v) ? (v as string[]).map(String) : [];
+}
+
+export async function smembers(key: string): Promise<string[]> {
+  const v = await cmd(['SMEMBERS', key]);
+  return Array.isArray(v) ? (v as string[]).map(String) : [];
+}
+
+export async function srem(key: string, member: string): Promise<void> {
+  await cmd(['SREM', key, member]);
+}
+
+export async function sismember(key: string, member: string): Promise<boolean> {
+  const v = await cmd(['SISMEMBER', key, member]);
+  return Number(v) === 1;
+}
+
+export async function setStr(key: string, value: string): Promise<void> {
+  await cmd(['SET', key, value]);
+}
+
+export async function getStr(key: string): Promise<string | null> {
+  const v = await cmd(['GET', key]);
+  return v == null ? null : String(v);
+}
+
+/** Admin + ops keys. Kept together so the whole surface is readable at a glance. */
+export const A = {
+  blockedIps: 'rmct:admin:blocked:ips',
+  blockedEmails: 'rmct:admin:blocked:emails',
+  flags: 'rmct:admin:flags',               // JSON blob
+  maintenance: 'rmct:admin:maintenance',   // JSON blob
+  activity: (day: string) => `rmct:act:${day}`,
+  errors: (day: string) => `rmct:errlog:${day}`,
+  rate: (bucket: string, who: string) => `rmct:rl:${bucket}:${who}`,
+  loginFails: (who: string) => `rmct:rl:adminlogin:${who}`,
+};
+
+/** How many entries each rolling log keeps. Bounded on purpose. */
+export const LOG_CAP = 500;
+
+/**
+ * The caller's IP, as Vercel reports it. x-forwarded-for is a list; the first
+ * entry is the client. Never trust it for authorisation, only for rate
+ * bucketing and blocking, both of which are best-effort by nature.
+ */
+export function clientIp(headers: Record<string, string | string[] | undefined> | undefined): string {
+  const raw = headers?.['x-forwarded-for'];
+  const v = Array.isArray(raw) ? raw[0] : raw;
+  return (v ?? '').split(',')[0].trim();
+}
+
+/** A stable, non-identifying bucket id for an address. Never stores the raw IP. */
+export function ipBucket(ip: string, salt: string, window: string): string {
+  return createHash('sha256').update(`${window}:${salt}:${ip}`).digest('hex').slice(0, 24);
+}
+
+export type RateVerdict = { allowed: boolean; enforced: boolean; count: number; limit: number };
+
+/**
+ * Fixed-window rate limit.
+ *
+ * Returns `enforced: false` when there is no store, so a caller can say so
+ * honestly instead of implying a ceiling that is not there.
+ */
+export async function rateLimit(
+  bucket: string,
+  ip: string,
+  limit: number,
+  windowSeconds: number,
+): Promise<RateVerdict> {
+  if (!storeEnabled || !ip) return { allowed: true, enforced: false, count: 0, limit };
+  try {
+    const window = String(Math.floor(Date.now() / 1000 / windowSeconds));
+    const who = ipBucket(ip, process.env.PULSE_SALT || 'ditdah', window);
+    const key = A.rate(bucket, `${window}:${who}`);
+    const n = Number(await cmd(['INCR', key])) || 0;
+    if (n === 1) await expire(key, windowSeconds);
+    return { allowed: n <= limit, enforced: true, count: n, limit };
+  } catch {
+    // A broken store must not take the site down with it.
+    return { allowed: true, enforced: false, count: 0, limit };
+  }
+}
+
+/** Is this address on the blocklist? False when unconfigured. */
+export async function isIpBlocked(ip: string): Promise<boolean> {
+  if (!storeEnabled || !ip) return false;
+  try {
+    return await sismember(A.blockedIps, ip);
+  } catch {
+    return false;
+  }
+}
+
+export async function isEmailBlocked(email: string): Promise<boolean> {
+  if (!storeEnabled || !email) return false;
+  try {
+    return await sismember(A.blockedEmails, email.trim().toLowerCase());
+  } catch {
+    return false;
+  }
+}
+
+export type ActivityEntry = {
+  t: number;        // epoch ms
+  kind: string;     // pageview | action | error | admin
+  name: string;     // screen, action name, or error fingerprint
+  ip: string;       // hashed bucket, never the raw address
+  ua: string;       // truncated user agent
+  meta?: Record<string, unknown>;
+};
+
+/**
+ * Append to the rolling activity log.
+ *
+ * The address is hashed with a daily-rotating salt before it is written, so
+ * the log answers "how many and what" without becoming a record of who. That
+ * keeps it consistent with the privacy policy and the App Store labels.
+ */
+export async function logActivity(e: Omit<ActivityEntry, 't'>): Promise<void> {
+  if (!storeEnabled) return;
+  try {
+    const day = dayKey();
+    const entry: ActivityEntry = { ...e, t: Date.now() };
+    await lpushCapped(A.activity(day), JSON.stringify(entry), LOG_CAP);
+    await expire(A.activity(day), DAY_TTL);
+  } catch {
+    /* logging must never break the request it is describing */
+  }
+}
+
+export async function logError(fingerprint: string, detail: Record<string, unknown>): Promise<void> {
+  if (!storeEnabled) return;
+  try {
+    const day = dayKey();
+    await lpushCapped(A.errors(day), JSON.stringify({ t: Date.now(), fingerprint, ...detail }), LOG_CAP);
+    await expire(A.errors(day), DAY_TTL);
+  } catch {
+    /* non-fatal */
+  }
+}
+
+export type SiteConfig = {
+  maintenance: { on: boolean; message: string };
+  flags: Record<string, boolean>;
+};
+
+export const DEFAULT_CONFIG: SiteConfig = {
+  maintenance: { on: false, message: '' },
+  flags: {},
+};
+
+export async function readSiteConfig(): Promise<SiteConfig> {
+  if (!storeEnabled) return DEFAULT_CONFIG;
+  try {
+    const [m, f] = await Promise.all([getStr(A.maintenance), getStr(A.flags)]);
+    return {
+      maintenance: m ? { ...DEFAULT_CONFIG.maintenance, ...JSON.parse(m) } : DEFAULT_CONFIG.maintenance,
+      flags: f ? JSON.parse(f) : {},
+    };
+  } catch {
+    return DEFAULT_CONFIG;
   }
 }

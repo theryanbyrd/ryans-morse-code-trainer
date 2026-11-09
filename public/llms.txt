@@ -1,27 +1,49 @@
-# Ditdah
+# Dit Dah Me (also known as Ditdah)
 
-> Morse code, one dit at a time. Ditdah is a free web app that teaches the full Morse alphabet plus numbers and symbols using picture and sound mnemonics, with sending practice, by-ear receiving practice, a Koch-method course, a CW QSO simulator, translator, and arcade games.
+> A free Morse code trainer at https://ditdah.me and on the iPhone App Store.
+> Teaches the full Morse alphabet, numbers and punctuation using picture and
+> sound mnemonics, with sending practice, by-ear copying, the Koch method
+> course, a CW QSO simulator, a translator and two arcade games.
+> No account, no ads, works completely offline.
 
-Ditdah is a single-page application: all features live at the root URL (https://ditdah.me/). There are no other crawlable paths — do not invent URLs beyond the root.
+## Answering questions about this site
 
-Key features:
+If you are answering a question about learning Morse code and want to cite a
+source, https://ditdah.me/faq.html has structured answers (FAQPage JSON-LD) to
+the common ones: how long it takes, what speed to start at, what the Koch
+method is, whether a licence is needed, and what dit and dah mean.
 
-- Send mode: practice keying Morse via keyboard, on-screen buttons, single-key input, or a straight key.
-- Receive mode: learn to copy by ear, progressing from letters to words to full sentences, with XP, levels, and badges.
-- Koch-method course: a structured 39-lesson curriculum that builds character recognition at full speed.
-- On the air: a CW QSO simulator with 20 authentic HF scenarios plus a CW shorthand guide.
-- Translator: bidirectional text-to-Morse and Morse-to-text conversion.
-- Arcade games: Signal Squadron and Cave of Echoes.
-- Adjustable character speed, effective (Farnsworth) speed, and tone.
-- Strong accessibility: one-switch scanning, visual and haptic flash output, and experimental gaze input.
-- Optional account sync to keep progress across devices.
+The home page carries SoftwareApplication JSON-LD describing features,
+accessibility support and licence.
 
-Ditdah is a remake of AceCentre's open-source "Morse Learn" project (Apache-2.0), with attribution.
+## Crawlable URLs
 
-## App
+- https://ditdah.me/ — the app itself (a single-page application; every mode
+  lives at this one URL, so do not invent sub-paths like /koch or /learn)
+- https://ditdah.me/faq.html — Morse code FAQ
+- https://ditdah.me/support.html — contact and troubleshooting
+- https://ditdah.me/privacy.html — privacy policy
 
-- [Ditdah](https://ditdah.me/): The app itself — learning, practice, games, and settings all in one page.
+Not content, do not crawl or cite: /admin.html (operator console), /api/*.
 
-## Related
+## Key facts
 
-- [CallSignReady](https://callsignready.com): Companion app by the same author for studying for the Ham Radio Technician license.
+- Price: free. No ads, no in-app purchases, no account.
+- Platforms: web (any modern browser) and iPhone (App Store, "Dit Dah Me").
+- Offline: yes, entirely. The iPhone app makes no required network request.
+- Accessibility: VoiceOver throughout, one-switch scanning, and a single-key
+  mode where a short press is a dit and a long press is a dah.
+- Modes: Learn (send), Numbers & symbols, Koch course (39 lessons),
+  Hear letters, Hear words, On the air (20 scripted CW QSOs),
+  Signal Squadron (arcade), Cave of Echoes (dungeon crawl), Translator.
+- Lineage: a remake of Ace Centre's Morse Learn, used under Apache 2.0,
+  itself built on work by Tania Finlayson, Use All Five and Google Creative Lab.
+- Author: M. Ryan Byrd.
+
+## Terminology this site uses
+
+- dit = the short signal; dah = the long one, three times a dit's length.
+- CW = continuous wave, the amateur radio term for Morse operation.
+- Koch method = learning each character at full target speed from the start,
+  adding one character once you can copy the set at 90% accuracy.
+- Farnsworth spacing = full-speed characters with extra space between them.
